@@ -1,0 +1,504 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Reporte GLP - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Encabezado -->
+    <div class="flex items-center space-x-3">
+        <a href="{{ url_for('main.index') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>
+                <span>Reporte MATPEL - Control de Escape de GLP</span>
+            </h1>
+            <p class="text-slate-400 text-xs mt-0.5">Complete con precisión todos los campos operacionales requeridos.</p>
+        </div>
+    </div>
+
+    <!-- Formulario Completo -->
+    <form action="{{ url_for('reportes.crear_matpel_glp') }}" method="POST" class="space-y-6">
+        
+        <!-- SECCIÓN 1: DATOS GENERALES DE LA LLAMADA Y TIEMPOS -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2 border-b border-slate-800/60 pb-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-fire-500"></i>
+                <span>1. Información de Cabecera y Tiempos</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha del Evento *</label>
+                    <input type="date" name="fecha" required value="{{ date_today }}"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Aviso *</label>
+                    <select name="clase_aviso" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Radial">Radial</option>
+                        <option value="Telefonico">Telefónico</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Prensa">Prensa / RRSS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recibido por (Receptor) *</label>
+                    <input type="text" name="receptor_aviso" required placeholder="Nombre de quien recibe"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Tiempos de actuación -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Aviso *</label>
+                    <input type="time" name="hora_aviso" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Salida *</label>
+                    <input type="time" name="hora_salida" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Llegada *</label>
+                    <input type="time" name="hora_llegada" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Regreso *</label>
+                    <input type="time" name="hora_regreso" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Datos Solicitante -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Solicitante</label>
+                    <input type="text" name="solicitante_nombre" placeholder="Nombre completo"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula Solicitante</label>
+                    <input type="text" name="solicitante_cedula" placeholder="ej: V-12345678"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono Solicitante</label>
+                    <input type="text" name="solicitante_telefono" placeholder="ej: 0412-1234567"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Dirección Exacta del Suceso *</label>
+                    <input type="text" name="direccion" required placeholder="Av., Calle, Barrio, Inmueble..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Punto de Referencia</label>
+                    <input type="text" name="punto_referencia" placeholder="Frente a, al lado de..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: DETALLES ESPECÍFICOS DEL ESCAPE DE GLP (MATPEL) -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2 border-b border-slate-800/60 pb-2">
+                <i data-lucide="flame" class="w-4 h-4 text-red-500"></i>
+                <span>2. Parámetros Técnicos de MATPEL y Propietario</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clasificación del Servicio *</label>
+                    <select name="clasificacion_servicio" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Residencial">Residencial</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Transporte">Transporte / Distribuidor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Almacenamiento *</label>
+                    <select name="tipo_almacenamiento" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Cilindro GLP 10kg">Cilindro GLP (10kg)</option>
+                        <option value="Cilindro GLP 18kg">Cilindro GLP (18kg)</option>
+                        <option value="Cilindro GLP 43kg">Cilindro GLP (43kg)</option>
+                        <option value="Tanque Estacionario">Tanque Estacionario</option>
+                        <option value="Cisterna / Camion">Camión Cisterna de Gas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Producto / UN</label>
+                    <input type="text" name="nombre_producto" value="Gas Licuado de Petróleo (GLP) / UN 1075"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Propietario e Inmueble -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Propietario / Responsable</label>
+                    <input type="text" name="propietario_nombre" placeholder="Nombre del dueño"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">RIF o Cédula Propietario</label>
+                    <input type="text" name="propietario_rif_ci" placeholder="V-12345678-0 / J-12345678-9"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Empresa Distribuidora</label>
+                    <input type="text" name="empresa_distribuidora" placeholder="ej: Pdvsa Gas, Gas Comunal"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Certificación y seguridad -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Tiene Certificado Bomberil?</label>
+                    <select name="certificado_bomberil"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">N° de Certificado (Si aplica)</label>
+                    <input type="text" name="nro_certificado" placeholder="Nro de Certificado de Prevención"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div class="flex flex-col justify-center space-y-2 mt-4 sm:mt-0 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Controles en Sitio</span>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="hoja_seguridad" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">HDS (Hoja Seg)</span>
+                        </label>
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="extintor" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">Extintor</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos de vehículo involucrado si es transporte de GLP -->
+            <div class="border-t border-slate-800/40 pt-4 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos de Vehículo Transportador de GLP Involucrado (Si Aplica)</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <input type="text" name="vehiculo_marca" placeholder="Marca (ej: Chevrolet Cargo)"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_placa" placeholder="Placa Vehículo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_color" placeholder="Color Vehículo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: VEHÍCULOS / UNIDADES ACTUANTES (DINÁMICA) -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="truck" class="w-4 h-4 text-amber-500"></i>
+                    <span>3. Vehículos Bomberiles Actuantes</span>
+                </h2>
+                <button type="button" onclick="agregarVehiculo()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Añadir Unidad</span>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-800">
+                            <th class="pb-2 pr-4 font-semibold w-1/3">Unidad Móvil *</th>
+                            <th class="pb-2 pr-4 font-semibold w-1/3">Conductor *</th>
+                            <th class="pb-2 pr-4 font-semibold">Km Salida</th>
+                            <th class="pb-2 pr-4 font-semibold">Km Regreso</th>
+                            <th class="pb-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenedor-vehiculos" class="divide-y divide-slate-800/40">
+                        <tr class="fila-vehiculo border-b border-transparent">
+                            <td class="py-2 pr-4">
+                                <select name="vehiculos_actuantes[]" required
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                                    <option value="">Seleccione Unidad</option>
+                                    {% for v in vehiculos %}
+                                        <option value="{{ v.id }}">{{ v.unidad }} - {{ v.tipo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="text" name="conductores[]" required placeholder="Nombre Conductor"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="number" step="0.1" name="kms_llegada[]" placeholder="0.0"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 text-right">
+                                <button type="button" onclick="eliminarFila(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                                    <i data-lucide="trash" class="w-4 h-4"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: PERSONAL BOMBERIL ACTUANTE -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i>
+                    <span>4. Personal Bomberil Actuante (Comisión)</span>
+                </h2>
+                <button type="button" onclick="agregarCombatiente()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                    <span>Añadir Combatiente</span>
+                </button>
+            </div>
+
+            <!-- Jefe de Comisión y Conductor Base -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- Jefe de Comisión -->
+                <div class="bg-slate-950/45 p-4 rounded-xl border border-slate-800/40 space-y-2">
+                    <span class="block text-xs font-bold text-fire-400">Jefe de Comisión *</span>
+                    <div class="space-y-2">
+                        <input type="text" name="jefe_comision_nombre" required placeholder="Nombre y Apellido"
+                            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" name="jefe_comision_ci" placeholder="C.I. (ej: V-10222333)"
+                                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            <input type="text" name="jefe_comision_rango" placeholder="Rango (ej: Sargento)"
+                                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conductor Principal -->
+                <div class="bg-slate-950/45 p-4 rounded-xl border border-slate-800/40 space-y-2">
+                    <span class="block text-xs font-bold text-fire-400">Conductor Asignado *</span>
+                    <div class="space-y-2">
+                        <input type="text" name="conductor_unidad_nombre" required placeholder="Nombre y Apellido"
+                            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" name="conductor_unidad_ci" placeholder="C.I. Conductor"
+                                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            <input type="text" name="conductor_unidad_rango" placeholder="Rango Conductor"
+                                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Listado dinámico de combatientes -->
+            <div class="space-y-2 mt-2">
+                <span class="block text-xs font-semibold text-slate-400">Otros Combatientes / Funcionarios en la Comisión</span>
+                <div id="contenedor-combatientes" class="space-y-2">
+                    <!-- Filas se insertarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: ACTUACIÓN DE OTROS ORGANISMOS -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-blue-500"></i>
+                    <span>5. Actuación de Otros Organismos (Apoyo)</span>
+                </h2>
+                <button type="button" onclick="agregarOrganismo()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Añadir Organismo</span>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-800">
+                            <th class="pb-2 pr-4 font-semibold w-1/4">Organismo</th>
+                            <th class="pb-2 pr-4 font-semibold w-1/3">Jefe de Unidad</th>
+                            <th class="pb-2 pr-4 font-semibold w-1/4">Matrícula Unidad</th>
+                            <th class="pb-2 pr-4 font-semibold w-12">Cant.</th>
+                            <th class="pb-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenedor-organismos" class="divide-y divide-slate-800/40">
+                        <!-- Fila de ejemplo en blanco o dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: DETALLE DE ACTUACIÓN / OBSERVACIONES -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2 border-b border-slate-800/60 pb-2">
+                <i data-lucide="align-left" class="w-4 h-4 text-purple-500"></i>
+                <span>6. Descripción de la Actuación / Observaciones Generales</span>
+            </h2>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Relato Detallado del Procedimiento Operacional *</label>
+                <textarea name="observaciones_generales" required rows="5" placeholder="Describa de manera pormenorizada las acciones tomadas en el sitio: control de la fuga, mitigación de riesgos, mediciones tomadas, etc..."
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+            </div>
+        </div>
+
+        <!-- BOTÓN DE GUARDADO -->
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('main.index') }}" class="px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all">
+                Cancelar
+            </a>
+            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg shadow-fire-950/30 transition-all transform hover:scale-[1.02] cursor-pointer">
+                Enviar Reporte para Validación
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Plantillas dinámicas en JS -->
+<template id="plantilla-vehiculo">
+    <tr class="fila-vehiculo border-b border-transparent">
+        <td class="py-2 pr-4">
+            <select name="vehiculos_actuantes[]" required
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                <option value="">Seleccione Unidad</option>
+                {% for v in vehiculos %}
+                    <option value="{{ v.id }}">{{ v.unidad }} - {{ v.tipo }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="py-2 pr-4">
+            <input type="text" name="conductores[]" required placeholder="Nombre Conductor"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="number" step="0.1" name="kms_llegada[]" placeholder="0.0"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 text-right">
+            <button type="button" onclick="eliminarFila(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash" class="w-4 h-4"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+<template id="plantilla-combatiente">
+    <div class="fila-combatiente grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-950/20 p-2 rounded-lg border border-slate-800/40 relative">
+        <input type="text" name="combatientes_nombres[]" required placeholder="Nombre completo"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 sm:col-span-2">
+        <input type="text" name="combatientes_cis[]" placeholder="C.I. combatiente"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        <div class="flex items-center space-x-2">
+            <input type="text" name="combatientes_rangos[]" placeholder="Rango"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 flex-grow">
+            <button type="button" onclick="eliminarCombatiente(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<template id="plantilla-organismo">
+    <tr class="fila-organismo border-b border-transparent">
+        <td class="py-2 pr-4">
+            <input type="text" name="organismo_nombre[]" required placeholder="GNB, CICPC, PC, etc."
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="text" name="organismo_jefe[]" placeholder="Jefe de Comisión"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="text" name="organismo_matricula[]" placeholder="Placa / Unidad"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="number" name="organismo_cantidad[]" value="1" min="1"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 text-right">
+            <button type="button" onclick="eliminarFila(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash" class="w-4 h-4"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // JS dinámico para añadir filas en vehículos actuantes, combatientes y organismos
+    
+    function agregarVehiculo() {
+        const contenedor = document.getElementById('contenedor-vehiculos');
+        const plantilla = document.getElementById('plantilla-vehiculo').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons(); // Recargar iconos Lucide en el nuevo nodo
+    }
+
+    function agregarCombatiente() {
+        const contenedor = document.getElementById('contenedor-combatientes');
+        const plantilla = document.getElementById('plantilla-combatiente').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function agregarOrganismo() {
+        const contenedor = document.getElementById('contenedor-organismos');
+        const plantilla = document.getElementById('plantilla-organismo').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function eliminarFila(boton) {
+        const fila = boton.closest('tr');
+        fila.remove();
+    }
+
+    function eliminarCombatiente(boton) {
+        const fila = boton.closest('.fila-combatiente');
+        fila.remove();
+    }
+
+    // Inicializar con un organismo vacío
+    document.addEventListener("DOMContentLoaded", function() {
+        agregarOrganismo();
+    });
+</script>
+{% endblock %}

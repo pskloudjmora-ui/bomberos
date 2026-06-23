@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Historial de Reportes - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Encabezado -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                <i data-lucide="history" class="w-8 h-8 text-fire-500"></i>
+                <span>Mi Historial de Reportes</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Consulte los reportes operacionales que ha elaborado y enviado al sistema.</p>
+        </div>
+        <div class="relative group inline-block text-left">
+            <button class="px-5 py-3 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg shadow-fire-950/20 transition-all flex items-center space-x-2 transform hover:scale-[1.02] cursor-pointer focus:outline-none">
+                <i data-lucide="file-plus" class="w-4 h-4"></i>
+                <span>Crear Nuevo Reporte</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 origin-top-right rounded-xl bg-slate-900 border border-slate-800 p-2 shadow-2xl ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform scale-95 group-hover:scale-100 z-50">
+                <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mb-1">CATEGORÍA MATPEL</div>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='matpel_glp') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
+                    <span>Control Escape de GLP</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='matpel_combustible') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="droplet" class="w-4 h-4 text-amber-500"></i>
+                    <span>Derrame Combustible</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='matpel_quimico') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-500"></i>
+                    <span>Derrame Químico</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='matpel_otros') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
+                    <span>Otras Sustancias Peligrosas</span>
+                </a>
+                
+                <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">ATENCIÓN DE SALUD</div>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='pre_hospitalario') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="activity" class="w-4 h-4 text-rose-500"></i>
+                    <span>Atención Pre-Hospitalaria</span>
+                </a>
+
+                <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">SERVICIOS ESPECIALES</div>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_agua') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="droplets" class="w-4 h-4 text-blue-500"></i>
+                    <span>Abastecimiento de Agua</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_insectos') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="bug" class="w-4 h-4 text-yellow-500"></i>
+                    <span>Control de Insectos</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_animal') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="paw-print" class="w-4 h-4 text-amber-600"></i>
+                    <span>Control de Animales</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_achicamiento') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="chevrons-down" class="w-4 h-4 text-sky-400"></i>
+                    <span>Achicamiento (Inundación)</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_baldeo') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="waves" class="w-4 h-4 text-blue-400"></i>
+                    <span>Baldeo de Vía</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Reportes -->
+    <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-slate-300 text-sm">
+                <thead>
+                    <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                        <th class="py-4 px-6">N° Control</th>
+                        <th class="py-4 px-6">Fecha / Hora</th>
+                        <th class="py-4 px-6">Tipo de Servicio</th>
+                        <th class="py-4 px-6">Dirección / Punto de Ref.</th>
+                        <th class="py-4 px-6">Estado</th>
+                        <th class="py-4 px-6 text-center">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    {% for reporte in reportes %}
+                    <tr class="hover:bg-slate-900/20 transition-colors">
+                        <td class="py-4 px-6 font-bold text-white">{{ reporte.nro_control }}</td>
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col">
+                                <span>{{ reporte.fecha.strftime('%d/%m/%Y') }}</span>
+                                <span class="text-xs text-slate-500">{{ reporte.hora_aviso.strftime('%H:%M') }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            {% set label = 'MATPEL - GLP' %}
+                            {% set badge_color = 'bg-red-500/10 border-red-500/20 text-red-400 border' %}
+                            {% if reporte.tipo_reporte == 'servicio_agua' %}
+                                {% set label = 'Serv. Especial - Agua' %}
+                                {% set badge_color = 'bg-blue-500/10 border-blue-500/20 text-blue-400 border' %}
+                            {% endif %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full {{ badge_color }}">
+                                {{ label }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 max-w-[250px] truncate">
+                            <div class="flex flex-col">
+                                <span class="truncate">{{ reporte.direccion }}</span>
+                                <span class="text-xs text-slate-500 truncate">{{ reporte.punto_referencia or 'Sin ref.' }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            {% set est_color = 'bg-slate-800 text-slate-400' %}
+                            {% if reporte.estado == 'Validado' %}
+                                {% set est_color = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 border' %}
+                            {% elif reporte.estado == 'Enviado' %}
+                                {% set est_color = 'bg-amber-500/10 border-amber-500/20 text-amber-400 border animate-pulse' %}
+                            {% elif reporte.estado == 'Rechazado' %}
+                                {% set est_color = 'bg-fire-500/10 border-fire-500/20 text-fire-400 border' %}
+                            {% endif %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ est_color }}">
+                                {{ reporte.estado }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <a href="{{ url_for('reportes.detalle_reporte', reporte_id=reporte.id) }}" 
+                               class="inline-flex items-center space-x-1 px-3 py-1.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all">
+                                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                <span>Ver Detalle</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="py-12 px-6 text-center text-slate-500 text-sm">
+                            <i data-lucide="folder" class="w-10 h-10 mx-auto mb-3 text-slate-700"></i>
+                            <span class="block font-medium">Aún no ha creado ningún reporte en el sistema.</span>
+                            <span class="text-xs text-slate-600 block mt-1">Presione el botón "Nuevo Reporte GLP" para registrar su primera actuación.</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

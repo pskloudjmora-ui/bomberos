@@ -1,0 +1,923 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Encabezado -->
+    <div class="flex items-center space-x-3">
+        <a href="{{ url_for('main.index') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                {% if tipo_reporte.startswith('matpel_') %}
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500 animate-pulse"></i>
+                {% elif tipo_reporte == 'pre_hospitalario' %}
+                    <i data-lucide="activity" class="w-6 h-6 text-emerald-500"></i>
+                {% else %}
+                    <i data-lucide="truck" class="w-6 h-6 text-blue-500"></i>
+                {% endif %}
+                <span>{{ title }}</span>
+            </h1>
+            <p class="text-slate-400 text-xs mt-0.5">Complete con precisión todos los campos operacionales requeridos.</p>
+        </div>
+    </div>
+
+    <!-- Formulario Completo -->
+    <form action="{{ url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte) }}" method="POST" class="space-y-6">
+        
+        <!-- SECCIÓN 1: DATOS GENERALES DE LA LLAMADA Y TIEMPOS -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2 border-b border-slate-800/60 pb-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-fire-500"></i>
+                <span>1. Información de Cabecera y Tiempos</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha del Evento *</label>
+                    <input type="date" name="fecha" required value="{{ date_today }}"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Aviso *</label>
+                    <select name="clase_aviso" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Radial">Radial</option>
+                        <option value="Telefonico">Telefónico</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Prensa">Prensa / RRSS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recibido por (Receptor) *</label>
+                    <input type="text" name="receptor_aviso" required placeholder="Nombre de quien recibe"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Tiempos de actuación -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Aviso *</label>
+                    <input type="time" name="hora_aviso" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Salida *</label>
+                    <input type="time" name="hora_salida" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Llegada *</label>
+                    <input type="time" name="hora_llegada" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Regreso *</label>
+                    <input type="time" name="hora_regreso" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Datos Solicitante -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Solicitante</label>
+                    <input type="text" name="solicitante_nombre" placeholder="Nombre completo"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula Solicitante</label>
+                    <input type="text" name="solicitante_cedula" placeholder="ej: V-12345678"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono Solicitante</label>
+                    <input type="text" name="solicitante_telefono" placeholder="ej: 0412-1234567"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Dirección Exacta del Suceso *</label>
+                    <input type="text" name="direccion" required placeholder="Av., Calle, Barrio, Inmueble..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Punto de Referencia</label>
+                    <input type="text" name="punto_referencia" placeholder="Frente a, al lado de..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: DETALLES ESPECÍFICOS DEL REPORTE -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2 border-b border-slate-800/60 pb-2">
+                {% if tipo_reporte.startswith('matpel_') %}
+                    <i data-lucide="flame" class="w-4 h-4 text-red-500"></i>
+                {% elif tipo_reporte == 'pre_hospitalario' %}
+                    <i data-lucide="heart" class="w-4 h-4 text-emerald-500"></i>
+                {% else %}
+                    <i data-lucide="settings" class="w-4 h-4 text-blue-500"></i>
+                {% endif %}
+                <span>2. Parámetros Técnicos Específicos</span>
+            </h2>
+
+            {# 2.1 ESCAPE GLP #}
+            {% if tipo_reporte == 'matpel_glp' %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clasificación del Servicio *</label>
+                    <select name="clasificacion_servicio" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Residencial">Residencial</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Transporte">Transporte / Distribuidor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Almacenamiento *</label>
+                    <select name="tipo_almacenamiento" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Cilindro GLP 10kg">Cilindro GLP (10kg)</option>
+                        <option value="Cilindro GLP 18kg">Cilindro GLP (18kg)</option>
+                        <option value="Cilindro GLP 43kg">Cilindro GLP (43kg)</option>
+                        <option value="Tanque Estacionario">Tanque Estacionario</option>
+                        <option value="Cisterna / Camion">Camión Cisterna de Gas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Producto / UN</label>
+                    <input type="text" name="nombre_producto" value="Gas Licuado de Petróleo (GLP)" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <!-- Propietario -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Propietario / Responsable</label>
+                    <input type="text" name="propietario_nombre" placeholder="Nombre del dueño"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">RIF o Cédula Propietario</label>
+                    <input type="text" name="propietario_rif_ci" placeholder="V-12345678-0"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Empresa Distribuidora</label>
+                    <input type="text" name="empresa_distribuidora" placeholder="ej: Pdvsa Gas"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <!-- Certificados -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Tiene Certificado Bomberil?</label>
+                    <select name="certificado_bomberil"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">N° de Certificado (Si aplica)</label>
+                    <input type="text" name="nro_certificado" placeholder="Nro de Certificado"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div class="flex flex-col justify-center space-y-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Controles en Sitio</span>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="hoja_seguridad" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">HDS</span>
+                        </label>
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="extintor" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">Extintor</span>
+                        </label>
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="equipo_derrame" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">Eq. Derrame</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Vehículo Transportador Involucrado -->
+            <div class="border-t border-slate-800/40 pt-4 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos de Vehículo Transportador de GLP Involucrado (Si Aplica)</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <input type="text" name="vehiculo_marca" placeholder="Marca (ej: Chevrolet Cargo)"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_placa" placeholder="Placa Vehículo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_color" placeholder="Color Vehículo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                </div>
+            </div>
+
+            {# 2.2 DERRAME COMBUSTIBLE #}
+            {% elif tipo_reporte == 'matpel_combustible' %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Combustible *</label>
+                    <select name="tipo_combustible" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Diesel">Diésel (Gasoil)</option>
+                        <option value="Kerosene">Kerosén</option>
+                        <option value="Aceite / Lubricante">Aceite / Lubricante</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Almacenamiento *</label>
+                    <select name="tipo_almacenamiento" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Tanque Subterraneo">Tanque Subterráneo</option>
+                        <option value="Tanque Superficial">Tanque Superficial</option>
+                        <option value="Tanque Vehicular">Tanque Vehicular (Automóvil/Camión)</option>
+                        <option value="Cisterna de Transporte">Cisterna de Transporte</option>
+                        <option value="Tambores / Envases">Tambores / Envases menores</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cantidad Estimada Derrame (Litros) *</label>
+                    <input type="number" step="0.1" name="cantidad_estimada_derrame" required placeholder="ej: 150.5"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Vehículos Involucrados</label>
+                    <input type="text" name="vehiculos_involucrados" placeholder="Describa marcas, placas, modelos involucrados en el derrame..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Mitigación Efectuada *</label>
+                    <textarea name="mitigacion_efectuada" required rows="2" placeholder="ej: Aplicación de capa de espuma AFFF, lavado con abundante agua y detergente neutro..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.3 DERRAME QUÍMICO #}
+            {% elif tipo_reporte == 'matpel_quimico' %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre de la Sustancia Química *</label>
+                    <input type="text" name="nombre_sustancia" required placeholder="ej: Ácido Sulfúrico"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Número UN / ID ONU</label>
+                    <input type="text" name="un_numero" placeholder="ej: UN 1830"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Riesgos Específicos Identificados *</label>
+                    <input type="text" name="riesgos_especificos" required placeholder="ej: Corrosivo, Tóxico por inhalación, Reactivo con agua"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Materiales Absorbentes Usados</label>
+                    <input type="text" name="materiales_absorbentes_usados" placeholder="ej: Arena seca, cal, aserrín tratado"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Materiales Neutralizantes Usados</label>
+                    <input type="text" name="materiales_neutralizantes_usados" placeholder="ej: Bicarbonato de sodio, ácido cítrico"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Acciones de Mitigación Realizadas *</label>
+                    <textarea name="acciones_mitigacion" required rows="2" placeholder="Describa el dique de contención, neutralización del derrame, ventilación, etc..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.4 MATPEL OTROS #}
+            {% elif tipo_reporte == 'matpel_otros' %}
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Descripción de la Sustancia Peligrosa *</label>
+                    <input type="text" name="descripcion_sustancia" required placeholder="Describa la sustancia no clasificada previamente..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Riesgos Identificados *</label>
+                    <textarea name="riesgos_identificados" required rows="2" placeholder="Describa los riesgos (explosivo, radiactivo, peligro biológico...)"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Medidas de Seguridad Adoptadas *</label>
+                    <textarea name="medidas_seguridad_adoptadas" required rows="2" placeholder="Perímetro de seguridad establecido, evacuación, uso de EPP especial..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.5 PRE-HOSPITALARIO #}
+            {% elif tipo_reporte == 'pre_hospitalario' %}
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Completo del Paciente *</label>
+                    <input type="text" name="paciente_nombre" required placeholder="Nombre y Apellido"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula Identidad Paciente</label>
+                    <input type="text" name="paciente_cedula" placeholder="ej: V-15666777"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Edad *</label>
+                        <input type="number" name="paciente_edad" required placeholder="Años"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Género *</label>
+                        <select name="paciente_genero" required
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                            <option value="Masculino">Masc</option>
+                            <option value="Femenino">Fem</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- Condición Clínica -->
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Diagnóstico / Condición Clínica del Paciente *</label>
+                    <textarea name="condicion_paciente" required rows="2" placeholder="Traumatismo generalizado, quemadura de 2do grado, paro cardiorespiratorio restablecido, crisis hipertensiva..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+            <!-- Signos Vitales -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4 bg-slate-950/20 p-3 rounded-xl border border-slate-800/30">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tensión Arterial (TA)</label>
+                    <input type="text" name="signos_vitales_tension" placeholder="ej: 120/80 mmHg"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca / Pulso (ppm)</label>
+                    <input type="number" name="signos_vitales_pulso" placeholder="ej: 75"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (rpm)</label>
+                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <!-- Logística de traslado -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro de Traslado (Destino) *</label>
+                    <input type="text" name="centro_traslado" required placeholder="ej: Hospital Central, Centro Clínico Universitario"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
+                    <input type="text" name="material_medico_utilizado" placeholder="ej: Inmovilizador cervical, soluciones salinas, cánula nasal, gasas"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones Especiales</label>
+                    <textarea name="recomendaciones" rows="2" placeholder="Mantener reposo absoluto, evaluación por traumatólogo de guardia..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.6 SERVICIO AGUA #}
+            {% elif tipo_reporte == 'servicio_agua' %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clasificación del Servicio *</label>
+                    <select name="clasificacion_servicio" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Comunidad / Residencial">Comunidad / Residencial</option>
+                        <option value="Gubernamental">Institución Gubernamental</option>
+                        <option value="Educativo">Plantel Educativo / Escuela</option>
+                        <option value="Salud">Centro de Salud / Hospital</option>
+                        <option value="Privado / Comercial">Entidad Privada / Comercial</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Distribuidos *</label>
+                    <input type="number" name="litros_distribuidos" required placeholder="ej: 10000"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Beneficiarios Estimados (Personas)</label>
+                    <input type="number" name="beneficiarios_estimados" placeholder="ej: 150"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Materiales y Equipos Usados *</label>
+                    <textarea name="material_usado" required rows="2" placeholder="ej: 3 tramos de manguera de 2.5 pulgadas, acoples rápidos, llave de hidrante, motobomba auxiliar..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.7 CONTROL INSECTOS #}
+            {% elif tipo_reporte == 'servicio_insectos' %}
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Insecto *</label>
+                    <select name="tipo_insecto" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Abejas (Apis Mellifera)">Abejas (Apis Mellifera)</option>
+                        <option value="Avispas">Avispas / Avisperos</option>
+                        <option value="Abejas sin aguijón (Meliponas)">Meliponas (Abejas sin aguijón)</option>
+                        <option value="Termitas">Termitas</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clasificación de Riesgo *</label>
+                    <select name="clasificacion_riesgo" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Ponzonoso">Ponzoñoso</option>
+                        <option value="No Ponzonoso">No Ponzoñoso</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Método de Control Realizado *</label>
+                    <select name="metodo_control" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Reubicacion">Reubicación Ecológica (Captura)</option>
+                        <option value="Exterminio">Exterminio (Solo riesgo extremo)</option>
+                        <option value="Aislamiento">Aislamiento de Área</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Materiales Utilizados *</label>
+                    <input type="text" name="materiales_utilizados" required placeholder="ej: Trajes de apicultura, caja núcleo, ahumador, insecticida"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Condición Actual y Ubicación del Enjambre *</label>
+                    <textarea name="condicion_actual" required rows="2" placeholder="ej: Enjambre en alero de vivienda de 2 pisos, altura de 5 metros, comportamiento agresivo..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones a la Comunidad</label>
+                    <textarea name="recomendaciones" rows="2" placeholder="No molestar el enjambre, mantener mascotas alejadas, no aplicar productos químicos domésticos..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.8 CONTROL ANIMAL #}
+            {% elif tipo_reporte == 'servicio_animal' %}
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Animal *</label>
+                    <select name="tipo_animal" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Canino">Canino (Perro)</option>
+                        <option value="Felino">Felino (Gato)</option>
+                        <option value="Reptil">Reptil (Serpiente / Caimán)</option>
+                        <option value="Ave">Ave</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Raza / Descripción del Animal *</label>
+                    <input type="text" name="raza_descripcion" required placeholder="ej: Mestizo color marrón, Serpiente Cascabel, etc."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Condición del Animal *</label>
+                    <select name="condicion_animal" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Atrapado / En peligro">Atrapado / En peligro (Rescate)</option>
+                        <option value="Herido">Herido / Lesionado</option>
+                        <option value="Agresivo / Suelto">Agresivo / Deambulando</option>
+                        <option value="Fallecido">Fallecido</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Destino final del Animal *</label>
+                    <select name="destino_animal" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Entregado a dueno">Entregado a su dueño</option>
+                        <option value="Liberado en habitat natural">Liberado en hábitat natural (Fauna silvestre)</option>
+                        <option value="Refugio / Fundacion">Trasladado a Refugio / Fundación</option>
+                        <option value="Clinica Veterinaria">Trasladado a Clínica Veterinaria</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones y Observaciones Técnicas</label>
+                    <textarea name="recomendaciones_tecnicas" rows="2" placeholder="Acciones tomadas de rescate vertical, uso de pértiga de captura, recomendaciones al dueño de control veterinario..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.9 ACHICAMIENTO #}
+            {% elif tipo_reporte == 'servicio_achicamiento' %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Causa de la Inundación *</label>
+                    <select name="causa_inundacion" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Precipitaciones Pluviales">Precipitaciones Pluviales (Lluvias)</option>
+                        <option value="Colapso de Cloacas / Drenajes">Colapso de Cloacas / Drenajes</option>
+                        <option value="Ruptura de Tuberia Principal">Ruptura de Tubería Principal de Agua</option>
+                        <option value="Desbordamiento de Rio/Quebrada">Desbordamiento de Río / Quebrada</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Bombas y Equipos Usados *</label>
+                    <input type="text" name="bombas_usadas" required placeholder="ej: Motobomba de 3 pulgadas, Electrobomba sumergible"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tiempo de Operación de Succión *</label>
+                    <input type="text" name="tiempo_operacion" required placeholder="ej: 2 horas 15 minutos"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <!-- Niveles de agua -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nivel de Agua Inicial *</label>
+                    <input type="text" name="nivel_agua_inicial" required placeholder="ej: 80 cm"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nivel de Agua Final *</label>
+                    <input type="text" name="nivel_agua_final" required placeholder="ej: Totalmente succionada / 0 cm"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Condición del Inmueble afectado *</label>
+                    <input type="text" name="condicion_inmueble" required placeholder="ej: Sótano de edificio residencial, sala-cocina de vivienda"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Inspección Técnica / Observaciones Estructurales</label>
+                    <textarea name="inspeccion_tecnica_observaciones" rows="2" placeholder="Agrietamientos observados en paredes, socavación del terreno, recomendaciones de evaluación por ingeniería municipal..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+
+            {# 2.10 BALDEO DE VÍA #}
+            {% elif tipo_reporte == 'servicio_baldeo' %}
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Motivo del Baldeo *</label>
+                    <select name="motivo_baldeo" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Limpieza por derrame menor de combustible">Derrame menor de combustible / Despeje de vía</option>
+                        <option value="Limpieza post-incendio">Limpieza post-incendio (remoción de escombros/cenizas)</option>
+                        <option value="Apoyo a evento publico o plaza">Limpieza de espacios públicos / plaza pública</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Área o Vía Afectada *</label>
+                    <input type="text" name="area_afectada" required placeholder="ej: Av. Intercomunal sector El Prado"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados *</label>
+                    <input type="number" name="litros_agua_utilizados" required placeholder="ej: 5000"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Limpieza de Vías Efectuada con éxito? *</label>
+                    <select name="limpieza_vias_efectuada" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Si">Sí</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Observaciones / Detalles del Baldeo</label>
+                    <textarea name="observaciones_baldeo" rows="2" placeholder="Uso de dispersantes ecológicos, barrido manual en conjunto con personal de aseo..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- SECCIÓN 3: VEHÍCULOS / UNIDADES ACTUANTES (DINÁMICA) -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="truck" class="w-4 h-4 text-amber-500"></i>
+                    <span>3. Vehículos Bomberiles Actuantes</span>
+                </h2>
+                <button type="button" onclick="agregarVehiculo()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Añadir Unidad</span>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-800">
+                            <th class="pb-2 pr-4 font-semibold w-1/3">Unidad Móvil *</th>
+                            <th class="pb-2 pr-4 font-semibold w-1/3">Conductor *</th>
+                            <th class="pb-2 pr-4 font-semibold">Km Salida</th>
+                            <th class="pb-2 pr-4 font-semibold">Km Regreso</th>
+                            <th class="pb-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenedor-vehiculos" class="divide-y divide-slate-800/40">
+                        <tr class="fila-vehiculo border-b border-transparent">
+                            <td class="py-2 pr-4">
+                                <select name="vehiculos_actuantes[]" required
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                                    <option value="">Seleccione Unidad</option>
+                                    {% for v in vehiculos %}
+                                        <option value="{{ v.id }}">{{ v.unidad }} - {{ v.tipo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="text" name="conductores[]" required placeholder="Nombre Conductor"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="number" step="0.1" name="kms_llegada[]" placeholder="0.0"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 text-right">
+                                <button type="button" onclick="eliminarFila(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                                    <i data-lucide="trash" class="w-4 h-4"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: PERSONAL BOMBERIL ACTUANTE -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i>
+                    <span>4. Personal Bomberil Actuante (Comisión)</span>
+                </h2>
+                <button type="button" onclick="agregarCombatiente()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                    <span>Añadir Combatiente</span>
+                </button>
+            </div>
+
+            <!-- Jefe de Comisión y Conductor Base -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- Jefe de Comisión -->
+                <div class="bg-slate-950/45 p-4 rounded-xl border border-slate-800/40 space-y-2">
+                    <span class="block text-xs font-bold text-fire-400">Jefe de Comisión *</span>
+                    <div class="space-y-2">
+                        <input type="text" name="jefe_comision_nombre" required placeholder="Nombre y Apellido"
+                            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" name="jefe_comision_ci" placeholder="C.I. (ej: V-10222333)"
+                                  class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            <input type="text" name="jefe_comision_rango" placeholder="Rango (ej: Sargento)"
+                                  class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conductor Principal -->
+                <div class="bg-slate-950/45 p-4 rounded-xl border border-slate-800/40 space-y-2">
+                    <span class="block text-xs font-bold text-fire-400">Conductor Asignado *</span>
+                    <div class="space-y-2">
+                        <input type="text" name="conductor_unidad_nombre" required placeholder="Nombre y Apellido"
+                            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" name="conductor_unidad_ci" placeholder="C.I. Conductor"
+                                  class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            <input type="text" name="conductor_unidad_rango" placeholder="Rango Conductor"
+                                  class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Listado dinámico de combatientes -->
+            <div class="space-y-2 mt-2">
+                <span class="block text-xs font-semibold text-slate-400">Otros Combatientes / Funcionarios en la Comisión</span>
+                <div id="contenedor-combatientes" class="space-y-2">
+                    <!-- Filas se insertarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: ACTUACIÓN DE OTROS ORGANISMOS -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-blue-500"></i>
+                    <span>5. Actuación de Otros Organismos (Apoyo)</span>
+                </h2>
+                <button type="button" onclick="agregarOrganismo()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Añadir Organismo</span>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-800">
+                            <th class="pb-2 pr-4 font-semibold w-1/4">Organismo</th>
+                            <th class="pb-2 pr-4 font-semibold w-1/3">Jefe de Unidad</th>
+                            <th class="pb-2 pr-4 font-semibold w-1/4">Matrícula Unidad</th>
+                            <th class="pb-2 pr-4 font-semibold w-12">Cant.</th>
+                            <th class="pb-2 w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenedor-organismos" class="divide-y divide-slate-800/40">
+                        <!-- Fila de ejemplo en blanco o dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: DETALLE DE ACTUACIÓN / OBSERVACIONES -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2 border-b border-slate-800/60 pb-2">
+                <i data-lucide="align-left" class="w-4 h-4 text-purple-500"></i>
+                <span>6. Descripción de la Actuación / Observaciones Generales</span>
+            </h2>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Relato Detallado del Procedimiento Operacional *</label>
+                <textarea name="observaciones_generales" required rows="5" placeholder="Describa de manera pormenorizada las acciones tomadas en el sitio..."
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+            </div>
+        </div>
+
+        <!-- BOTÓN DE GUARDADO -->
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('main.index') }}" class="px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all">
+                Cancelar
+            </a>
+            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg shadow-fire-950/30 transition-all transform hover:scale-[1.02] cursor-pointer">
+                Enviar Reporte para Validación
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Plantillas dinámicas en JS -->
+<template id="plantilla-vehiculo">
+    <tr class="fila-vehiculo border-b border-transparent">
+        <td class="py-2 pr-4">
+            <select name="vehiculos_actuantes[]" required
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                <option value="">Seleccione Unidad</option>
+                {% for v in vehiculos %}
+                    <option value="{{ v.id }}">{{ v.unidad }} - {{ v.tipo }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="py-2 pr-4">
+            <input type="text" name="conductores[]" required placeholder="Nombre Conductor"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="number" step="0.1" name="kms_llegada[]" placeholder="0.0"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 text-right">
+            <button type="button" onclick="eliminarFila(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash" class="w-4 h-4"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+<template id="plantilla-combatiente">
+    <div class="fila-combatiente grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-950/20 p-2 rounded-lg border border-slate-800/40 relative">
+        <input type="text" name="combatientes_nombres[]" required placeholder="Nombre completo"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 sm:col-span-2">
+        <input type="text" name="combatientes_cis[]" placeholder="C.I. combatiente"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        <div class="flex items-center space-x-2">
+            <input type="text" name="combatientes_rangos[]" placeholder="Rango"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 flex-grow">
+            <button type="button" onclick="eliminarCombatiente(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<template id="plantilla-organismo">
+    <tr class="fila-organismo border-b border-transparent">
+        <td class="py-2 pr-4">
+            <input type="text" name="organismo_nombre[]" required placeholder="GNB, CICPC, PC, etc."
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="text" name="organismo_jefe[]" placeholder="Jefe de Comisión"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="text" name="organismo_matricula[]" placeholder="Placa / Unidad"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
+            <input type="number" name="organismo_cantidad[]" value="1" min="1"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 text-right">
+            <button type="button" onclick="eliminarFila(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash" class="w-4 h-4"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // JS dinámico para añadir filas en vehículos actuantes, combatientes y organismos
+    
+    function agregarVehiculo() {
+        const contenedor = document.getElementById('contenedor-vehiculos');
+        const plantilla = document.getElementById('plantilla-vehiculo').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons(); // Recargar iconos Lucide en el nuevo nodo
+    }
+
+    function agregarCombatiente() {
+        const contenedor = document.getElementById('contenedor-combatientes');
+        const plantilla = document.getElementById('plantilla-combatiente').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function agregarOrganismo() {
+        const contenedor = document.getElementById('contenedor-organismos');
+        const plantilla = document.getElementById('plantilla-organismo').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function eliminarFila(boton) {
+        const fila = boton.closest('tr');
+        fila.remove();
+    }
+
+    function eliminarCombatiente(boton) {
+        const fila = boton.closest('.fila-combatiente');
+        fila.remove();
+    }
+
+    // Inicializar con un organismo vacío
+    document.addEventListener("DOMContentLoaded", function() {
+        agregarOrganismo();
+    });
+</script>
+{% endblock %}

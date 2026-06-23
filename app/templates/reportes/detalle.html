@@ -1,0 +1,704 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte {{ reporte.nro_control }} - Detalle{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Estilos específicos para impresión */
+    @media print {
+        body {
+            background: white !important;
+            color: black !important;
+        }
+        nav, footer, .no-print {
+            display: none !important;
+        }
+        .print-container {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            color: black !important;
+        }
+        .print-header {
+            border-bottom: 2px solid black !important;
+            color: black !important;
+            padding-bottom: 1rem !important;
+        }
+        .print-section {
+            border: 1px solid #ccc !important;
+            page-break-inside: avoid;
+        }
+        input, select, textarea {
+            border: none !important;
+            background: transparent !important;
+            color: black !important;
+        }
+        span, td, th, h1, h2, h3, p {
+            color: black !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Botones de Acción (no imprimibles) -->
+    <div class="flex items-center justify-between no-print">
+        <div class="flex items-center space-x-3">
+            <a href="{{ url_for('main.index') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-white">Detalle de Actuación</h1>
+                <p class="text-xs text-slate-400">Reporte {{ reporte.nro_control }}</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all flex items-center space-x-2 cursor-pointer">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                <span>Imprimir Reporte</span>
+            </button>
+            
+            {% if current_user.es_admin and reporte.estado == 'Enviado' %}
+            <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
+                <input type="hidden" name="accion" value="validar">
+                <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold transition-all flex items-center space-x-1.5 shadow-lg shadow-emerald-950/20 cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Validar</span>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- DOCUMENTO OFICIAL DE REPORTE (IMPRIMIBLE) -->
+    <div class="glass-panel p-8 rounded-2xl border border-slate-800 shadow-2xl print-container bg-slate-900/20 text-slate-300 space-y-6">
+        
+        <!-- CABECERA OFICIAL -->
+        <div class="print-header border-b border-slate-800 pb-6 flex flex-col sm:flex-row justify-between items-center sm:items-start text-center sm:text-left space-y-4 sm:space-y-0">
+            <div class="space-y-1">
+                <div class="text-xs font-bold uppercase tracking-widest text-fire-500">REPÚBLICA BOLIVARIANA DE VENEZUELA</div>
+                <div class="text-sm font-extrabold text-white">CUERPO DE BOMBEROS Y BOMBERAS</div>
+                <div class="text-xs text-slate-400">Dirección de Operaciones y Control de Emergencias</div>
+            </div>
+            <div class="text-center sm:text-right space-y-1">
+                <div class="inline-flex px-3 py-1 bg-slate-800 border border-slate-700/50 rounded-full text-xs font-bold text-white mb-1">
+                    {{ reporte.tipo_reporte|upper
+                        |replace('MATPEL_GLP', 'CONTROL DE ESCAPE DE GLP')
+                        |replace('MATPEL_COMBUSTIBLE', 'DERRAME DE COMBUSTIBLE')
+                        |replace('MATPEL_QUIMICO', 'DERRAME DE SUSTANCIA QUÍMICA')
+                        |replace('MATPEL_OTROS', 'OTRAS SUSTANCIAS PELIGROSAS')
+                        |replace('PRE_HOSPITALARIO', 'ATENCIÓN PRE-HOSPITALARIA')
+                        |replace('SERVICIO_AGUA', 'ABASTECIMIENTO DE AGUA')
+                        |replace('SERVICIO_INSECTOS', 'CONTROL Y REUBICACIÓN DE INSECTOS')
+                        |replace('SERVICIO_ANIMAL', 'CONTROL DE ANIMAL DOMÉSTICO')
+                        |replace('SERVICIO_ACHICAMIENTO', 'ACHICAMIENTO DE AGUA')
+                        |replace('SERVICIO_BALDEO', 'BALDEO DE AGUA') }}
+                </div>
+                <div class="text-sm font-extrabold text-fire-500">N° CONTROL: {{ reporte.nro_control }}</div>
+                <div class="text-xs text-slate-500">Fecha Registro: {{ reporte.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+        </div>
+
+        <!-- 1. DATOS GENERALES DE LA ALERTA -->
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-fire-500"></i>
+                <span>1. Información de Aviso, Tiempos y Ubicación</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Fecha del Incidente:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.fecha.strftime('%d/%m/%Y') }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Clase de Aviso:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clase_aviso }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Receptor del Aviso:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.receptor_aviso }}</span>
+                </div>
+                
+                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-4 gap-2">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Hora Aviso:</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_aviso.strftime('%H:%M') }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Hora Salida:</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_salida.strftime('%H:%M') }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Hora Llegada:</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_llegada.strftime('%H:%M') }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Hora Regreso:</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_regreso.strftime('%H:%M') }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Solicitante:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.solicitante_nombre or 'No registrado' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Cédula Solicitante:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.solicitante_cedula or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Teléfono Solicitante:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.solicitante_telefono or '--' }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Dirección del Suceso:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.direccion }}</span>
+                    {% if reporte.punto_referencia %}
+                        <span class="text-slate-400 block mt-0.5">Ref: {{ reporte.punto_referencia }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. DETALLE ESPECÍFICO (SEGÚN TIPO DE REPORTE) -->
+        
+        {# 2.1 ESCAPE GLP #}
+        {% if reporte.tipo_reporte == 'matpel_glp' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
+                <span>2. Parámetros Técnicos MATPEL (Escape GLP)</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Clasificación del Servicio:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clasificacion_servicio }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Producto / UN:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.nombre_producto }} ({{ reporte.un_numero }})</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Almacenamiento:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_almacenamiento }}</span>
+                </div>
+                
+                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Propietario / Responsable:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.propietario_nombre or 'No registrado' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">CI / RIF Propietario:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.propietario_rif_ci or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Empresa Distribuidora:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.empresa_distribuidora or '--' }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Certificado Bomberil:</span>
+                        <span class="text-white text-sm font-medium">{% if reporte.certificado_bomberil %}Sí{% else %}No{% endif %}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">N° Certificado:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.nro_certificado or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Controles Técnicos en Sitio:</span>
+                        <span class="text-white text-sm font-medium">
+                            HDS: {% if reporte.hoja_seguridad %}Sí{% else %}No{% endif %} | 
+                            Extintor: {% if reporte.extintor %}Sí{% else %}No{% endif %} | 
+                            Equipo Derrame: {% if reporte.equipo_derrame %}Sí{% else %}No{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {% if reporte.vehiculo_marca or reporte.vehiculo_placa %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Vehículo Transportador Involucrado:</span>
+                    <span class="text-white text-sm font-medium">
+                        Marca: {{ reporte.vehiculo_marca or '--' }} | 
+                        Placa: {{ reporte.vehiculo_placa or '--' }} | 
+                        Color: {{ reporte.vehiculo_color or '--' }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 2.2 DERRAME COMBUSTIBLE #}
+        {% elif reporte.tipo_reporte == 'matpel_combustible' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
+                <span>2. Parámetros Técnicos MATPEL (Derrame Combustible)</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Combustible:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_combustible }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Almacenamiento:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_almacenamiento }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Cantidad Estimada:</span>
+                    <span class="text-white text-sm font-bold text-red-400">{{ reporte.cantidad_estimada_derrame or '0' }} Litros</span>
+                </div>
+                
+                {% if reporte.vehiculos_involucrados %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Vehículos Involucrados:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.vehiculos_involucrados }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Mitigación Efectuada:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.mitigacion_efectuada }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# 2.3 DERRAME QUÍMICO #}
+        {% elif reporte.tipo_reporte == 'matpel_quimico' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
+                <span>2. Parámetros Técnicos MATPEL (Derrame Químico)</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Sustancia Química:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.nombre_sustancia }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Número UN:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.un_numero or '--' }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Riesgos Específicos:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.riesgos_especificos }}</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Materiales Absorbentes Usados:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.materiales_absorbentes_usados or 'Ninguno' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Materiales Neutralizantes Usados:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.materiales_neutralizantes_usados or 'Ninguno' }}</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Acciones de Mitigación:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.acciones_mitigacion }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# 2.4 MATPEL OTROS #}
+        {% elif reporte.tipo_reporte == 'matpel_otros' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
+                <span>2. Parámetros Técnicos MATPEL (Otras Sustancias)</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Descripción de Sustancia:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.descripcion_sustancia }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Riesgos Identificados:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.riesgos_identificados }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Medidas de Seguridad Adoptadas:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.medidas_seguridad_adoptadas }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# 2.5 PRE-HOSPITALARIO #}
+        {% elif reporte.tipo_reporte == 'pre_hospitalario' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="activity" class="w-4 h-4 text-emerald-500"></i>
+                <span>2. Ficha de Atención Pre-Hospitalaria</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div class="sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Nombre Paciente:</span>
+                    <span class="text-white text-sm font-bold">{{ reporte.paciente_nombre }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Cédula:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.paciente_cedula or '--' }}</span>
+                </div>
+                
+                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-2">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Edad:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.paciente_edad }} Años</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Género:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.paciente_genero }}</span>
+                    </div>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2 sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Signos Vitales:</span>
+                    <span class="text-white text-sm font-medium block">
+                        Tensión: {{ reporte.signos_vitales_tension or 'No evaluada' }} |
+                        Pulso: {{ reporte.signos_vitales_pulso or '--' }} ppm |
+                        Resp: {{ reporte.signos_vitales_fr or '--' }} rpm
+                    </span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Diagnóstico / Condición Clínica:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.condicion_paciente }}</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Centro de Traslado (Destino):</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.centro_traslado }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Material Médico Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_medico_utilizado or 'Ninguno' }}</span>
+                </div>
+
+                {% if reporte.recomendaciones %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Recomendaciones:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.recomendaciones }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 2.6 SERVICIO AGUA #}
+        {% elif reporte.tipo_reporte == 'servicio_agua' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
+                <span>2. Parámetros de Abastecimiento de Agua</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Clasificación de Servicio:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clasificacion_servicio }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Litros Distribuidos:</span>
+                    <span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_distribuidos }} Lts.</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Beneficiarios Estimados:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.beneficiarios_estimados or '--' }} Personas</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Material Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_usado }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# 2.7 CONTROL INSECTOS #}
+        {% elif reporte.tipo_reporte == 'servicio_insectos' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="bug" class="w-4 h-4 text-yellow-500"></i>
+                <span>2. Parámetros de Control y Reubicación de Insectos</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Insecto:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_insecto }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Riesgo:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clasificacion_riesgo }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Método de Control:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.metodo_control }}</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-2">
+                    <span class="block font-semibold text-slate-500">Condición Actual y Ubicación:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.condicion_actual }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Materiales Utilizados:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.materiales_utilizados }}</span>
+                </div>
+
+                {% if reporte.recomendaciones %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Recomendaciones:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.recomendaciones }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 2.8 CONTROL ANIMAL #}
+        {% elif reporte.tipo_reporte == 'servicio_animal' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="paw-print" class="w-4 h-4 text-amber-600"></i>
+                <span>2. Parámetros de Control / Rescate Animal</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo Animal:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_animal }}</span>
+                </div>
+                <div class="sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Raza / Descripción:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.raza_descripcion }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Condición:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.condicion_animal }}</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Destino del Animal:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.destino_animal }}</span>
+                </div>
+                {% if reporte.recomendaciones_tecnicas %}
+                <div class="border-t border-slate-800/40 pt-2 sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Observaciones y Recomendaciones:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.recomendaciones_tecnicas }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 2.9 ACHICAMIENTO #}
+        {% elif reporte.tipo_reporte == 'servicio_achicamiento' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
+                <span>2. Parámetros de Achicamiento por Inundación</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Causa Inundación:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.causa_inundacion }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Equipos de Bombeo:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.bombas_usadas }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Tiempo de Succión:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tiempo_operacion }}</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Nivel de Agua Inicial:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.nivel_agua_inicial }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Nivel de Agua Final:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.nivel_agua_final }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Condición Inmueble Afectado:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.condicion_inmueble }}</span>
+                </div>
+
+                {% if reporte.inspeccion_tecnica_observaciones %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Observaciones / Inspección Técnica:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.inspeccion_tecnica_observaciones }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 2.10 BALDEO #}
+        {% elif reporte.tipo_reporte == 'servicio_baldeo' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="waves" class="w-4 h-4 text-blue-500"></i>
+                <span>2. Parámetros de Baldeo de Vía</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div class="sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Motivo de Baldeo:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.motivo_baldeo }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Litros Agua Utilizados:</span>
+                    <span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados }} Lts.</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 sm:col-span-2">
+                    <span class="block font-semibold text-slate-500">Área / Vía Afectada:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.area_afectada }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Limpieza Efectiva:</span>
+                    <span class="text-white text-sm font-medium">{% if reporte.limpieza_vias_efectuada %}Sí{% else %}No{% endif %}</span>
+                </div>
+
+                {% if reporte.observaciones_baldeo %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Observaciones Baldeo:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.observaciones_baldeo }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 3. VEHÍCULOS / UNIDADES ACTUANTES -->
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="truck" class="w-4 h-4 text-amber-500"></i>
+                <span>3. Unidades y Materiales Bomberiles Actuantes</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-800/80 bg-slate-900/40">
+                            <th class="py-2 px-4 font-semibold">Unidad Móvil</th>
+                            <th class="py-2 px-4 font-semibold">Placa</th>
+                            <th class="py-2 px-4 font-semibold">Conductor</th>
+                            <th class="py-2 px-4 font-semibold text-right">Km Salida</th>
+                            <th class="py-2 px-4 font-semibold text-right">Km Llegada</th>
+                            <th class="py-2 px-4 font-semibold text-right">Recorrido</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/40">
+                        {% for va in reporte.vehiculos_actuantes %}
+                        <tr class="text-white">
+                            <td class="py-2 px-4 font-medium">{{ va.vehiculo.unidad }} ({{ va.vehiculo.tipo }})</td>
+                            <td class="py-2 px-4">{{ va.vehiculo.placa }}</td>
+                            <td class="py-2 px-4">{{ va.conductor_nombre }}</td>
+                            <td class="py-2 px-4 text-right">{{ va.km_salida or 0.0 }} km</td>
+                            <td class="py-2 px-4 text-right">{{ va.km_llegada or 0.0 }} km</td>
+                            <td class="py-2 px-4 text-right font-semibold text-amber-500">
+                                {% if va.km_llegada and va.km_salida %}
+                                    {{ "%.2f"|format(va.km_llegada - va.km_salida) }} km
+                                {% else %}
+                                    0.00 km
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="py-4 text-center text-slate-500">No se registraron unidades bomberiles en el reporte.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. PERSONAL BOMBERIL ACTUANTE -->
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i>
+                <span>4. Personal Actuante en el Servicio (Comisión)</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-white">
+                {% for pers in reporte.personal_actuante %}
+                <div class="p-3 bg-slate-950/30 rounded-lg border border-slate-800/40 flex flex-col justify-between">
+                    <div>
+                        <span class="block text-[10px] font-bold text-slate-500 uppercase">{{ pers.rol_en_servicio }}</span>
+                        <span class="text-sm font-semibold text-white mt-1 block">{{ pers.rango or '' }} {{ pers.nombre_completo }}</span>
+                    </div>
+                    {% if pers.cedula %}
+                        <span class="text-[10px] text-slate-400 mt-2 block">C.I.: {{ pers.cedula }}</span>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="col-span-3 text-center text-slate-500 py-2">No se registró personal en la comisión.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 5. ACTUACIÓN DE OTROS ORGANISMOS -->
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-blue-500"></i>
+                <span>5. Cooperación de Otros Organismos (Apoyo Institucional)</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-800/80 bg-slate-900/40">
+                            <th class="py-2 px-4 font-semibold">Organismo</th>
+                            <th class="py-2 px-4 font-semibold">Jefe de Unidad</th>
+                            <th class="py-2 px-4 font-semibold">Matrícula Unidad</th>
+                            <th class="py-2 px-4 font-semibold text-right">Cant. Unidades</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/40">
+                        {% for org in reporte.otros_organismos %}
+                        <tr class="text-white">
+                            <td class="py-2 px-4 font-medium">{{ org.nombre_organismo }}</td>
+                            <td class="py-2 px-4">{{ org.jefe_unidad or '--' }}</td>
+                            <td class="py-2 px-4">{{ org.matricula_unidad or '--' }}</td>
+                            <td class="py-2 px-4 text-right">{{ org.cantidad_unidades }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-slate-500">No actuaron otros organismos externos.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. OBSERVACIONES / ACTUACIÓN -->
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="align-left" class="w-4 h-4 text-purple-500"></i>
+                <span>6. Detalle de la Actuación Operacional / Relato Técnico</span>
+            </div>
+            <div class="p-4 text-xs text-slate-200 leading-relaxed whitespace-pre-line font-mono bg-slate-950/20">
+                {{ reporte.observaciones_generales }}
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE FIRMAS Y VALIDEZ (SOLO PARA IMPRIMIR) -->
+        <div class="hidden print:grid grid-cols-2 gap-12 pt-16 text-center text-xs text-black">
+            <div class="border-t border-black pt-4">
+                <div class="font-bold">ELABORADO POR:</div>
+                <div class="mt-2">{{ reporte.creador.rango or '' }} {{ reporte.creador.nombre }} {{ reporte.creador.apellido }}</div>
+                <div>C.I.: {{ reporte.creador.cedula }}</div>
+            </div>
+            <div class="border-t border-black pt-4">
+                <div class="font-bold">VALIDADO POR (ADMINISTRACIÓN):</div>
+                <div class="mt-2">{% if reporte.estado == 'Validado' %}Firma y Sello Digital{% else %}Pendiente de Validación{% endif %}</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

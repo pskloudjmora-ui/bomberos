@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Administrador - Cuerpo de Bomberos{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js para gráficos dinámicos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    
+    <!-- ENCABEZADO Y FILTROS -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                <i data-lucide="shield" class="w-8 h-8 text-fire-500"></i>
+                <span>Panel de Administración</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Monitoreo de incidencias, estadísticas y validación de reportes.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all flex items-center space-x-2">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                <span>Imprimir / PDF</span>
+            </button>
+            <a href="{{ url_for('auth.registrar_usuario') }}" class="px-4 py-2 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg transition-all flex items-center space-x-2">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>Registrar Bombero</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- SECCIÓN FILTROS DE BÚSQUEDA -->
+    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center space-x-2">
+            <i data-lucide="filter" class="w-4 h-4 text-fire-500"></i>
+            <span>Filtros de Búsqueda</span>
+        </h2>
+        <form method="GET" action="{{ url_for('main.dashboard_admin') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha Inicio</label>
+                <input type="date" name="fecha_inicio" value="{{ filtro_inicio }}"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha Fin</label>
+                <input type="date" name="fecha_fin" value="{{ filtro_fin }}"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Reporte</label>
+                <select name="tipo_reporte" 
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <option value="Todos" {% if filtro_tipo == 'Todos' %}selected{% endif %}>Todos los Tipos</option>
+                    <option value="matpel_glp" {% if filtro_tipo == 'matpel_glp' %}selected{% endif %}>MATPEL - Escape de GLP</option>
+                    <option value="matpel_combustible" {% if filtro_tipo == 'matpel_combustible' %}selected{% endif %}>MATPEL - Derrame Combustible</option>
+                    <option value="matpel_quimico" {% if filtro_tipo == 'matpel_quimico' %}selected{% endif %}>MATPEL - Derrame Químico</option>
+                    <option value="pre_hospitalario" {% if filtro_tipo == 'pre_hospitalario' %}selected{% endif %}>Atención Pre-Hospitalaria</option>
+                    <option value="servicio_agua" {% if filtro_tipo == 'servicio_agua' %}selected{% endif %}>Servicio Especial - Abastecimiento Agua</option>
+                    <option value="servicio_insectos" {% if filtro_tipo == 'servicio_insectos' %}selected{% endif %}>Servicio Especial - Control Insectos</option>
+                    <option value="servicio_animal" {% if filtro_tipo == 'servicio_animal' %}selected{% endif %}>Servicio Especial - Control Animal</option>
+                    <option value="servicio_achicamiento" {% if filtro_tipo == 'servicio_achicamiento' %}selected{% endif %}>Servicio Especial - Achicamiento</option>
+                    <option value="servicio_baldeo" {% if filtro_tipo == 'servicio_baldeo' %}selected{% endif %}>Servicio Especial - Baldeo de Vías</option>
+                </select>
+            </div>
+            <div class="flex items-end space-x-2">
+                <div class="flex-grow">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Unidad Actuante</label>
+                    <select name="vehiculo" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Todos">Todas las Unidades</option>
+                        {% for vehiculo in vehiculos %}
+                            <option value="{{ vehiculo.id }}" {% if filtro_vehiculo == vehiculo.id|string %}selected{% endif %}>{{ vehiculo.unidad }} ({{ vehiculo.tipo }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="p-3 bg-fire-600 hover:bg-fire-500 text-white rounded-xl transition-all shadow-md">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- METRICAS CLAVE / KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- KPI: Total Incidencias -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex items-center justify-between shadow-xl">
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Incidencias Atendidas</span>
+                <div class="text-3xl font-extrabold text-white">{{ total_incidencias }}</div>
+                <p class="text-[10px] text-slate-500">En el período seleccionado</p>
+            </div>
+            <div class="p-4 bg-fire-500/10 text-fire-500 rounded-2xl">
+                <i data-lucide="alert-circle" class="w-6 h-6 animate-pulse"></i>
+            </div>
+        </div>
+
+        <!-- KPI: Tiempo Promedio de Respuesta -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex items-center justify-between shadow-xl">
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Promedio de Respuesta</span>
+                <div class="text-3xl font-extrabold text-white">
+                    {% if tiempo_promedio_minutos > 0 %}
+                        {{ tiempo_promedio_minutos }} <span class="text-sm font-semibold text-slate-400">min</span>
+                    {% else %}
+                        --
+                    {% endif %}
+                </div>
+                <p class="text-[10px] text-slate-500">Aviso -> Llegada al sitio</p>
+            </div>
+            <div class="p-4 bg-amber-500/10 text-amber-500 rounded-2xl">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
+        </div>
+
+        <!-- KPI: Tipo de Servicio Frecuente -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex items-center justify-between shadow-xl">
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Servicio más Común</span>
+                <div class="text-base font-extrabold text-white truncate max-w-[170px]" title="{{ tipo_mas_frecuente }}">
+                    {{ tipo_mas_frecuente|replace('matpel_glp', 'GLP')|replace('servicio_agua', 'Agua')|replace('servicio_baldeo', 'Baldeo')|replace('pre_hospitalario', 'Salud')|replace('servicio_insectos', 'Insectos')|upper }}
+                </div>
+                <p class="text-[10px] text-slate-400 font-semibold">{{ tipo_mas_frecuente_cant }} reportes registrados</p>
+            </div>
+            <div class="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl">
+                <i data-lucide="trending-up" class="w-6 h-6"></i>
+            </div>
+        </div>
+
+        <!-- KPI: Litros de Agua Distribuidos -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex items-center justify-between shadow-xl">
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Agua Total Distribuida</span>
+                <div class="text-3xl font-extrabold text-white">
+                    {{ "{:,}".format(litros_totales_agua) }} <span class="text-sm font-semibold text-slate-400">Lts</span>
+                </div>
+                <p class="text-[10px] text-slate-500">Baldeo y Abastecimiento</p>
+            </div>
+            <div class="p-4 bg-blue-500/10 text-blue-500 rounded-2xl">
+                <i data-lucide="droplet" class="w-6 h-6 text-blue-400"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECCIÓN DE GRÁFICOS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Gráfico 1: Tendencia Temporal -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 lg:col-span-2 space-y-4">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="activity" class="w-4 h-4 text-fire-500"></i>
+                <span>Tendencia Temporal de Incidentes</span>
+            </h3>
+            <div class="h-64 relative">
+                <canvas id="graficoTendencia"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfico 2: Categorías de Incidencias -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-amber-500"></i>
+                <span>Distribución por Servicio</span>
+            </h3>
+            <div class="h-64 relative flex items-center justify-center">
+                {% if datos_pastel %}
+                    <canvas id="graficoPastel"></canvas>
+                {% else %}
+                    <div class="text-slate-500 text-xs text-center">No hay datos suficientes para graficar en este rango.</div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLA DE REPORTES Y GESTIÓN -->
+    <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+        <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="list" class="w-4 h-4 text-fire-500"></i>
+                <span>Listado de Actuaciones Operacionales</span>
+            </h3>
+            <span class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-400 font-semibold">
+                {{ reportes|length }} reportes listados
+            </span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-slate-300 text-sm">
+                <thead>
+                    <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                        <th class="py-4 px-6">N° Control</th>
+                        <th class="py-4 px-6">Fecha / Hora</th>
+                        <th class="py-4 px-6">Tipo Servicio</th>
+                        <th class="py-4 px-6">Dirección</th>
+                        <th class="py-4 px-6">Estado</th>
+                        <th class="py-4 px-6 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    {% for reporte in reportes %}
+                    <tr class="hover:bg-slate-900/20 transition-colors">
+                        <td class="py-4 px-6 font-bold text-white">{{ reporte.nro_control }}</td>
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col">
+                                <span>{{ reporte.fecha.strftime('%d/%m/%Y') }}</span>
+                                <span class="text-xs text-slate-500">{{ reporte.hora_aviso.strftime('%H:%M') }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            {% set label = 'MATPEL - GLP' %}
+                            {% set badge_color = 'bg-red-500/10 border-red-500/20 text-red-400' %}
+                            {% if reporte.tipo_reporte == 'servicio_agua' %}
+                                {% set label = 'Serv. Especial - Agua' %}
+                                {% set badge_color = 'bg-blue-500/10 border-blue-500/20 text-blue-400' %}
+                            {% elif reporte.tipo_reporte == 'servicio_baldeo' %}
+                                {% set label = 'Serv. Especial - Baldeo' %}
+                                {% set badge_color = 'bg-blue-400/10 border-blue-400/20 text-blue-300' %}
+                            {% elif reporte.tipo_reporte == 'pre_hospitalario' %}
+                                {% set label = 'Atenc. Médica' %}
+                                {% set badge_color = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' %}
+                            {% endif %}
+                            <span class="inline-flex items-center px-2 py-0.5 border text-xs font-medium rounded-full {{ badge_color }}">
+                                {{ label }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 truncate max-w-[200px]" title="{{ reporte.direccion }}">
+                            {{ reporte.direccion }}
+                        </td>
+                        <td class="py-4 px-6">
+                            {% set est_color = 'bg-slate-800 text-slate-400' %}
+                            {% if reporte.estado == 'Validado' %}
+                                {% set est_color = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 border' %}
+                            {% elif reporte.estado == 'Enviado' %}
+                                {% set est_color = 'bg-amber-500/10 border-amber-500/20 text-amber-400 border animate-pulse' %}
+                            {% elif reporte.estado == 'Rechazado' %}
+                                {% set est_color = 'bg-fire-500/10 border-fire-500/20 text-fire-400 border' %}
+                            {% endif %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ est_color }}">
+                                {{ reporte.estado }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="flex items-center justify-center space-x-2">
+                                <a href="{{ url_for('reportes.detalle_reporte', reporte_id=reporte.id) }}" 
+                                   class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors flex items-center justify-center"
+                                   title="Ver Detalle">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                                
+                                {% if reporte.estado == 'Enviado' %}
+                                <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="accion" value="validar">
+                                    <button type="submit" class="p-1.5 bg-emerald-950/40 border border-emerald-800 text-emerald-400 hover:bg-emerald-800 hover:text-white rounded-lg transition-colors flex items-center justify-center"
+                                            title="Validar Reporte">
+                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="accion" value="rechazar">
+                                    <button type="submit" class="p-1.5 bg-fire-950/40 border border-fire-800/80 text-fire-400 hover:bg-fire-800 hover:text-white rounded-lg transition-colors flex items-center justify-center"
+                                            title="Rechazar Reporte">
+                                        <i data-lucide="x" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                <form action="{{ url_for('main.eliminar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline" 
+                                      onsubmit="return confirm('¿Está completamente seguro de eliminar permanentemente este reporte? Esta acción no se puede deshacer.');">
+                                    <button type="submit" class="p-1.5 bg-slate-800 hover:bg-fire-950/40 hover:border-fire-900 hover:text-fire-400 border border-transparent rounded-lg transition-colors flex items-center justify-center"
+                                            title="Eliminar Reporte">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="py-8 px-6 text-center text-slate-500 text-sm">
+                            <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                            <span>No se encontraron reportes en el período seleccionado.</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Configuración de los gráficos dinámicos de Chart.js
+    
+    // 1. Gráfico de Tendencia (Líneas)
+    const ctxTendencia = document.getElementById('graficoTendencia').getContext('2d');
+    const fechas = {{ fechas_grafico|tojson }};
+    const cantidades = {{ cantidades_grafico|tojson }};
+    
+    new Chart(ctxTendencia, {
+        type: 'line',
+        data: {
+            labels: fechas.length > 0 ? fechas : ['Sin datos'],
+            datasets: [{
+                label: 'Número de Incidencias',
+                data: cantidades.length > 0 ? cantidades : [0],
+                borderColor: '#fa3b3b',
+                backgroundColor: 'rgba(250, 59, 59, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: '#fa3b3b',
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8', stepSize: 1 }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
+            }
+        }
+    });
+
+    // 2. Gráfico de Categorías (Pastel/Dona)
+    {% if datos_pastel %}
+    const ctxPastel = document.getElementById('graficoPastel').getContext('2d');
+    const datosPastelBruto = {{ datos_pastel|tojson }};
+    
+    // Formatear etiquetas legibles
+    const etiquetasLegibles = {
+        'matpel_glp': 'MATPEL GLP',
+        'matpel_combustible': 'Combustibles',
+        'matpel_quimico': 'Químicos',
+        'pre_hospitalario': 'Atenc. Médica',
+        'servicio_agua': 'Serv. Especial Agua',
+        'servicio_baldeo': 'Baldeo Vías'
+    };
+    
+    const etiquetasPastel = Object.keys(datosPastelBruto).map(key => etiquetasLegibles[key] || key.toUpperCase());
+    const valoresPastel = Object.values(datosPastelBruto);
+    
+    new Chart(ctxPastel, {
+        type: 'doughnut',
+        data: {
+            labels: etiquetasPastel,
+            datasets: [{
+                data: valoresPastel,
+                backgroundColor: [
+                    '#fa3b3b', // Rojo (GLP)
+                    '#f59e0b', // Amber (Combustible)
+                    '#10b981', // Emerald (PreHosp)
+                    '#3b82f6', // Blue (Agua)
+                    '#22d3ee', // Cyan (Baldeo)
+                    '#a855f7'  // Purple (Otros)
+                ],
+                borderWidth: 1,
+                borderColor: '#0f172a'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#cbd5e1',
+                        font: { size: 10 }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

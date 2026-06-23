@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Bombero - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Encabezado -->
+    <div class="flex items-center space-x-3">
+        <a href="{{ url_for('main.gestionar_usuarios') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                <i data-lucide="user-plus" class="w-6 h-6 text-fire-500"></i>
+                <span>Registrar Nuevo Personal Bomberil</span>
+            </h1>
+            <p class="text-slate-400 text-xs mt-0.5">Ingrese los datos personales y credenciales de acceso para el funcionario.</p>
+        </div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div class="glass-panel p-8 rounded-2xl border border-slate-800 shadow-2xl">
+        <form action="{{ url_for('auth.registrar_usuario') }}" method="POST" class="space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                <div>
+                    <label for="nombre" class="block text-sm font-semibold text-slate-300">Nombres *</label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="ej: Juan Carlos"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="apellido" class="block text-sm font-semibold text-slate-300">Apellidos *</label>
+                    <input type="text" id="apellido" name="apellido" required placeholder="ej: Pérez Gómez"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="cedula" class="block text-sm font-semibold text-slate-300">Cédula de Identidad *</label>
+                    <input type="text" id="cedula" name="cedula" required placeholder="ej: V-12345678"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="rango" class="block text-sm font-semibold text-slate-300">Rango / Jerarquía Bomberil</label>
+                    <input type="text" id="rango" name="rango" placeholder="ej: Distinguido, Cabo Primero, Teniente"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+            </div>
+
+            <div class="border-t border-slate-800/60 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                <div>
+                    <label for="username" class="block text-sm font-semibold text-slate-300">Nombre de Usuario *</label>
+                    <input type="text" id="username" name="username" required placeholder="ej: jperez"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="rol" class="block text-sm font-semibold text-slate-300">Rol del Sistema *</label>
+                    <select id="rol" name="rol" required
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="bombero">Bombero (Solo creación de reportes e historial)</option>
+                        <option value="administrador">Administrador (Métricas, validación y gestión total)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-slate-300">Contraseña Temporal *</label>
+                    <input type="password" id="password" name="password" required placeholder="••••••••"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+            </div>
+
+            <div class="flex justify-end space-x-3 border-t border-slate-800/60 pt-6">
+                <a href="{{ url_for('main.gestionar_usuarios') }}" class="px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-8 py-3 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg shadow-fire-950/30 transition-all transform hover:scale-[1.02] cursor-pointer">
+                    Registrar Funcionario
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
