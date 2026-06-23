@@ -42,6 +42,11 @@ def create_app(config_class=Config):
             
     return app
 
+# Instancia de aplicación para servidores WSGI como Gunicorn
+app = create_app()
+
+__all__ = ['create_app', 'app', 'db', 'Usuario']
+
 def crear_usuarios_defecto():
     """Crea usuarios semilla para pruebas iniciales."""
     # Verificar si ya existen usuarios
