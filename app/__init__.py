@@ -14,6 +14,39 @@ login_manager.login_message_category = 'warning'
 def load_user(user_id):
     return Usuario.query.get(int(user_id))
 
+
+def crear_usuarios_defecto():
+    """Crea usuarios semilla para pruebas iniciales."""
+    # Verificar si ya existen usuarios
+    if Usuario.query.first() is None:
+        # Crear Admin
+        admin = Usuario(
+            username='admin',
+            nombre='Jefe',
+            apellido='Administrador',
+            cedula='V-12345678',
+            rango='Coronel',
+            rol='administrador'
+        )
+        admin.set_password('admin123')
+        db.session.add(admin)
+
+        # Crear Bombero de prueba
+        bombero = Usuario(
+            username='bombero',
+            nombre='Juan',
+            apellido='Pérez',
+            cedula='V-87654321',
+            rango='Cabo Primero',
+            rol='bombero'
+        )
+        bombero.set_password('bombero123')
+        db.session.add(bombero)
+        
+        db.session.commit()
+        print("Usuarios por defecto creados: admin/admin123 y bombero/bombero123")
+
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -46,34 +79,3 @@ def create_app(config_class=Config):
 app = create_app()
 
 __all__ = ['create_app', 'app', 'db', 'Usuario']
-
-def crear_usuarios_defecto():
-    """Crea usuarios semilla para pruebas iniciales."""
-    # Verificar si ya existen usuarios
-    if Usuario.query.first() is None:
-        # Crear Admin
-        admin = Usuario(
-            username='admin',
-            nombre='Jefe',
-            apellido='Administrador',
-            cedula='V-12345678',
-            rango='Coronel',
-            rol='administrador'
-        )
-        admin.set_password('admin123')
-        db.session.add(admin)
-
-        # Crear Bombero de prueba
-        bombero = Usuario(
-            username='bombero',
-            nombre='Juan',
-            apellido='Pérez',
-            cedula='V-87654321',
-            rango='Cabo Primero',
-            rol='bombero'
-        )
-        bombero.set_password('bombero123')
-        db.session.add(bombero)
-        
-        db.session.commit()
-        print("Usuarios por defecto creados: admin/admin123 y bombero/bombero123")
