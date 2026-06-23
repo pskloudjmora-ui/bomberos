@@ -8,7 +8,11 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'super-secret-key-bomberos-2026'
     
     # Intentar obtener la URL de conexión completa directamente
-    DATABASE_URL = os.environ.get('DATABASE_URL')
+    DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('RENDER_DATABASE_URL')
+
+    # Render y algunos servicios pueden proporcionar postgres:// en lugar de postgresql://
+    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
     
     if DATABASE_URL:
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
