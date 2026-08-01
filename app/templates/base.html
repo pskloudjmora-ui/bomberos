@@ -109,13 +109,38 @@
                                     <i data-lucide="users" class="w-4 h-4"></i>
                                     <span>Bomberos</span>
                                 </a>
+                                <a href="{{ url_for('main.gestionar_vehiculos') }}" class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors">
+                                    <i data-lucide="truck" class="w-4 h-4"></i>
+                                    <span>Vehículos</span>
+                                </a>
                             {% else %}
                                 <a href="{{ url_for('main.historial_bombero') }}" class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors">
                                     <i data-lucide="history" class="w-4 h-4 text-fire-500"></i>
                                     <span>Mis Reportes</span>
                                 </a>
                             {% endif %}
-                            
+
+                            {% if current_user.es_admin %}
+                            <!-- Dropdown de Registro -->
+                            <div class="relative group">
+                                <button class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors cursor-pointer focus:outline-none">
+                                    <i data-lucide="clipboard-plus" class="w-4 h-4 text-emerald-500"></i>
+                                    <span>Registro</span>
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <div class="absolute left-0 mt-1 w-56 origin-top-left rounded-xl bg-slate-900 border border-slate-800 p-2 shadow-2xl ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform scale-95 group-hover:scale-100 z-50">
+                                    <a href="{{ url_for('auth.registrar_usuario') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="user-plus" class="w-4 h-4 text-fire-500"></i>
+                                        <span>Registrar Bomberos</span>
+                                    </a>
+                                    <a href="{{ url_for('auth.registrar_vehiculo') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="truck" class="w-4 h-4 text-blue-500"></i>
+                                        <span>Registrar Unidades</span>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+
                             <!-- Dropdown de Nuevo Reporte -->
                             <div class="relative group">
                                 <button class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1.5 transition-colors cursor-pointer focus:outline-none">
