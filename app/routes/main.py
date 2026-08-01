@@ -226,3 +226,70 @@ def validar_reporte(reporte_id):
         
     db.session.commit()
     return redirect(url_for('main.dashboard_admin'))
+
+
+@main_bp.route('/admin/vehiculos')
+@login_required
+def gestionar_vehiculos():
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+    vehiculos = Vehiculo.query.order_by(Vehiculo.unidad.asc()).all()
+    return render_template('admin/vehiculos.html', vehiculos=vehiculos)
+
+
+@main_bp.route('/admin/vehiculo/<int:vehiculo_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_vehiculo(vehiculo_id):
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+
+    vehiculo = Vehiculo.query.get_or_404(vehiculo_id)
+
+    if request.method == 'POST':
+        vehiculo.unidad = request.form.get('unidad')
+        vehiculo.placa = request.form.get('placa')
+        vehiculo.marca = request.form.get('marca')
+        vehiculo.modelo = request.form.get('modelo')
+        vehiculo.color = request.form.get('color')
+        vehiculo.tipo = request.form.get('tipo')
+
+        db.session.commit()
+        flash(f'Vehículo {vehiculo.unidad} actualizado correctamente.', 'success')
+        return redirect(url_for('main.gestionar_vehiculos'))
+
+    return render_template('admin/editar_vehiculo.html', vehiculo=vehiculo)
+
+
+@main_bp.route('/admin/vehiculo/<int:vehiculo_id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_vehiculo(vehiculo_id):
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+
+    vehiculo = Vehiculo.query.get_or_404(vehiculo_id)
+    unidad = vehiculo.unidad
+
+    db.session.delete(vehiculo)
+    db.session.commit()
+
+    flash(f'Vehículo {unidad} eliminado correctamente.', 'success')
+    return redirect(url_for('main.gestionar_vehiculos'))
+
+
+@main_bp.route('/admin/vehiculo/<int:vehiculo_id>/toggle', methods=['POST'])
+@login_required
+def toggle_vehiculo(vehiculo_id):
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+
+    vehiculo = Vehiculo.query.get_or_404(vehiculo_id)
+    vehiculo.activo = not vehiculo.activo
+    db.session.commit()
+
+    estado = "activado" if vehiculo.activo else "desactivado"
+    flash(f'Vehículo {vehiculo.unidad} {estado} correctamente.', 'success')
+    return redirect(url_for('main.gestionar_vehiculos'))

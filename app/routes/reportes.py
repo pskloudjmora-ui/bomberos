@@ -282,13 +282,6 @@ def crear_reporte(tipo_reporte):
     )
 
 
-# Alias legacy para mantener compatibilidad si se llama a crear_matpel_glp
-@reportes_bp.route('/crear/matpel_glp', methods=['GET', 'POST'])
-@login_required
-def crear_matpel_glp():
-    return redirect(url_for('reportes.crear_reporte', tipo_reporte='matpel_glp'))
-
-
 @reportes_bp.route('/detalle/<int:reporte_id>')
 @login_required
 def detalle_reporte(reporte_id):

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import db, Usuario
+from app.models import db, Usuario, Vehiculo
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -80,3 +80,42 @@ def registrar_usuario():
         return redirect(url_for('main.gestionar_usuarios'))
         
     return render_template('auth/registrar.html')
+
+@auth_bp.route('/registrar-vehiculo', methods=['GET', 'POST'])
+@login_required
+def registrar_vehiculo():
+    if not current_user.es_admin:
+        flash('Acceso denegado: Se requieren permisos de administrador.', 'danger')
+        return redirect(url_for('main.index'))
+
+    if request.method == 'POST':
+        unidad = request.form.get('unidad')
+        placa = request.form.get('placa')
+        marca = request.form.get('marca')
+        modelo = request.form.get('modelo')
+        color = request.form.get('color')
+        tipo = request.form.get('tipo')
+
+        vehiculo_existente = Vehiculo.query.filter(
+            (Vehiculo.unidad == unidad) | (Vehiculo.placa == placa)
+        ).first()
+        if vehiculo_existente:
+            flash('Error: El número de unidad o la placa ya se encuentran registrados.', 'danger')
+            return redirect(url_for('auth.registrar_vehiculo'))
+
+        nuevo_vehiculo = Vehiculo(
+            unidad=unidad,
+            placa=placa,
+            marca=marca,
+            modelo=modelo,
+            color=color,
+            tipo=tipo
+        )
+
+        db.session.add(nuevo_vehiculo)
+        db.session.commit()
+
+        flash(f'Unidad {unidad} registrada exitosamente.', 'success')
+        return redirect(url_for('main.gestionar_vehiculos'))
+
+    return render_template('auth/registrar_vehiculo.html')
