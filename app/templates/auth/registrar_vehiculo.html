@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Unidad - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Encabezado -->
+    <div class="flex items-center space-x-3">
+        <a href="{{ url_for('main.gestionar_usuarios') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                <i data-lucide="truck" class="w-6 h-6 text-fire-500"></i>
+                <span>Registrar Nueva Unidad</span>
+            </h1>
+            <p class="text-slate-400 text-xs mt-0.5">Ingrese los datos de la unidad o vehículo del cuerpo de bomberos.</p>
+        </div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div class="glass-panel p-8 rounded-2xl border border-slate-800 shadow-2xl">
+        <form action="{{ url_for('auth.registrar_vehiculo') }}" method="POST" class="space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                <div>
+                    <label for="unidad" class="block text-sm font-semibold text-slate-300">Nro. de Unidad *</label>
+                    <input type="text" id="unidad" name="unidad" required placeholder="ej: B-05, M-15, A-02"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="placa" class="block text-sm font-semibold text-slate-300">Placa *</label>
+                    <input type="text" id="placa" name="placa" required placeholder="ej: ABC-123"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="marca" class="block text-sm font-semibold text-slate-300">Marca *</label>
+                    <input type="text" id="marca" name="marca" required placeholder="ej: Ford, Chevrolet, Toyota"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="modelo" class="block text-sm font-semibold text-slate-300">Modelo *</label>
+                    <input type="text" id="modelo" name="modelo" required placeholder="ej: Ranger, Hilux, Sprinter"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="color" class="block text-sm font-semibold text-slate-300">Color</label>
+                    <input type="text" id="color" name="color" placeholder="ej: Rojo, Blanco"
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+                <div>
+                    <label for="tipo" class="block text-sm font-semibold text-slate-300">Tipo de Unidad *</label>
+                    <select id="tipo" name="tipo" required
+                        class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="">Seleccione un tipo</option>
+                        <option value="Unidad de Supresión de Incendios">Unidad de Supresión de Incendios</option>
+                        <option value="Ambulancia">Ambulancia</option>
+                        <option value="Cisterna">Cisterna</option>
+                        <option value="Unidad de Rescate">Unidad de Rescate</option>
+                        <option value="Unidad de Escala">Unidad de Escala</option>
+                        <option value="Unidad de Comando">Unidad de Comando</option>
+                        <option value="Unidad de Apoyo Logístico">Unidad de Apoyo Logístico</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="flex justify-end space-x-3 border-t border-slate-800/60 pt-6">
+                <a href="{{ url_for('main.gestionar_usuarios') }}" class="px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-8 py-3 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg shadow-fire-950/30 transition-all transform hover:scale-[1.02] cursor-pointer">
+                    Registrar Unidad
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
