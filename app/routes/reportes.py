@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, Response
 from flask_login import login_required, current_user
 from datetime import datetime
 from app.models import (
@@ -7,6 +7,7 @@ from app.models import (
     ReportePreHospitalario, ReporteServicioAgua, ReporteServicioInsectos, ReporteServicioAnimal,
     ReporteServicioAchicamiento, ReporteServicioBaldeo
 )
+from app.services.pdf_service import generar_pdf_reporte, renderizar_html_reporte
 
 reportes_bp = Blueprint('reportes', __name__)
 
@@ -55,7 +56,7 @@ REPORT_TITLE_MAP = {
 # Campos específicos que corresponden a cada clase de reporte
 REPORT_FIELDS_MAP = {
     'matpel_glp': [
-        'clasificacion_servicio', 'nombre_producto', 'un_numero', 'tipo_almacenamiento',
+        'clasificacion_servicio', 'nombre_producto', 'un_numero', 'riesgo_producto', 'tipo_almacenamiento',
         'certificado_bomberil', 'nro_certificado', 'propietario_nombre', 'propietario_rif_ci',
         'empresa_distribuidora', 'vehiculo_marca', 'vehiculo_placa', 'vehiculo_color',
         'hoja_seguridad', 'extintor', 'equipo_derrame'
@@ -264,7 +265,7 @@ def crear_reporte(tipo_reporte):
 
             db.session.commit()
             flash(f'Reporte {nro_control} creado y enviado con éxito.', 'success')
-            return redirect(url_for('main.index'))
+            return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte_inst.id))
 
         except Exception as e:
             db.session.rollback()
@@ -296,3 +297,54 @@ def detalle_reporte(reporte_id):
         return redirect(url_for('main.index'))
         
     return render_template('reportes/detalle.html', reporte=reporte)
+
+
+@reportes_bp.route('/pdf/<int:reporte_id>')
+@login_required
+def descargar_pdf(reporte_id):
+    """
+    Genera y descarga el reporte operativo en formato PDF (tamaño Carta).
+
+    El logotipo, el nro de control, los tiempos, vehículos, solicitante,
+    receptor y dirección se incrustan automáticamente desde la base de datos.
+    """
+    reporte = Reporte.query.get_or_404(reporte_id)
+
+    # Restricción: Un bombero ordinario solo puede descargar su propio historial
+    if not current_user.es_admin and reporte.creador_id != current_user.id:
+        flash('Acceso denegado: No está autorizado para descargar este reporte.', 'danger')
+        return redirect(url_for('main.index'))
+
+    try:
+        pdf_bytes, motor = generar_pdf_reporte(reporte)
+    except Exception as e:
+        flash(f'Error al generar el PDF: {str(e)}', 'danger')
+        return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte.id))
+
+    nombre_archivo = f"Reporte_{reporte.nro_control.replace('/', '_')}.pdf"
+    respuesta = Response(pdf_bytes, mimetype='application/pdf')
+    respuesta.headers['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+    return respuesta
+
+
+@reportes_bp.route('/imprimir/<int:reporte_id>')
+@login_required
+def imprimir_reporte(reporte_id):
+    """
+    Vista de impresión/reimpresión del reporte: muestra el documento oficial
+    en pantalla para imprimirlo con el navegador (Ctrl+P). Reutiliza la misma
+    plantilla del PDF, por lo que el resultado de impresión es idéntico al
+    documento descargado. La barra de acciones no se imprime (.no-print).
+    """
+    reporte = Reporte.query.get_or_404(reporte_id)
+
+    # Restricción: Un bombero ordinario solo puede imprimir su propio historial
+    if not current_user.es_admin and reporte.creador_id != current_user.id:
+        flash('Acceso denegado: No está autorizado para imprimir este reporte.', 'danger')
+        return redirect(url_for('main.index'))
+
+    try:
+        return renderizar_html_reporte(reporte)
+    except Exception as e:
+        flash(f'Error al preparar la impresión: {str(e)}', 'danger')
+        return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte.id))
