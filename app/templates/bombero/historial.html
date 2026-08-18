@@ -125,11 +125,23 @@
                             </span>
                         </td>
                         <td class="py-4 px-6 text-center">
-                            <a href="{{ url_for('reportes.detalle_reporte', reporte_id=reporte.id) }}" 
-                               class="inline-flex items-center space-x-1 px-3 py-1.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all">
-                                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                                <span>Ver Detalle</span>
-                            </a>
+                            <div class="flex items-center justify-center space-x-2">
+                                <a href="{{ url_for('reportes.detalle_reporte', reporte_id=reporte.id) }}" 
+                                   class="inline-flex items-center space-x-1 px-3 py-1.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                    <span>Ver Detalle</span>
+                                </a>
+                                <a href="{{ url_for('reportes.descargar_pdf', reporte_id=reporte.id) }}" 
+                                   class="p-1.5 bg-slate-900 border border-slate-800 hover:bg-emerald-700 hover:border-emerald-700 hover:text-white text-emerald-400 rounded-lg transition-all flex items-center justify-center"
+                                   title="Descargar PDF">
+                                    <i data-lucide="file-down" class="w-3.5 h-3.5"></i>
+                                </a>
+                                <a href="{{ url_for('reportes.imprimir_reporte', reporte_id=reporte.id) }}" 
+                                   class="p-1.5 bg-slate-900 border border-slate-800 hover:bg-slate-700 hover:text-white text-sky-400 rounded-lg transition-all flex items-center justify-center"
+                                   title="Reimprimir Reporte">
+                                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% else %}
