@@ -120,6 +120,7 @@ CREATE TABLE reportes_matpel_glp (
 	nombre_producto VARCHAR(150), 
 	un_numero VARCHAR(10), 
 	tipo_almacenamiento VARCHAR(100), 
+	riesgo_producto VARCHAR(150), 
 	certificado_bomberil BOOLEAN DEFAULT FALSE, 
 	nro_certificado VARCHAR(50), 
 	propietario_nombre VARCHAR(150), 
