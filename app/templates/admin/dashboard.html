@@ -249,6 +249,18 @@
                                    title="Ver Detalle">
                                     <i data-lucide="eye" class="w-4 h-4"></i>
                                 </a>
+
+                                <a href="{{ url_for('reportes.descargar_pdf', reporte_id=reporte.id) }}" 
+                                   class="p-1.5 bg-slate-800 hover:bg-emerald-700 hover:text-white text-emerald-400 rounded-lg transition-colors flex items-center justify-center"
+                                   title="Descargar PDF">
+                                    <i data-lucide="file-down" class="w-4 h-4"></i>
+                                </a>
+
+                                <a href="{{ url_for('reportes.imprimir_reporte', reporte_id=reporte.id) }}" 
+                                   class="p-1.5 bg-slate-800 hover:bg-slate-600 hover:text-white text-sky-400 rounded-lg transition-colors flex items-center justify-center"
+                                   title="Reimprimir Reporte">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                </a>
                                 
                                 {% if reporte.estado == 'Enviado' %}
                                 <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
