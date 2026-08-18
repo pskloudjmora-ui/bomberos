@@ -62,6 +62,11 @@
                 <i data-lucide="printer" class="w-4 h-4"></i>
                 <span>Imprimir Reporte</span>
             </button>
+
+            <a href="{{ url_for('reportes.descargar_pdf', reporte_id=reporte.id) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold transition-all flex items-center space-x-2 shadow-lg shadow-emerald-950/20">
+                <i data-lucide="file-down" class="w-4 h-4"></i>
+                <span>Descargar PDF</span>
+            </a>
             
             {% if current_user.es_admin and reporte.estado == 'Enviado' %}
             <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">

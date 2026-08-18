@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reporte {{ dto.nro_control }}</title>
+<style>
+    @page {
+        size: letter;
+        margin: 1.3cm 1.1cm 1.1cm 1.1cm;
+    }
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 9pt;
+        color: #111111;
+        margin: 0;
+        padding: 0;
+        line-height: 1.35;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    td, th {
+        border: 0.6pt solid #222222;
+        padding: 3.5pt 5pt;
+        vertical-align: top;
+    }
+    th {
+        background-color: #e9e9e9;
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
+        text-align: left;
+    }
+    .tcampos {
+        background-color: #efefef;
+        font-weight: bold;
+        font-size: 7.2pt;
+        text-transform: uppercase;
+        letter-spacing: 0.4pt;
+        width: 34%;
+    }
+    .tvalor {
+        font-size: 9pt;
+    }
+    .titulo-seccion {
+        background-color: #1f1f1f;
+        color: #ffffff;
+        font-size: 8pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.6pt;
+        text-align: center;
+        padding: 5pt 4pt;
+    }
+    .tarjeta {
+        margin: 7pt 0;
+    }
+    .no-cortar {
+        page-break-inside: avoid;
+    }
+    .centro {
+        text-align: center;
+    }
+    .encabezado td {
+        border: none;
+        vertical-align: middle;
+        padding: 0 4pt;
+    }
+    .caja-control td {
+        border: 0.8pt solid #000000;
+    }
+    .republ {
+        font-size: 6.8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        color: #333333;
+    }
+    .estado-municipio {
+        font-size: 8pt;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .institucion {
+        font-size: 8.5pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
+    }
+    .sello-control {
+        text-align: center;
+        font-weight: bold;
+        font-size: 9.5pt;
+        text-transform: uppercase;
+        background-color: #efefef;
+    }
+    .control-num {
+        text-align: center;
+        font-weight: bold;
+        font-size: 11pt;
+    }
+    .control-det {
+        text-align: center;
+        font-size: 7pt;
+    }
+    .barra-titulo {
+        border: 1.4pt solid #000000;
+        text-align: center;
+        padding: 6pt;
+        margin: 9pt 0;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1pt;
+        font-size: 10pt;
+        background-color: #f7f7f7;
+    }
+    .firma-caja {
+        border: none;
+        padding: 0 6pt;
+    }
+    .firma-caja td {
+        border: none;
+    }
+    .linea-firma {
+        border-top: 0.9pt solid #000000;
+        padding-top: 4pt;
+        margin-top: 58pt;
+        text-align: center;
+        font-size: 8pt;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .pie {
+        text-align: center;
+        font-size: 6.5pt;
+        color: #555555;
+        margin-top: 12pt;
+    }
+    .texto-largo {
+        font-size: 8.5pt;
+        white-space: normal;
+    }
+    .logo-rec {
+        border: 0.8pt solid #999999;
+        text-align: center;
+        padding: 24pt 4pt;
+        font-size: 7pt;
+        color: #666666;
+    }
+    .barra-acciones {
+        background-color: #1f2937;
+        color: #ffffff;
+        padding: 7pt 10pt;
+        margin-bottom: 10pt;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 8.5pt;
+        text-align: center;
+    }
+    .barra-acciones a, .barra-acciones button {
+        display: inline-block;
+        color: #ffffff;
+        background-color: #374151;
+        border: 0.6pt solid #4b5563;
+        border-radius: 3pt;
+        padding: 4pt 10pt;
+        margin: 0 3pt;
+        text-decoration: none;
+        font-size: 8.5pt;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .barra-acciones a:hover, .barra-acciones button:hover {
+        background-color: #4b5563;
+    }
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Barra de acciones (no se imprime ni aparece en el PDF) -->
+{% if dto.reporte_id %}
+<div class="no-print barra-acciones">
+    <button type="button" onclick="window.print()">Reimprimir Reporte</button>
+    <a href="{{ url_for('reportes.descargar_pdf', reporte_id=dto.reporte_id) }}">Descargar PDF</a>
+    <a href="{{ url_for('reportes.detalle_reporte', reporte_id=dto.reporte_id) }}">Volver al Detalle</a>
+</div>
+{% endif %}
+
+<!-- ============ CABECERA INSTITUCIONAL ============ -->
+<table class="encabezado">
+    <tr>
+        <td style="width: 21%; text-align: center;">
+            {% if dto.logo %}
+            <img src="{{ dto.logo }}" width="88">
+            {% else %}
+            <div class="logo-rec">LOGOTIPO<br>OFICIAL</div>
+            {% endif %}
+        </td>
+        <td style="width: 56%; text-align: center;">
+            <div class="republ">República Bolivariana de Venezuela</div>
+            <div class="estado-municipio">Estado Carabobo &mdash; Municipio San Diego</div>
+            <div class="institucion">Alcaldía de San Diego</div>
+            <div class="institucion">Cuerpo de Bomberos y Bomberas y<br>Administración de Emergencias de Carácter Civil</div>
+            <div class="republ" style="margin-top: 2pt;">Dirección de Operaciones y Control de Emergencias</div>
+        </td>
+        <td style="width: 23%;">
+            <table class="caja-control">
+                <tr><td class="sello-control">N&deg; De Control</td></tr>
+                <tr><td class="control-num">{{ dto.nro_control }}</td></tr>
+                <tr><td class="control-det"><b>Fecha de emisi&oacute;n:</b> {{ dto.fecha_emision }}</td></tr>
+                <tr><td class="control-det"><b>Estado:</b> {{ dto.estado }} &nbsp;|&nbsp; <b>Fecha del incidente:</b> {{ dto.fecha_incidente }}</td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<div class="barra-titulo">Reporte Operativo &mdash; {{ dto.nombre_servicio }}</div>
+
+<!-- ============ 1. INFORMACIÓN GENERAL DEL AVISO ============ -->
+<table class="tarjeta no-cortar">
+    <tr>
+        <td class="titulo-seccion" colspan="4">1. Informaci&oacute;n General del Aviso, Tiempos y Ubicaci&oacute;n</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Fecha del Incidente</td>
+        <td class="tvalor">{{ dto.fecha_incidente }}</td>
+        <td class="tcampos">Clase de Aviso</td>
+        <td class="tvalor">{{ dto.clase_aviso }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">{{ dto.horas[0].etiqueta }}</td>
+        <td class="tvalor">{{ dto.horas[0].valor }}</td>
+        <td class="tcampos">{{ dto.horas[1].etiqueta }}</td>
+        <td class="tvalor">{{ dto.horas[1].valor }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">{{ dto.horas[2].etiqueta }}</td>
+        <td class="tvalor">{{ dto.horas[2].valor }}</td>
+        <td class="tcampos">{{ dto.horas[3].etiqueta }}</td>
+        <td class="tvalor">{{ dto.horas[3].valor }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Solicitante</td>
+        <td class="tvalor">{{ dto.solicitante_nombre }}</td>
+        <td class="tcampos">C&eacute;dula del Solicitante</td>
+        <td class="tvalor">{{ dto.solicitante_cedula }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Tel&eacute;fono del Solicitante</td>
+        <td class="tvalor">{{ dto.solicitante_telefono }}</td>
+        <td class="tcampos">Receptor del Aviso</td>
+        <td class="tvalor">{{ dto.receptor_aviso }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Direcci&oacute;n del Suceso</td>
+        <td class="tvalor" colspan="3">{{ dto.direccion }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Punto de Referencia</td>
+        <td class="tvalor" colspan="3">{{ dto.punto_referencia }}</td>
+    </tr>
+</table>
+
+<!-- ============ 2. DETALLE ESPECÍFICO DEL SERVICIO ============ -->
+<table class="tarjeta">
+    <tr>
+        <td class="titulo-seccion" colspan="2">{{ dto.titulo_seccion_2 }}</td>
+    </tr>
+    {% for campo in dto.especifico %}
+    <tr>
+        <td class="tcampos">{{ campo.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ campo.valor }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- ============ 3. VEHÍCULOS Y UNIDADES ACTUANTES ============ -->
+<table class="tarjeta no-cortar">
+    <tr>
+        <td class="titulo-seccion" colspan="7">3. Veh&iacute;culos y Unidades Actuantes</td>
+    </tr>
+    <tr>
+        <th style="width: 14%;">Unidad</th>
+        <th style="width: 22%;">Tipo</th>
+        <th style="width: 9%;">Placa</th>
+        <th style="width: 20%;">Conductor</th>
+        <th style="width: 9%;">Km Salida</th>
+        <th style="width: 9%;">Km Llegada</th>
+        <th style="width: 9%;">Recorrido</th>
+    </tr>
+    {% for v in dto.vehiculos %}
+    <tr>
+        <td class="tvalor"><b>{{ v.unidad }}</b></td>
+        <td class="tvalor">{{ v.tipo }}</td>
+        <td class="tvalor">{{ v.placa }}</td>
+        <td class="tvalor">{{ v.conductor }}</td>
+        <td class="tvalor centro">{{ v.km_salida }}</td>
+        <td class="tvalor centro">{{ v.km_llegada }}</td>
+        <td class="tvalor centro">{{ v.recorrido }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="tvalor centro">No se registraron unidades bomberiles en el servicio.</td></tr>
+    {% endfor %}
+</table>
+
+<!-- ============ 4. ACTUACIÓN BOMBERIL ============ -->
+<table class="tarjeta no-cortar">
+    <tr>
+        <td class="titulo-seccion" colspan="3">4. Actuaci&oacute;n Bomberil</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Material y Equipos Utilizados</td>
+        <td class="tvalor texto-largo" colspan="2">{{ dto.material_bomberil }}</td>
+    </tr>
+    <tr>
+        <td class="tcampos">Cantidad de Bomberos Actuantes</td>
+        <td class="tvalor" colspan="2">{{ dto.total_efectivos }} efectivos en comisi&oacute;n</td>
+    </tr>
+    {% if dto.jefe_comision %}
+    <tr>
+        <td class="tcampos">Jefe de Comisi&oacute;n</td>
+        <td class="tvalor" colspan="2">{{ dto.jefe_comision.nombre }} &nbsp;&mdash;&nbsp; C.I.: {{ dto.jefe_comision.cedula }}</td>
+    </tr>
+    {% endif %}
+    {% if dto.conductor_unidad %}
+    <tr>
+        <td class="tcampos">Conductor de Unidad</td>
+        <td class="tvalor" colspan="2">{{ dto.conductor_unidad.nombre }} &nbsp;&mdash;&nbsp; C.I.: {{ dto.conductor_unidad.cedula }}</td>
+    </tr>
+    {% endif %}
+    {% if dto.combatientes %}
+    <tr>
+        <td class="tcampos">Combatientes</td>
+        <td class="tvalor texto-largo" colspan="2">
+            {% for c in dto.combatientes %}{{ loop.index }}. {{ c.nombre }} (C.I.: {{ c.cedula }}){% if not loop.last %} &nbsp;&bull;&nbsp; {% endif %}{% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+</table>
+
+<!-- ============ 5. COOPERACIÓN DE OTROS ORGANISMOS ============ -->
+<table class="tarjeta no-cortar">
+    <tr>
+        <td class="titulo-seccion" colspan="4">5. Cooperaci&oacute;n de Otros Organismos (Apoyo Institucional)</td>
+    </tr>
+    <tr>
+        <th style="width: 36%;">Organismo</th>
+        <th style="width: 30%;">Jefe de Unidad</th>
+        <th style="width: 22%;">Matr&iacute;cula</th>
+        <th style="width: 12%;">Cant. Unidades</th>
+    </tr>
+    {% for org in dto.otros_organismos %}
+    <tr>
+        <td class="tvalor"><b>{{ org.nombre }}</b></td>
+        <td class="tvalor">{{ org.jefe }}</td>
+        <td class="tvalor">{{ org.matricula }}</td>
+        <td class="tvalor centro">{{ org.cantidad }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="tvalor centro">No actuaron organismos externos de apoyo.</td></tr>
+    {% endfor %}
+</table>
+
+<!-- ============ 6. OBSERVACIONES Y RELATO OPERACIONAL ============ -->
+<table class="tarjeta">
+    <tr>
+        <td class="titulo-seccion">6. Observaciones Generales y Relato Operacional</td>
+    </tr>
+    <tr>
+        <td class="tvalor texto-largo" style="min-height: 70pt;">{{ dto.observaciones|safe }}</td>
+    </tr>
+</table>
+
+<!-- ============ 7. FIRMAS ============ -->
+<table class="firma-caja no-cortar">
+    <tr>
+        <td style="width: 50%;">
+            <div class="linea-firma">Jefe de Comisi&oacute;n</div>
+            <div class="centro" style="font-size: 8pt; margin-top: 3pt;">
+                {% if dto.jefe_comision %}{{ dto.jefe_comision.nombre }}<br>C.I.: {{ dto.jefe_comision.cedula }}{% else %}Nombre y C.I.{% endif %}
+            </div>
+        </td>
+        <td style="width: 50%;">
+            <div class="linea-firma">Reporte Elaborado Por</div>
+            <div class="centro" style="font-size: 8pt; margin-top: 3pt;">
+                {% if dto.elaborado_por %}{{ dto.elaborado_por.nombre }}<br>C.I.: {{ dto.elaborado_por.cedula }}{% else %}Nombre y C.I.{% endif %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div class="pie">
+    Documento generado por el Sistema de Reportes Operativos &mdash; Cuerpo de Bomberos y Bomberas y Administraci&oacute;n
+    de Emergencias de Car&aacute;cter Civil, Municipalidad de San Diego, Estado Carabobo.
+</div>
+
+</body>
+</html>
