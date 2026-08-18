@@ -190,6 +190,7 @@ class ReporteMatpelGLP(Reporte):
     clasificacion_servicio = db.Column(db.String(100), nullable=True)  # Residencial, Comercial, Industrial, Transporte
     nombre_producto = db.Column(db.String(150), nullable=True)  # GLP, Propano, Butano, etc.
     un_numero = db.Column(db.String(10), nullable=True)  # Ej: UN 1075
+    riesgo_producto = db.Column(db.String(150), nullable=True)  # Inflamable, Explosivo, Asfixiante, etc.
     tipo_almacenamiento = db.Column(db.String(100), nullable=True)  # Cilindro, Tanque Estacionario, Cisterna
     
     # Certificaciones y Permisologías
