@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de {{ usuario.nombre }} {{ usuario.apellido }} - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Encabezado -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="{{ url_for('main.gestionar_usuarios') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-white flex items-center space-x-2">
+                    <i data-lucide="user" class="w-6 h-6 text-fire-500"></i>
+                    <span>Detalle del Funcionario</span>
+                </h1>
+                <p class="text-slate-400 text-xs mt-0.5">Información del personal bomberil y sus reportes elaborados.</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{{ url_for('main.editar_usuario', usuario_id=usuario.id) }}" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all flex items-center space-x-2 cursor-pointer">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+                <span>Editar</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tarjeta de datos personales -->
+    <div class="glass-panel p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-fire-600 to-fire-800 text-xl font-extrabold text-white flex items-center justify-center uppercase shadow-lg shadow-fire-950/30">
+                    {{ usuario.nombre[0] }}{{ usuario.apellido[0] }}
+                </div>
+                <div>
+                    <div class="text-xl font-extrabold text-white">{{ usuario.rango or 'Bombero' }} {{ usuario.nombre }} {{ usuario.apellido }}</div>
+                    <div class="text-xs text-slate-500">@{{ usuario.username }}</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                {% if usuario.rol == 'administrador' %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-fire-500/10 border border-fire-500/20 text-fire-400">
+                    Administrador
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300">
+                    Bombero
+                </span>
+                {% endif %}
+                {% if usuario.activo %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                    Activo
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-500">
+                    Inactivo
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-slate-800/60 pt-6 text-sm">
+            <div>
+                <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Cédula de Identidad</span>
+                <span class="text-white font-medium mt-1 block">{{ usuario.cedula }}</span>
+            </div>
+            <div>
+                <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Rango / Jerarquía</span>
+                <span class="text-white font-medium mt-1 block">{{ usuario.rango or 'Sin rango asignado' }}</span>
+            </div>
+            <div>
+                <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Registrado el</span>
+                <span class="text-white font-medium mt-1 block">{{ usuario.fecha_registro.strftime('%d/%m/%Y %H:%M') if usuario.fecha_registro else '--' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes elaborados por el funcionario -->
+    <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+        <div class="px-6 py-4 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-fire-500"></i>
+                <span>Reportes Elaborados por {{ usuario.nombre }}</span>
+            </h3>
+            <span class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-400 font-semibold">{{ reportes|length }}</span>
+        </div>
+        <table class="w-full text-left border-collapse text-slate-300 text-sm">
+            <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/40 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <th class="py-3 px-6">N° Control</th>
+                    <th class="py-3 px-6">Fecha</th>
+                    <th class="py-3 px-6">Tipo de Servicio</th>
+                    <th class="py-3 px-6">Estado</th>
+                    <th class="py-3 px-6 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+                {% for reporte in reportes %}
+                <tr class="hover:bg-slate-900/20 transition-colors">
+                    <td class="py-3 px-6 font-bold text-white">{{ reporte.nro_control }}</td>
+                    <td class="py-3 px-6">{{ reporte.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td class="py-3 px-6">{{ reporte.tipo_reporte|upper|replace('MATPEL_GLP', 'MATPEL GLP')|replace('SERVICIO_AGUA', 'Serv. Agua')|replace('PRE_HOSPITALARIO', 'Pre-Hospitalaria')|replace('SERVICIO_BALDEO', 'Baldeo')|replace('SERVICIO_INSECTOS', 'Insectos')|replace('SERVICIO_ANIMAL', 'Animal')|replace('SERVICIO_ACHICAMIENTO', 'Achicamiento')|replace('MATPEL_COMBUSTIBLE', 'MATPEL Comb.' )|replace('MATPEL_QUIMICO', 'MATPEL Quím.')|replace('MATPEL_OTROS', 'MATPEL Otros') }}</td>
+                    <td class="py-3 px-6">
+                        {% set est_color = 'bg-slate-800 text-slate-400' %}
+                        {% if reporte.estado == 'Validado' %}
+                            {% set est_color = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 border' %}
+                        {% elif reporte.estado == 'Enviado' %}
+                            {% set est_color = 'bg-amber-500/10 border-amber-500/20 text-amber-400 border' %}
+                        {% elif reporte.estado == 'Rechazado' %}
+                            {% set est_color = 'bg-fire-500/10 border-fire-500/20 text-fire-400 border' %}
+                        {% endif %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ est_color }}">{{ reporte.estado }}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <a href="{{ url_for('reportes.detalle_reporte', reporte_id=reporte.id) }}" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors inline-flex" title="Ver Detalle">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="py-10 px-6 text-center text-slate-500 text-sm">
+                        <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+                        <span>Este funcionario aún no ha elaborado reportes en el sistema.</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex justify-end space-x-3">
+        <a href="{{ url_for('main.editar_usuario', usuario_id=usuario.id) }}" class="px-6 py-3 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all inline-flex items-center space-x-2">
+            <i data-lucide="pencil" class="w-4 h-4"></i>
+            <span>Editar Funcionario</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}
