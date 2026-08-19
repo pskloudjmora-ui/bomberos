@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from datetime import datetime
 from app.models import (
-    db, Vehiculo, Reporte, ReporteVehiculoActuante, ReportePersonalActuante, ReporteOtroOrganismo,
+    db, Usuario, Vehiculo, Reporte, ReporteVehiculoActuante, ReportePersonalActuante, ReporteOtroOrganismo,
     ReporteMatpelGLP, ReporteMatpelCombustible, ReporteMatpelQuimico, ReporteMatpelOtros,
     ReportePreHospitalario, ReporteServicioAgua, ReporteServicioInsectos, ReporteServicioAnimal,
     ReporteServicioAchicamiento, ReporteServicioBaldeo
@@ -97,6 +97,21 @@ REPORT_FIELDS_MAP = {
         'observaciones_baldeo'
     ]
 }
+
+def resolver_personal_seleccionado(clave_usuario_id, clave_nombre, clave_ci, clave_rango):
+    """
+    Resuelve los datos de un bombero del formulario: si se eligió un usuario
+    del listado (select), toma nombre, cédula y rango desde la BD; en caso
+    contrario usa los campos de texto manuales (compatibilidad).
+    Devuelve (nombre_completo, cedula, rango).
+    """
+    usuario_id = request.form.get(clave_usuario_id)
+    if usuario_id:
+        usuario = Usuario.query.get(int(usuario_id))
+        if usuario:
+            return f'{usuario.nombre} {usuario.apellido}', usuario.cedula, usuario.rango
+    return request.form.get(clave_nombre), request.form.get(clave_ci), request.form.get(clave_rango)
+
 
 def parse_field_value(field_name, raw_val):
     """
@@ -213,9 +228,14 @@ def crear_reporte(tipo_reporte):
                     db.session.add(vehiculo_act)
 
             # 6. REGISTRAR PERSONAL ACTUANTE (Jefe de Comisión, Conductor y Elaborado Por)
+            jefe_nombre, jefe_ci, jefe_rango = resolver_personal_seleccionado(
+                'jefe_comision_usuario_id', 'jefe_comision_nombre', 'jefe_comision_ci', 'jefe_comision_rango')
+            conductor_nombre, conductor_ci, conductor_rango = resolver_personal_seleccionado(
+                'conductor_unidad_usuario_id', 'conductor_unidad_nombre', 'conductor_unidad_ci', 'conductor_unidad_rango')
+
             roles_personal = [
-                ('Jefe de Comisión', request.form.get('jefe_comision_nombre'), request.form.get('jefe_comision_ci'), request.form.get('jefe_comision_rango')),
-                ('Conductor Unidad', request.form.get('conductor_unidad_nombre'), request.form.get('conductor_unidad_ci'), request.form.get('conductor_unidad_rango')),
+                ('Jefe de Comisión', jefe_nombre, jefe_ci, jefe_rango),
+                ('Conductor Unidad', conductor_nombre, conductor_ci, conductor_rango),
                 ('Reporte Elaborado Por', current_user.nombre + " " + current_user.apellido, current_user.cedula, current_user.rango)
             ]
             
@@ -230,18 +250,28 @@ def crear_reporte(tipo_reporte):
                     )
                     db.session.add(pers_act)
 
-            # Combatientes dinámicos
+            # Combatientes dinámicos (selección de bomberos del sistema o texto manual)
+            combatientes_usuario_ids = request.form.getlist('combatientes_usuario_id[]')
             combatientes_nombres = request.form.getlist('combatientes_nombres[]')
             combatientes_cis = request.form.getlist('combatientes_cis[]')
             combatientes_rangos = request.form.getlist('combatientes_rangos[]')
             
-            for i in range(len(combatientes_nombres)):
-                if combatientes_nombres[i]:
+            for i in range(max(len(combatientes_usuario_ids), len(combatientes_nombres))):
+                nombre = ci = rango = None
+                if i < len(combatientes_usuario_ids) and combatientes_usuario_ids[i]:
+                    usuario = Usuario.query.get(int(combatientes_usuario_ids[i]))
+                    if usuario:
+                        nombre, ci, rango = f'{usuario.nombre} {usuario.apellido}', usuario.cedula, usuario.rango
+                if not nombre and i < len(combatientes_nombres) and combatientes_nombres[i]:
+                    nombre = combatientes_nombres[i]
+                    ci = combatientes_cis[i] if i < len(combatientes_cis) else ""
+                    rango = combatientes_rangos[i] if i < len(combatientes_rangos) else ""
+                if nombre:
                     pers_act = ReportePersonalActuante(
                         reporte_id=reporte_inst.id,
-                        nombre_completo=combatientes_nombres[i],
-                        cedula=combatientes_cis[i] if i < len(combatientes_cis) else "",
-                        rango=combatientes_rangos[i] if i < len(combatientes_rangos) else "",
+                        nombre_completo=nombre,
+                        cedula=ci,
+                        rango=rango,
                         rol_en_servicio='Combatiente'
                     )
                     db.session.add(pers_act)
@@ -273,12 +303,14 @@ def crear_reporte(tipo_reporte):
             return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
 
     vehiculos = Vehiculo.query.filter_by(activo=True).all()
+    bomberos = Usuario.query.filter_by(activo=True).order_by(Usuario.rango.asc(), Usuario.nombre.asc()).all()
     date_today = datetime.utcnow().strftime('%Y-%m-%d')
     return render_template(
         'reportes/crear.html',
         tipo_reporte=tipo_reporte,
         title=title,
         vehiculos=vehiculos,
+        bomberos=bomberos,
         date_today=date_today
     )
 

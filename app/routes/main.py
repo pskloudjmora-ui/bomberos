@@ -184,6 +184,100 @@ def gestionar_usuarios():
     return render_template('admin/usuarios.html', usuarios=usuarios)
 
 
+@main_bp.route('/admin/usuario/<int:usuario_id>')
+@login_required
+def ver_usuario(usuario_id):
+    """
+    Visualiza el detalle completo de un bombero: datos personales, credenciales
+    de acceso y reportes que ha elaborado. Exclusivo de administrador.
+    """
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+    usuario = Usuario.query.get_or_404(usuario_id)
+    reportes = Reporte.query.filter_by(creador_id=usuario.id).order_by(Reporte.fecha.desc()).all()
+    return render_template('admin/ver_usuario.html', usuario=usuario, reportes=reportes)
+
+
+@main_bp.route('/admin/usuario/<int:usuario_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_usuario(usuario_id):
+    """
+    Edita los datos y credenciales de un bombero. Exclusivo de administrador.
+    Si se deja la contraseña en blanco, se conserva la actual.
+    """
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+
+    usuario = Usuario.query.get_or_404(usuario_id)
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        cedula = request.form.get('cedula')
+        rango = request.form.get('rango')
+        rol = request.form.get('rol', 'bombero')
+        activo = request.form.get('activo') == 'on'
+        password = request.form.get('password')
+
+        # Validación de unicidad (excluyendo al propio usuario)
+        duplicado = Usuario.query.filter(
+            ((Usuario.username == username) | (Usuario.cedula == cedula)) &
+            (Usuario.id != usuario.id)
+        ).first()
+        if duplicado:
+            flash('Error: El nombre de usuario o la cédula ya pertenecen a otro funcionario.', 'danger')
+            return redirect(url_for('main.editar_usuario', usuario_id=usuario.id))
+
+        usuario.username = username
+        usuario.nombre = nombre
+        usuario.apellido = apellido
+        usuario.cedula = cedula
+        usuario.rango = rango
+        usuario.rol = rol
+        usuario.activo = activo
+        if password:
+            usuario.set_password(password)
+
+        db.session.commit()
+        flash(f'Datos de {usuario.nombre} {usuario.apellido} actualizados correctamente.', 'success')
+        return redirect(url_for('main.gestionar_usuarios'))
+
+    return render_template('admin/editar_usuario.html', usuario=usuario)
+
+
+@main_bp.route('/admin/usuario/<int:usuario_id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_usuario(usuario_id):
+    """
+    Elimina un bombero del sistema. Exclusivo de administrador.
+    No se permite borrar la propia cuenta ni a usuarios con reportes creados.
+    """
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+
+    usuario = Usuario.query.get_or_404(usuario_id)
+
+    if usuario.id == current_user.id:
+        flash('No puede eliminar su propia cuenta de administrador.', 'warning')
+        return redirect(url_for('main.gestionar_usuarios'))
+
+    if usuario.reportes_creados:
+        flash(f'No se puede eliminar a {usuario.nombre} {usuario.apellido}: tiene '
+              f'{len(usuario.reportes_creados)} reporte(s) en el sistema. '
+              'Puede desactivar su cuenta en la edición en su lugar.', 'warning')
+        return redirect(url_for('main.gestionar_usuarios'))
+
+    nombre_completo = f'{usuario.nombre} {usuario.apellido}'
+    db.session.delete(usuario)
+    db.session.commit()
+    flash(f'El bombero {nombre_completo} fue eliminado del sistema.', 'success')
+    return redirect(url_for('main.gestionar_usuarios'))
+
+
 @main_bp.route('/admin/reporte/<int:reporte_id>/eliminar', methods=['POST'])
 @login_required
 def eliminar_reporte(reporte_id):
