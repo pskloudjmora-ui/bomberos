@@ -22,6 +22,70 @@
         </div>
     </div>
 
+    <!-- Filtros de búsqueda -->
+    <div class="glass-panel p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <form method="GET" action="{{ url_for('main.gestionar_usuarios') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div class="md:col-span-1">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Buscar</label>
+                <input type="text" name="q" value="{{ filtros.q }}" placeholder="Nombre, cédula, usuario..."
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2.5 text-sm text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Rango</label>
+                <select name="rango"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2.5 text-sm text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                    <option value="">Todos los rangos</option>
+                    {% for rango in rangos %}
+                    <option value="{{ rango }}" {% if filtros.rango == rango %}selected{% endif %}>{{ rango }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Rol</label>
+                <select name="rol"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2.5 text-sm text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                    <option value="">Todos los roles</option>
+                    <option value="administrador" {% if filtros.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+                    <option value="bombero" {% if filtros.rol == 'bombero' %}selected{% endif %}>Bombero</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Estado</label>
+                <select name="estado"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2.5 text-sm text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                    <option value="">Todos los estados</option>
+                    <option value="activo" {% if filtros.estado == 'activo' %}selected{% endif %}>Activo</option>
+                    <option value="inactivo" {% if filtros.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                </select>
+            </div>
+            <div class="md:col-span-4 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/60">
+                <a href="{{ url_for('main.lista_bomberos_imprimir', q=filtros.q, rango=filtros.rango, rol=filtros.rol, estado=filtros.estado) }}"
+                   class="inline-flex items-center space-x-2 px-4 py-2.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-300 text-sm font-semibold transition-all"
+                   title="Imprimir la lista de bomberos según los filtros aplicados">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Imprimir Lista</span>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs text-slate-500">
+                        <b class="text-slate-300">{{ usuarios|length }}</b> funcionario(s) encontrado(s)
+                    </span>
+                    <a href="{{ url_for('main.gestionar_usuarios') }}" class="px-4 py-2.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl text-slate-400 text-sm font-semibold transition-all">
+                        Limpiar filtros
+                    </a>
+                    <button type="submit" class="inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-fire-600 to-fire-700 hover:from-fire-500 hover:to-fire-600 rounded-xl text-white text-sm font-bold shadow-lg shadow-fire-950/20 transition-all cursor-pointer">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        <span>Filtrar</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if not usuarios %}
+    <div class="glass-panel p-10 rounded-2xl border border-slate-800 text-center text-slate-500 text-sm">
+        No se encontraron funcionarios con los criterios de búsqueda indicados.
+    </div>
+    {% else %}
     <!-- Tabla de Personal -->
     <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
@@ -98,6 +162,7 @@
             </table>
         </div>
     </div>
+    {% endif %}
 
 </div>
 {% endblock %}

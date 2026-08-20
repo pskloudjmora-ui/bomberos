@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Listado de Personal Bomberil</title>
+<style>
+    @page {
+        size: letter;
+        margin: 1.3cm 1.1cm 1.1cm 1.1cm;
+    }
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 9pt;
+        color: #111111;
+        margin: 0;
+        padding: 0;
+        line-height: 1.35;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    td, th {
+        border: 0.6pt solid #222222;
+        padding: 4pt 5pt;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #e9e9e9;
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
+        text-align: left;
+    }
+    .encabezado td {
+        border: none;
+        vertical-align: middle;
+        padding: 0 4pt;
+    }
+    .republ {
+        font-size: 6.8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        color: #333333;
+    }
+    .estado-municipio {
+        font-size: 8pt;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .institucion {
+        font-size: 8.5pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
+    }
+    .logo-rec {
+        border: 0.8pt solid #999999;
+        text-align: center;
+        padding: 24pt 4pt;
+        font-size: 7pt;
+        color: #666666;
+    }
+    .barra-titulo {
+        border: 1.4pt solid #000000;
+        text-align: center;
+        padding: 6pt;
+        margin: 9pt 0;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1pt;
+        font-size: 10pt;
+        background-color: #f7f7f7;
+    }
+    .filtros {
+        font-size: 8pt;
+        margin-bottom: 8pt;
+        border: 0.6pt solid #222222;
+        padding: 5pt 7pt;
+        background-color: #f4f4f4;
+    }
+    .filtros b {
+        text-transform: uppercase;
+        font-size: 7.2pt;
+    }
+    .centro {
+        text-align: center;
+    }
+    .activo {
+        font-weight: bold;
+    }
+    .inactivo {
+        color: #555555;
+        font-style: italic;
+    }
+    .firma {
+        margin-top: 22pt;
+        width: 46%;
+        text-align: center;
+        font-size: 8.5pt;
+    }
+    .firma .linea {
+        border-top: 0.8pt solid #000000;
+        padding-top: 4pt;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .pie-emision {
+        margin-top: 10pt;
+        font-size: 7.5pt;
+        color: #333333;
+    }
+    .barra-acciones {
+        background-color: #1f2937;
+        color: #ffffff;
+        padding: 7pt 10pt;
+        margin-bottom: 10pt;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 8.5pt;
+        text-align: center;
+    }
+    .barra-acciones a, .barra-acciones button {
+        display: inline-block;
+        color: #ffffff;
+        background-color: #374151;
+        border: 0.6pt solid #4b5563;
+        border-radius: 3pt;
+        padding: 4pt 10pt;
+        margin: 0 3pt;
+        text-decoration: none;
+        font-size: 8.5pt;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .barra-acciones a:hover, .barra-acciones button:hover {
+        background-color: #4b5563;
+    }
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Barra de acciones (no se imprime) -->
+<div class="no-print barra-acciones">
+    <button type="button" onclick="window.print()">Reimprimir Lista</button>
+    <a href="{{ url_for('main.gestionar_usuarios', q=filtros.q, rango=filtros.rango, rol=filtros.rol, estado=filtros.estado) }}">Volver a la Gestión</a>
+</div>
+
+<!-- ============ CABECERA INSTITUCIONAL ============ -->
+<table class="encabezado">
+    <tr>
+        <td style="width: 21%; text-align: center;">
+            {% if logo %}
+            <img src="{{ logo }}" width="88">
+            {% else %}
+            <div class="logo-rec">LOGOTIPO<br>OFICIAL</div>
+            {% endif %}
+        </td>
+        <td style="width: 56%; text-align: center;">
+            <div class="republ">República Bolivariana de Venezuela</div>
+            <div class="estado-municipio">Estado Carabobo &mdash; Municipio San Diego</div>
+            <div class="institucion">Alcaldía de San Diego</div>
+            <div class="institucion">Cuerpo de Bomberos y Bomberas y<br>Administración de Emergencias de Carácter Civil</div>
+            <div class="republ" style="margin-top: 2pt;">Dirección de Operaciones y Control de Emergencias</div>
+        </td>
+        <td style="width: 23%; text-align: right; font-size: 7.5pt; color: #333333;">
+            <b>Fecha de emisión:</b> {{ fecha_emision }}<br>
+            <b>Funcionarios:</b> {{ usuarios|length }}
+        </td>
+    </tr>
+</table>
+
+<div class="barra-titulo">Listado Oficial de Personal Bomberil</div>
+
+<!-- Criterios de búsqueda aplicados -->
+<div class="filtros">
+    <b>Rango de búsqueda aplicado:</b>
+    {% if filtros.q %}&nbsp; Texto: &laquo;{{ filtros.q }}&raquo; &mdash;{% endif %}
+    {% if filtros.rango %}&nbsp; Rango: {{ filtros.rango }} &mdash;{% endif %}
+    {% if filtros.rol %}&nbsp; Rol: {{ filtros.rol }} &mdash;{% endif %}
+    {% if filtros.estado %}&nbsp; Estado: {{ filtros.estado }}{% endif %}
+    {% if not filtros.q and not filtros.rango and not filtros.rol and not filtros.estado %}&nbsp; Sin filtros &mdash; listado completo{% endif %}
+</div>
+
+<!-- Tabla de personal -->
+<table>
+    <thead>
+        <tr>
+            <th style="width: 5%; text-align: center;">N&deg;</th>
+            <th>Rango / Jerarqu&iacute;a</th>
+            <th>Nombres y Apellidos</th>
+            <th>C&eacute;dula</th>
+            <th>Rol del Sistema</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td class="centro">{{ loop.index }}</td>
+            <td><b>{{ usuario.rango or 'Bombero' }}</b></td>
+            <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+            <td>{{ usuario.cedula }}</td>
+            <td>{{ 'Administrador' if usuario.rol == 'administrador' else 'Bombero' }}</td>
+            <td class="{% if usuario.activo %}activo{% else %}inactivo{% endif %}">{{ 'Activo' if usuario.activo else 'Inactivo' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" class="centro">No se encontraron funcionarios con los criterios indicados.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Firmas -->
+<table style="border: none; margin-top: 18pt;">
+    <tr>
+        <td class="firma">
+            <div class="linea">{{ emitido_por.rango or 'Bombero' }} {{ emitido_por.nombre }} {{ emitido_por.apellido }}</div>
+            <div style="font-size: 8pt; margin-top: 7pt;">Emitido por &mdash; {{ 'Administrador' if emitido_por.es_admin else 'Bombero' }} del Sistema</div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
