@@ -44,9 +44,14 @@
                 </div>
 
                 <div>
-                    <label for="rango" class="block text-sm font-semibold text-slate-300">Rango / Jerarquía Bomberil</label>
-                    <input type="text" id="rango" name="rango" placeholder="ej: Distinguido, Cabo Primero, Teniente"
+                    <label for="rango" class="block text-sm font-semibold text-slate-300">Rango / Jerarquía Bomberil *</label>
+                    <select id="rango" name="rango" required
                         class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="">— Seleccione el rango —</option>
+                        {% for rango in rangos %}
+                        <option value="{{ rango }}">{{ rango }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
             </div>
