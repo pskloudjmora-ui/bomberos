@@ -1,13 +1,61 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from sqlalchemy import func, extract, or_
+from sqlalchemy import func, extract, or_, case
 from datetime import datetime, timedelta, time
 from app.models import (
     db, Usuario, Vehiculo, Reporte, 
-    ReporteMatpelGLP, ReporteServicioAgua, ReporteServicioBaldeo
+    ReporteMatpelGLP, ReporteServicioAgua, ReporteServicioBaldeo,
+    RANGOS_BOMBERILES
 )
+from app.services.pdf_service import obtener_logo_data_uri
 
 main_bp = Blueprint('main', __name__)
+
+def _orden_jerarquia(column):
+    """
+    Expresión SQL para ordenar por la jerarquía establecida en RANGOS_BOMBERILES
+    (los rangos no incluidos en la lista van al final, ordenados alfabéticamente).
+    """
+    rango_pos = case(
+        {rango: posicion for posicion, rango in enumerate(RANGOS_BOMBERILES)},
+        value=column,
+        else_=len(RANGOS_BOMBERILES)
+    )
+    return rango_pos
+
+def _aplicar_filtros_usuarios(args):
+    """
+    Aplica los filtros de búsqueda de la gestión de personal: texto libre,
+    rango jerárquico, rol del sistema y estado de la cuenta.
+    Devuelve (consulta, dict_filtros).
+    """
+    query = Usuario.query
+
+    texto = args.get('q', '').strip()
+    rango = args.get('rango', '').strip()
+    rol = args.get('rol', '').strip()
+    estado = args.get('estado', '').strip()
+
+    if texto:
+        patron = f'%{texto}%'
+        query = query.filter(or_(
+            Usuario.nombre.ilike(patron),
+            Usuario.apellido.ilike(patron),
+            Usuario.username.ilike(patron),
+            Usuario.cedula.ilike(patron)
+        ))
+
+    if rango:
+        query = query.filter(Usuario.rango == rango)
+
+    if rol in ('administrador', 'bombero'):
+        query = query.filter(Usuario.rol == rol)
+
+    if estado in ('activo', 'inactivo'):
+        query = query.filter(Usuario.activo == (estado == 'activo'))
+
+    filtros = {'q': texto, 'rango': rango, 'rol': rol, 'estado': estado}
+    return query, filtros
 
 @main_bp.route('/')
 @login_required
@@ -175,13 +223,54 @@ def dashboard_admin():
 @login_required
 def gestionar_usuarios():
     """
-    Visualiza la lista de usuarios y bomberos registrados. Exclusivo de administrador.
+    Visualiza la lista de usuarios y bomberos registrados con filtros de búsqueda
+    (texto, rango, rol y estado). Exclusivo de administrador.
     """
     if not current_user.es_admin:
         flash('Acceso denegado.', 'danger')
         return redirect(url_for('main.index'))
-    usuarios = Usuario.query.order_by(Usuario.rango.asc(), Usuario.nombre.asc()).all()
-    return render_template('admin/usuarios.html', usuarios=usuarios)
+
+    query, filtros = _aplicar_filtros_usuarios(request.args)
+    usuarios = query.order_by(
+        _orden_jerarquia(Usuario.rango).asc(),
+        Usuario.nombre.asc()
+    ).all()
+
+    return render_template(
+        'admin/usuarios.html',
+        usuarios=usuarios,
+        rangos=RANGOS_BOMBERILES,
+        filtros=filtros
+    )
+
+
+@main_bp.route('/admin/usuarios/imprimir')
+@login_required
+def lista_bomberos_imprimir():
+    """
+    Vista imprimible (lista oficial) del personal bomberil filtrado por los
+    mismos criterios de búsqueda de la gestión. Exclusivo de administrador.
+    """
+    if not current_user.es_admin:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('main.index'))
+
+    query, filtros = _aplicar_filtros_usuarios(request.args)
+    usuarios = query.order_by(
+        _orden_jerarquia(Usuario.rango).asc(),
+        Usuario.nombre.asc()
+    ).all()
+
+    fecha_emision = datetime.utcnow().strftime('%d/%m/%Y %H:%M')
+
+    return render_template(
+        'admin/lista_bomberos.html',
+        usuarios=usuarios,
+        filtros=filtros,
+        logo=obtener_logo_data_uri(),
+        fecha_emision=fecha_emision,
+        emitido_por=current_user
+    )
 
 
 @main_bp.route('/admin/usuario/<int:usuario_id>')
@@ -245,7 +334,7 @@ def editar_usuario(usuario_id):
         flash(f'Datos de {usuario.nombre} {usuario.apellido} actualizados correctamente.', 'success')
         return redirect(url_for('main.gestionar_usuarios'))
 
-    return render_template('admin/editar_usuario.html', usuario=usuario)
+    return render_template('admin/editar_usuario.html', usuario=usuario, rangos=RANGOS_BOMBERILES)
 
 
 @main_bp.route('/admin/usuario/<int:usuario_id>/eliminar', methods=['POST'])

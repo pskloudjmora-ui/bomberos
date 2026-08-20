@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import db, Usuario, Vehiculo
+from app.models import db, Usuario, Vehiculo, RANGOS_BOMBERILES
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -79,7 +79,7 @@ def registrar_usuario():
         flash(f'Bombero {nombre} {apellido} registrado exitosamente.', 'success')
         return redirect(url_for('main.gestionar_usuarios'))
         
-    return render_template('auth/registrar.html')
+    return render_template('auth/registrar.html', rangos=RANGOS_BOMBERILES)
 
 @auth_bp.route('/registrar-vehiculo', methods=['GET', 'POST'])
 @login_required
