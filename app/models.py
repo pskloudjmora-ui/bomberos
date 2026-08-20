@@ -406,3 +406,9 @@ class ReporteServicioBaldeo(Reporte):
     __mapper_args__ = {
         'polymorphic_identity': 'servicio_baldeo',
     }
+
+RANGOS_BOMBERILES = [
+    'Primer General', 'General', 'Mayor', 'Teniente Coronel', 'Coronel', 'Capitán', 'Teniente',
+    'Primer Teniente', 'Sargento Segundo', 'Sargento Primero', 'Sargento Mayor', 'Cabo Segundo',
+    'Cabo Primero', 'Distinguido', 'Bombero Raso'
+]
