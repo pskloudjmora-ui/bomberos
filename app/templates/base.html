@@ -146,7 +146,7 @@
                                     <span>Crear Reporte</span>
                                     <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
                                 </button>
-                                <div class="absolute left-0 mt-1 w-64 origin-top-left rounded-xl bg-slate-900 border border-slate-800 p-2 shadow-2xl ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform scale-95 group-hover:scale-100 z-50">
+                                <div class="absolute left-0 mt-1 w-72 origin-top-left rounded-xl bg-slate-900 border border-slate-800 p-2 shadow-2xl ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform scale-95 group-hover:scale-100 z-50 max-h-[80vh] overflow-y-auto custom-scrollbar">
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mb-1">CATEGORÍA MATPEL</div>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='matpel_glp') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
@@ -164,11 +164,101 @@
                                         <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
                                         <span>Otras Sustancias Peligrosas</span>
                                     </a>
-                                    
-                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">ATENCIÓN DE SALUD</div>
+
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">ATENCIÓN PRE-HOSPITALARIA</div>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='aph_traslado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="ambulance" class="w-4 h-4 text-emerald-500"></i>
+                                        <span>APH Traslado de Emergencia</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='aph_no_traslado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="ambulance" class="w-4 h-4 text-amber-500"></i>
+                                        <span>APH Traslado No Realizado</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='aph_interhospitalario') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="ambulance" class="w-4 h-4 text-blue-500"></i>
+                                        <span>APH Interhospitalario</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='aph_sin_traslado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="ambulance" class="w-4 h-4 text-purple-500"></i>
+                                        <span>APH Sin Traslado</span>
+                                    </a>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='pre_hospitalario') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="activity" class="w-4 h-4 text-rose-500"></i>
-                                        <span>Atención Pre-Hospitalaria</span>
+                                        <span>APH Legacy (Anterior)</span>
+                                    </a>
+
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">INCENDIOS</div>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_estructura') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="flame" class="w-4 h-4 text-orange-500"></i>
+                                        <span>Incendio de Estructura</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_apoyo') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
+                                        <span>Apoyo por Incendios</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_electrico') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
+                                        <span>Incendio Equipo Eléctrico</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_vehiculo') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="car" class="w-4 h-4 text-red-400"></i>
+                                        <span>Incendio de Vehículo</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_desechos') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="trash-2" class="w-4 h-4 text-emerald-400"></i>
+                                        <span>Incendio Desechos Sólidos</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_vegetacion') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="trees" class="w-4 h-4 text-green-500"></i>
+                                        <span>Incendio Vegetación/Forestal</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_arbol') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="tree-pine" class="w-4 h-4 text-lime-500"></i>
+                                        <span>Incendio de Árbol</span>
+                                    </a>
+
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">RESCATE COLISIÓN / VOLCAMIENTO</div>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_colision_con_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="siren" class="w-4 h-4 text-red-500"></i>
+                                        <span>Colisión con Lesionado</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_colision_sin_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="siren" class="w-4 h-4 text-amber-500"></i>
+                                        <span>Colisión sin Lesionado</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_volcamiento_con_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="siren" class="w-4 h-4 text-orange-500"></i>
+                                        <span>Volcamiento con Lesionado</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_volcamiento_sin_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="siren" class="w-4 h-4 text-yellow-500"></i>
+                                        <span>Volcamiento sin Lesionado</span>
+                                    </a>
+
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">RESCATE ESPECIALIZADO</div>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_ascensor') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="arrow-up-down" class="w-4 h-4 text-blue-400"></i>
+                                        <span>Rescate Ascensor</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_inmueble') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="building" class="w-4 h-4 text-slate-400"></i>
+                                        <span>Rescate Inmueble</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_altura') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="mountain" class="w-4 h-4 text-cyan-500"></i>
+                                        <span>Rescate en Altura</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_tapiada') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="lock" class="w-4 h-4 text-purple-400"></i>
+                                        <span>Rescate Tapiada</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_golpeada') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="shield" class="w-4 h-4 text-pink-400"></i>
+                                        <span>Rescate Golpeada</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_caida') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="arrow-down" class="w-4 h-4 text-teal-400"></i>
+                                        <span>Rescate Caída</span>
                                     </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">SERVICIOS ESPECIALES</div>

@@ -1,11 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, Response
 from flask_login import login_required, current_user
 from datetime import datetime
+import json
 from app.models import (
     db, Usuario, Vehiculo, Reporte, ReporteVehiculoActuante, ReportePersonalActuante, ReporteOtroOrganismo,
     ReporteMatpelGLP, ReporteMatpelCombustible, ReporteMatpelQuimico, ReporteMatpelOtros,
     ReportePreHospitalario, ReporteServicioAgua, ReporteServicioInsectos, ReporteServicioAnimal,
-    ReporteServicioAchicamiento, ReporteServicioBaldeo
+    ReporteServicioAchicamiento, ReporteServicioBaldeo,
+    ReporteAPHTraslado, ReporteAPHNoTraslado, ReporteAPHInterhospitalario, ReporteAPHSinTraslado,
+    ReporteIncendio, ReporteRescateColision, ReporteRescateEspecializado, ReportePersonaAfectada
 )
 from app.services.pdf_service import generar_pdf_reporte, renderizar_html_reporte
 
@@ -23,6 +26,31 @@ REPORT_MODEL_MAP = {
     'servicio_animal': ReporteServicioAnimal,
     'servicio_achicamiento': ReporteServicioAchicamiento,
     'servicio_baldeo': ReporteServicioBaldeo,
+    # Nuevos: Atención Pre-Hospitalaria
+    'aph_traslado': ReporteAPHTraslado,
+    'aph_no_traslado': ReporteAPHNoTraslado,
+    'aph_interhospitalario': ReporteAPHInterhospitalario,
+    'aph_sin_traslado': ReporteAPHSinTraslado,
+    # Nuevos: Incendios
+    'incendio_estructura': ReporteIncendio,
+    'incendio_apoyo': ReporteIncendio,
+    'incendio_electrico': ReporteIncendio,
+    'incendio_vehiculo': ReporteIncendio,
+    'incendio_desechos': ReporteIncendio,
+    'incendio_vegetacion': ReporteIncendio,
+    'incendio_arbol': ReporteIncendio,
+    # Nuevos: Rescate Colisión/Volcamiento
+    'rescate_colision_con_lesionado': ReporteRescateColision,
+    'rescate_colision_sin_lesionado': ReporteRescateColision,
+    'rescate_volcamiento_con_lesionado': ReporteRescateColision,
+    'rescate_volcamiento_sin_lesionado': ReporteRescateColision,
+    # Nuevos: Rescate Especializado
+    'rescate_ascensor': ReporteRescateEspecializado,
+    'rescate_inmueble': ReporteRescateEspecializado,
+    'rescate_altura': ReporteRescateEspecializado,
+    'rescate_tapiada': ReporteRescateEspecializado,
+    'rescate_golpeada': ReporteRescateEspecializado,
+    'rescate_caida': ReporteRescateEspecializado,
 }
 
 # Prefijos correspondientes para la autogeneración del N° de Control
@@ -37,6 +65,27 @@ REPORT_PREFIX_MAP = {
     'servicio_animal': 'ANIM',
     'servicio_achicamiento': 'ACHI',
     'servicio_baldeo': 'BALD',
+    'aph_traslado': 'APH_TRAS',
+    'aph_no_traslado': 'APH_NO_TRAS',
+    'aph_interhospitalario': 'APH_INTER',
+    'aph_sin_traslado': 'APH_SIN_TRAS',
+    'incendio_estructura': 'INC_EST',
+    'incendio_apoyo': 'INC_APOYO',
+    'incendio_electrico': 'INC_ELEC',
+    'incendio_vehiculo': 'INC_VEH',
+    'incendio_desechos': 'INC_DESE',
+    'incendio_vegetacion': 'INC_VEG',
+    'incendio_arbol': 'INC_ARB',
+    'rescate_colision_con_lesionado': 'RES_COL_L',
+    'rescate_colision_sin_lesionado': 'RES_COL_S',
+    'rescate_volcamiento_con_lesionado': 'RES_VOL_L',
+    'rescate_volcamiento_sin_lesionado': 'RES_VOL_S',
+    'rescate_ascensor': 'RES_ASC',
+    'rescate_inmueble': 'RES_INM',
+    'rescate_altura': 'RES_ALT',
+    'rescate_tapiada': 'RES_TAP',
+    'rescate_golpeada': 'RES_GOL',
+    'rescate_caida': 'RES_CAID',
 }
 
 # Títulos de cabecera legibles para la plantilla crear.html
@@ -51,6 +100,27 @@ REPORT_TITLE_MAP = {
     'servicio_animal': 'Servicio Especial - Control de Animal Doméstico',
     'servicio_achicamiento': 'Servicio Especial - Achicamiento por Aguas Estancadas',
     'servicio_baldeo': 'Servicio Especial - Baldeo de Agua',
+    'aph_traslado': 'Atención Pre-Hospitalaria - Traslado de Emergencia',
+    'aph_no_traslado': 'Atención Pre-Hospitalaria - Traslado No Realizado',
+    'aph_interhospitalario': 'Atención Pre-Hospitalaria - Traslados Interhospitalarios',
+    'aph_sin_traslado': 'Atención Pre-Hospitalaria Sin Traslado',
+    'incendio_estructura': 'Reporte de Incendio de Estructura',
+    'incendio_apoyo': 'Reporte de Apoyo por Incendios',
+    'incendio_electrico': 'Reporte de Incendio de Equipos Eléctricos',
+    'incendio_vehiculo': 'Reporte de Incendio de Vehículo',
+    'incendio_desechos': 'Reporte de Incendio de Desechos Sólidos',
+    'incendio_vegetacion': 'Reporte de Incendio de Vegetación y/o Forestal',
+    'incendio_arbol': 'Reporte de Incendio de Árbol',
+    'rescate_colision_con_lesionado': 'Rescate por Colisión con Lesionado',
+    'rescate_colision_sin_lesionado': 'Rescate por Colisión sin Lesionado',
+    'rescate_volcamiento_con_lesionado': 'Rescate por Volcamiento con Lesionado',
+    'rescate_volcamiento_sin_lesionado': 'Rescate por Volcamiento sin Lesionado',
+    'rescate_ascensor': 'Rescate de Persona Incomunicada en Ascensor',
+    'rescate_inmueble': 'Rescate de Persona Incomunicada en Inmueble',
+    'rescate_altura': 'Rescate de Persona en Altura',
+    'rescate_tapiada': 'Rescate de Persona Tapiada',
+    'rescate_golpeada': 'Rescate de Persona Golpeada por',
+    'rescate_caida': 'Rescate de Persona Caída en',
 }
 
 # Campos específicos que corresponden a cada clase de reporte
@@ -97,7 +167,162 @@ REPORT_FIELDS_MAP = {
     'servicio_baldeo': [
         'motivo_baldeo', 'area_afectada', 'limpieza_vias_efectuada', 'litros_agua_utilizados',
         'observaciones_baldeo'
-    ]
+    ],
+    'aph_traslado': [
+        'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
+        'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
+        'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
+        'regla_9_miembro_superior_i', 'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i', 'regla_9_total',
+        'procedimiento_paraclinico', 'medicinas_usadas', 'material_medico_usado',
+        'centro_hospitalario', 'medico_recibe', 'medico_cedula', 'medico_msds', 'medico_firma',
+        'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
+    ],
+    'aph_no_traslado': [
+        'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
+        'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
+        'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
+        'regla_9_miembro_superior_i', 'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i', 'regla_9_total',
+        'procedimiento_paraclinico', 'medicinas_usadas', 'material_medico_usado',
+        'centro_hospitalario', 'medico_recibe', 'medico_cedula', 'medico_msds', 'medico_firma',
+        'motivo_no_traslado', 'indicaciones_dejadas',
+        'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
+    ],
+    'aph_interhospitalario': [
+        'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
+        'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
+        'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
+        'regla_9_miembro_superior_i', 'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i', 'regla_9_total',
+        'procedimiento_paraclinico', 'medicinas_usadas', 'material_medico_usado',
+        'centro_origen', 'medico_origen', 'centro_destino',
+        'medico_recibe', 'medico_cedula', 'medico_msds', 'medico_firma',
+        'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
+    ],
+    'aph_sin_traslado': [
+        'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
+        'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
+        'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
+        'regla_9_miembro_superior_i', 'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i', 'regla_9_total',
+        'procedimiento_paraclinico', 'medicinas_usadas', 'material_medico_usado',
+        'conducta_adoptada', 'indicaciones_dejadas',
+        'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
+    ],
+    'incendio_estructura': [
+        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar',
+        'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono'
+    ],
+    'incendio_apoyo': [
+        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar'
+    ],
+    'incendio_electrico': [
+        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar'
+    ],
+    'incendio_vehiculo': [
+        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar',
+        'vehiculo_marca', 'vehiculo_modelo', 'vehiculo_placa', 'vehiculo_color',
+        'vehiculo_anio', 'vehiculo_tipo',
+        'propietario_nombre', 'propietario_cedula', 'propietario_edad', 'propietario_telefono'
+    ],
+    'incendio_desechos': [
+        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar'
+    ],
+    'incendio_vegetacion': [
+        'subtipo_incendio', 'tipo_incendio', 'clase_incendio', 'intensidad',
+        'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar',
+        'tipo_terreno', 'tipo_vegetacion', 'extension_terreno', 'extension_terreno_afectada', 'coordenadas'
+    ],
+    'incendio_arbol': [
+        'subtipo_incendio', 'clase_incendio', 'intensidad',
+        'lugar_desarrollo', 'presunto_punto_origen',
+        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
+        'metodos_extincion', 'tecnicas_extincion',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'evaluacion_preliminar',
+        'tipo_terreno', 'tipo_vegetacion', 'extension_terreno', 'extension_terreno_afectada', 'coordenadas'
+    ],
+    'rescate_colision_con_lesionado': [
+        'subtipo_rescate', 'vehiculos_involucrados_json',
+        'observaciones_custodio', 'vehiculo_cargo_nombre', 'vehiculo_cargo_cedula', 'vehiculo_cargo_telefono'
+    ],
+    'rescate_colision_sin_lesionado': [
+        'subtipo_rescate', 'vehiculos_involucrados_json',
+        'observaciones_custodio', 'vehiculo_cargo_nombre', 'vehiculo_cargo_cedula', 'vehiculo_cargo_telefono'
+    ],
+    'rescate_volcamiento_con_lesionado': [
+        'subtipo_rescate', 'vehiculos_involucrados_json',
+        'observaciones_custodio', 'vehiculo_cargo_nombre', 'vehiculo_cargo_cedula', 'vehiculo_cargo_telefono'
+    ],
+    'rescate_volcamiento_sin_lesionado': [
+        'subtipo_rescate', 'vehiculos_involucrados_json',
+        'observaciones_custodio', 'vehiculo_cargo_nombre', 'vehiculo_cargo_cedula', 'vehiculo_cargo_telefono'
+    ],
+    'rescate_ascensor': [
+        'subtipo_rescate', 'tipo_servicio',
+        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
+        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+    ],
+    'rescate_inmueble': [
+        'subtipo_rescate', 'tipo_servicio',
+        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
+        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+    ],
+    'rescate_altura': [
+        'subtipo_rescate', 'tipo_servicio',
+        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
+        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+    ],
+    'rescate_tapiada': [
+        'subtipo_rescate', 'tipo_servicio',
+        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
+        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+    ],
+    'rescate_golpeada': [
+        'subtipo_rescate', 'tipo_servicio',
+        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
+        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+    ],
+    'rescate_caida': [
+        'subtipo_rescate', 'tipo_servicio',
+        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
+        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+    ],
 }
 
 def resolver_personal_seleccionado(clave_usuario_id, clave_nombre, clave_ci, clave_rango):
@@ -122,16 +347,25 @@ def parse_field_value(field_name, raw_val):
     if raw_val is None or raw_val == '':
         return None
     # Booleanos
-    if field_name in ['certificado_bomberil', 'hoja_seguridad', 'extintor', 'equipo_derrame', 'limpieza_vias_efectuada', 'vehiculo_afecto']:
+    if field_name in ['certificado_bomberil', 'hoja_seguridad', 'extintor', 'equipo_derrame', 'limpieza_vias_efectuada', 'vehiculo_afecto',
+                       'medico_firma', 'rechazo_firma', 'hubo_propagacion', 'poseia_equipos', 'fue_usado']:
         return raw_val in ['Si', 'on', 'true', '1', True]
     # Enteros
-    if field_name in ['paciente_edad', 'signos_vitales_pulso', 'signos_vitales_fr', 'litros_distribuidos', 'beneficiarios_estimados', 'litros_agua_utilizados']:
+    if field_name in ['paciente_edad', 'signos_vitales_pulso', 'signos_vitales_fr', 'litros_distribuidos',
+                       'beneficiarios_estimados', 'litros_agua_utilizados',
+                       'signos_vitales_fc', 'signos_vitales_fr', 'glasgow_apertura_ocular',
+                       'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
+                       'regla_9_total', 'propietario_edad', 'despliegue_cantidad_bomberos']:
         try:
             return int(raw_val)
         except ValueError:
             return 0
     # Flotantes / Decimales
-    if field_name in ['cantidad_estimada_derrame', 'capacidad_tanque_litros']:
+    if field_name in ['cantidad_estimada_derrame', 'capacidad_tanque_litros',
+                       'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen',
+                       'regla_9_miembro_superior_d', 'regla_9_miembro_superior_i',
+                       'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i',
+                       'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total']:
         try:
             return float(raw_val)
         except ValueError:
@@ -195,6 +429,58 @@ def crear_reporte(tipo_reporte):
                 specific_kwargs[field] = parse_field_value(field, raw_val)
 
             # 4. INSTANCIAR Y GUARDAR REPORTE POLIMÓRFICO
+            extra_kwargs = {}
+            # Subtipo para incendios
+            if tipo_reporte.startswith('incendio_'):
+                subtipos_map = {
+                    'incendio_estructura': 'estructura', 'incendio_apoyo': 'apoyo',
+                    'incendio_electrico': 'electrico', 'incendio_vehiculo': 'vehiculo',
+                    'incendio_desechos': 'desechos', 'incendio_vegetacion': 'vegetacion',
+                    'incendio_arbol': 'arbol',
+                }
+                extra_kwargs['subtipo_incendio'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('incendio_', ''))
+            # Subtipo para rescate colisión/volcamiento
+            if tipo_reporte.startswith('rescate_colision_') or tipo_reporte.startswith('rescate_volcamiento_'):
+                subtipos_map = {
+                    'rescate_colision_con_lesionado': 'colision_con_lesionado',
+                    'rescate_colision_sin_lesionado': 'colision_sin_lesionado',
+                    'rescate_volcamiento_con_lesionado': 'volcamiento_con_lesionado',
+                    'rescate_volcamiento_sin_lesionado': 'volcamiento_sin_lesionado',
+                }
+                extra_kwargs['subtipo_rescate'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('rescate_', ''))
+                # Serializar vehículos involucrados
+                veh_inv_marca = request.form.getlist('veh_inv_marca[]')
+                veh_inv_modelo = request.form.getlist('veh_inv_modelo[]')
+                veh_inv_placa = request.form.getlist('veh_inv_placa[]')
+                veh_inv_color = request.form.getlist('veh_inv_color[]')
+                veh_inv_anio = request.form.getlist('veh_inv_anio[]')
+                veh_inv_tipo = request.form.getlist('veh_inv_tipo[]')
+                veh_inv_propietario = request.form.getlist('veh_inv_propietario[]')
+                veh_inv_cedula = request.form.getlist('veh_inv_cedula[]')
+                veh_inv_telefono = request.form.getlist('veh_inv_telefono[]')
+                vehiculos_lista = []
+                for i in range(max(len(veh_inv_marca), len(veh_inv_placa))):
+                    vehiculos_lista.append({
+                        'marca': veh_inv_marca[i] if i < len(veh_inv_marca) else '',
+                        'modelo': veh_inv_modelo[i] if i < len(veh_inv_modelo) else '',
+                        'placa': veh_inv_placa[i] if i < len(veh_inv_placa) else '',
+                        'color': veh_inv_color[i] if i < len(veh_inv_color) else '',
+                        'anio': veh_inv_anio[i] if i < len(veh_inv_anio) else '',
+                        'tipo': veh_inv_tipo[i] if i < len(veh_inv_tipo) else '',
+                        'propietario': veh_inv_propietario[i] if i < len(veh_inv_propietario) else '',
+                        'cedula': veh_inv_cedula[i] if i < len(veh_inv_cedula) else '',
+                        'telefono': veh_inv_telefono[i] if i < len(veh_inv_telefono) else '',
+                    })
+                extra_kwargs['vehiculos_involucrados_json'] = json.dumps(vehiculos_lista) if vehiculos_lista else None
+            # Subtipo para rescate especializado
+            if tipo_reporte.startswith('rescate_') and not tipo_reporte.startswith('rescate_colision_') and not tipo_reporte.startswith('rescate_volcamiento_'):
+                subtipos_map = {
+                    'rescate_ascensor': 'ascensor', 'rescate_inmueble': 'inmueble',
+                    'rescate_altura': 'altura', 'rescate_tapiada': 'tapiada',
+                    'rescate_golpeada': 'golpeada', 'rescate_caida': 'caida',
+                }
+                extra_kwargs['subtipo_rescate'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('rescate_', ''))
+
             reporte_inst = model_class(
                 nro_control=nro_control,
                 fecha=fecha,
@@ -213,13 +499,37 @@ def crear_reporte(tipo_reporte):
                 creador_id=current_user.id,
                 estado='Enviado',
                 observaciones_generales=observaciones_generales,
-                **specific_kwargs
+                **specific_kwargs,
+                **extra_kwargs
             )
             
             db.session.add(reporte_inst)
             db.session.flush()
 
-            # 5. REGISTRAR VEHÍCULOS ACTUANTES
+            # 5. REGISTRAR PERSONAS AFECTADAS (para APH y Rescates)
+            if tipo_reporte.startswith('aph_') or tipo_reporte.startswith('rescate_'):
+                pa_nombres = request.form.getlist('pa_nombre[]')
+                pa_cedulas = request.form.getlist('pa_cedula[]')
+                pa_edades = request.form.getlist('pa_edad[]')
+                pa_sexos = request.form.getlist('pa_sexo[]')
+                pa_lesiones = request.form.getlist('pa_lesion[]')
+                pa_residencias = request.form.getlist('pa_residencia[]')
+
+                for i in range(max(len(pa_nombres), 0)):
+                    nombre = pa_nombres[i] if i < len(pa_nombres) else ''
+                    if nombre:
+                        persona = ReportePersonaAfectada(
+                            reporte_id=reporte_inst.id,
+                            nombre_apellido=nombre,
+                            cedula_pasaporte=pa_cedulas[i] if i < len(pa_cedulas) else '',
+                            edad=int(pa_edades[i]) if i < len(pa_edades) and pa_edades[i] else None,
+                            sexo=pa_sexos[i] if i < len(pa_sexos) else '',
+                            lesion=pa_lesiones[i] if i < len(pa_lesiones) else '',
+                            residencia=pa_residencias[i] if i < len(pa_residencias) else '',
+                        )
+                        db.session.add(persona)
+
+            # 6. REGISTRAR VEHÍCULOS ACTUANTES
             vehiculos_ids = request.form.getlist('vehiculos_actuantes[]')
             conductores = request.form.getlist('conductores[]')
             kms_salida = request.form.getlist('kms_salida[]')
@@ -236,7 +546,7 @@ def crear_reporte(tipo_reporte):
                     )
                     db.session.add(vehiculo_act)
 
-            # 6. REGISTRAR PERSONAL ACTUANTE (Jefe de Comisión, Conductor y Elaborado Por)
+            # 7. REGISTRAR PERSONAL ACTUANTE (Jefe de Comisión, Conductor y Elaborado Por)
             jefe_nombre, jefe_ci, jefe_rango = resolver_personal_seleccionado(
                 'jefe_comision_usuario_id', 'jefe_comision_nombre', 'jefe_comision_ci', 'jefe_comision_rango')
             conductor_nombre, conductor_ci, conductor_rango = resolver_personal_seleccionado(
@@ -285,7 +595,7 @@ def crear_reporte(tipo_reporte):
                     )
                     db.session.add(pers_act)
 
-            # 7. REGISTRAR ACTUACIÓN DE OTROS ORGANISMOS
+            # 8. REGISTRAR ACTUACIÓN DE OTROS ORGANISMOS
             organismos_nombres = request.form.getlist('organismo_nombre[]')
             organismos_jefes = request.form.getlist('organismo_jefe[]')
             organismos_matriculas = request.form.getlist('organismo_matricula[]')

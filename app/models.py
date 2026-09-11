@@ -422,6 +422,382 @@ class ReporteServicioBaldeo(Reporte):
         'polymorphic_identity': 'servicio_baldeo',
     }
 
+
+# ========================================================
+# NUEVOS FORMULARIOS - PERSONA AFECTADA COMPARTIDA
+# ========================================================
+
+class ReportePersonaAfectada(db.Model):
+    """
+    Personas afectadas en reportes de Atención Pre-Hospitalaria y Rescate.
+    Tabla compartida para múltiples tipos de reportes.
+    """
+    __tablename__ = 'reporte_personas_afectadas'
+
+    id = db.Column(db.Integer, primary_key=True)
+    reporte_id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), nullable=False)
+    nombre_apellido = db.Column(db.String(200), nullable=False)
+    cedula_pasaporte = db.Column(db.String(30), nullable=True)
+    edad = db.Column(db.Integer, nullable=True)
+    sexo = db.Column(db.String(20), nullable=True)
+    lesion = db.Column(db.String(255), nullable=True)
+    residencia = db.Column(db.String(255), nullable=True)
+
+    reporte = db.relationship('Reporte', backref=db.backref('personas_afectadas', cascade='all, delete-orphan', lazy=True))
+
+
+# ========================================================
+# SUBCLASES: ATENCIÓN PRE-HOSPITALARIA (4 TIPOS)
+# ========================================================
+
+class ReporteAPHTraslado(Reporte):
+    """
+    Reporte de Atención Pre-Hospitalaria: Traslado de Emergencia.
+    """
+    __tablename__ = 'reportes_aph_traslado'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Signos Vitales
+    signos_vitales_pa = db.Column(db.String(20), nullable=True)
+    signos_vitales_fc = db.Column(db.Integer, nullable=True)
+    signos_vitales_fr = db.Column(db.Integer, nullable=True)
+    signos_vitales_temperatura = db.Column(db.String(10), nullable=True)
+
+    # Escala de Coma de Glasgow
+    glasgow_apertura_ocular = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_verbal = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_motora = db.Column(db.Integer, nullable=True)
+    glasgow_total = db.Column(db.Integer, nullable=True)
+
+    # Regla de los 9 para Quemaduras
+    regla_9_cabeza = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_torax = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_abdomen = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_total = db.Column(db.Numeric(5, 2), nullable=True)
+
+    # Procedimientos y Tratamiento
+    procedimiento_paraclinico = db.Column(db.Text, nullable=True)
+    medicinas_usadas = db.Column(db.Text, nullable=True)
+    material_medico_usado = db.Column(db.Text, nullable=True)
+
+    # Datos del Centro Hospitalario
+    centro_hospitalario = db.Column(db.String(200), nullable=True)
+    medico_recibe = db.Column(db.String(150), nullable=True)
+    medico_cedula = db.Column(db.String(20), nullable=True)
+    medico_msds = db.Column(db.String(50), nullable=True)
+    medico_firma = db.Column(db.Boolean, default=False)
+
+    # Rechazo a la Atención y Traslado
+    rechazo_nombre = db.Column(db.String(200), nullable=True)
+    rechazo_cedula = db.Column(db.String(20), nullable=True)
+    rechazo_firma = db.Column(db.Boolean, default=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'aph_traslado',
+    }
+
+
+class ReporteAPHNoTraslado(Reporte):
+    """
+    Reporte de Atención Pre-Hospitalaria: Traslado No Realizado.
+    """
+    __tablename__ = 'reportes_aph_no_traslado'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Signos Vitales
+    signos_vitales_pa = db.Column(db.String(20), nullable=True)
+    signos_vitales_fc = db.Column(db.Integer, nullable=True)
+    signos_vitales_fr = db.Column(db.Integer, nullable=True)
+    signos_vitales_temperatura = db.Column(db.String(10), nullable=True)
+
+    # Escala de Coma de Glasgow
+    glasgow_apertura_ocular = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_verbal = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_motora = db.Column(db.Integer, nullable=True)
+    glasgow_total = db.Column(db.Integer, nullable=True)
+
+    # Regla de los 9 para Quemaduras
+    regla_9_cabeza = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_torax = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_abdomen = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_total = db.Column(db.Numeric(5, 2), nullable=True)
+
+    # Procedimientos y Tratamiento
+    procedimiento_paraclinico = db.Column(db.Text, nullable=True)
+    medicinas_usadas = db.Column(db.Text, nullable=True)
+    material_medico_usado = db.Column(db.Text, nullable=True)
+
+    # Datos del Centro Hospitalario
+    centro_hospitalario = db.Column(db.String(200), nullable=True)
+    medico_recibe = db.Column(db.String(150), nullable=True)
+    medico_cedula = db.Column(db.String(20), nullable=True)
+    medico_msds = db.Column(db.String(50), nullable=True)
+    medico_firma = db.Column(db.Boolean, default=False)
+
+    # Motivo del No Traslado
+    motivo_no_traslado = db.Column(db.Text, nullable=True)
+    indicaciones_dejadas = db.Column(db.Text, nullable=True)
+
+    # Rechazo a la Atención y Traslado
+    rechazo_nombre = db.Column(db.String(200), nullable=True)
+    rechazo_cedula = db.Column(db.String(20), nullable=True)
+    rechazo_firma = db.Column(db.Boolean, default=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'aph_no_traslado',
+    }
+
+
+class ReporteAPHInterhospitalario(Reporte):
+    """
+    Reporte de Atención Pre-Hospitalaria: Traslados Interhospitalarios.
+    """
+    __tablename__ = 'reportes_aph_interhospitalario'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Signos Vitales
+    signos_vitales_pa = db.Column(db.String(20), nullable=True)
+    signos_vitales_fc = db.Column(db.Integer, nullable=True)
+    signos_vitales_fr = db.Column(db.Integer, nullable=True)
+    signos_vitales_temperatura = db.Column(db.String(10), nullable=True)
+
+    # Escala de Coma de Glasgow
+    glasgow_apertura_ocular = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_verbal = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_motora = db.Column(db.Integer, nullable=True)
+    glasgow_total = db.Column(db.Integer, nullable=True)
+
+    # Regla de los 9 para Quemaduras
+    regla_9_cabeza = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_torax = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_abdomen = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_total = db.Column(db.Numeric(5, 2), nullable=True)
+
+    # Procedimientos y Tratamiento
+    procedimiento_paraclinico = db.Column(db.Text, nullable=True)
+    medicinas_usadas = db.Column(db.Text, nullable=True)
+    material_medico_usado = db.Column(db.Text, nullable=True)
+
+    # Datos Centro de Origen
+    centro_origen = db.Column(db.String(200), nullable=True)
+    medico_origen = db.Column(db.String(150), nullable=True)
+
+    # Datos Centro de Destino
+    centro_destino = db.Column(db.String(200), nullable=True)
+    medico_recibe = db.Column(db.String(150), nullable=True)
+    medico_cedula = db.Column(db.String(20), nullable=True)
+    medico_msds = db.Column(db.String(50), nullable=True)
+    medico_firma = db.Column(db.Boolean, default=False)
+
+    # Rechazo a la Atención y Traslado
+    rechazo_nombre = db.Column(db.String(200), nullable=True)
+    rechazo_cedula = db.Column(db.String(20), nullable=True)
+    rechazo_firma = db.Column(db.Boolean, default=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'aph_interhospitalario',
+    }
+
+
+class ReporteAPHSinTraslado(Reporte):
+    """
+    Reporte de Atención Pre-Hospitalaria Sin Traslado.
+    """
+    __tablename__ = 'reportes_aph_sin_traslado'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Signos Vitales
+    signos_vitales_pa = db.Column(db.String(20), nullable=True)
+    signos_vitales_fc = db.Column(db.Integer, nullable=True)
+    signos_vitales_fr = db.Column(db.Integer, nullable=True)
+    signos_vitales_temperatura = db.Column(db.String(10), nullable=True)
+
+    # Escala de Coma de Glasgow
+    glasgow_apertura_ocular = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_verbal = db.Column(db.Integer, nullable=True)
+    glasgow_respuesta_motora = db.Column(db.Integer, nullable=True)
+    glasgow_total = db.Column(db.Integer, nullable=True)
+
+    # Regla de los 9 para Quemaduras
+    regla_9_cabeza = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_torax = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_abdomen = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_superior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_d = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_miembro_inferior_i = db.Column(db.Numeric(5, 2), nullable=True)
+    regla_9_total = db.Column(db.Numeric(5, 2), nullable=True)
+
+    # Procedimientos y Tratamiento
+    procedimiento_paraclinico = db.Column(db.Text, nullable=True)
+    medicinas_usadas = db.Column(db.Text, nullable=True)
+    material_medico_usado = db.Column(db.Text, nullable=True)
+
+    # Conducta Adoptada
+    conducta_adoptada = db.Column(db.Text, nullable=True)
+    indicaciones_dejadas = db.Column(db.Text, nullable=True)
+
+    # Rechazo a la Atención y Traslado
+    rechazo_nombre = db.Column(db.String(200), nullable=True)
+    rechazo_cedula = db.Column(db.String(20), nullable=True)
+    rechazo_firma = db.Column(db.Boolean, default=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'aph_sin_traslado',
+    }
+
+
+# ========================================================
+# SUBCLASES: INCENDIOS (1 MODELO PARA 6 SUBTIPOS)
+# ========================================================
+
+class ReporteIncendio(Reporte):
+    """
+    Reporte unificado para incendios: Estructura, Apoyo por Incendios,
+    Equipos Eléctricos, Vehículo, Desechos Sólidos, Vegetación/Forestal, Árbol.
+    Se diferencia por el campo subtipo_incendio.
+    """
+    __tablename__ = 'reportes_incendio'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Subtipo de incendio
+    subtipo_incendio = db.Column(db.String(50), nullable=False)  # estructura, apoyo, electrico, vehiculo, desechos, vegetacion, arbol
+
+    # Tipo de incendio (para vegetación/forestal: Vegetación o Forestal)
+    tipo_incendio = db.Column(db.String(100), nullable=True)
+
+    # Características del incendio
+    clase_incendio = db.Column(db.String(20), nullable=True)  # 1era, 2da, 3era
+    intensidad = db.Column(db.String(20), nullable=True)  # 1era, 2da, 3era
+    lugar_desarrollo = db.Column(db.String(255), nullable=True)
+    presunto_punto_origen = db.Column(db.String(255), nullable=True)
+    tipo_equipo_contra_incendio = db.Column(db.String(255), nullable=True)
+    hora_control = db.Column(db.Time, nullable=True)
+    hora_extincion_total = db.Column(db.Time, nullable=True)
+    porcentaje_perdida_fuego = db.Column(db.Numeric(5, 2), nullable=True)
+    porcentaje_perdida_humo = db.Column(db.Numeric(5, 2), nullable=True)
+    porcentaje_perdida_total = db.Column(db.Numeric(5, 2), nullable=True)
+    litros_agua_utilizados = db.Column(db.Integer, nullable=True)
+    hubo_propagacion = db.Column(db.Boolean, default=False)
+    propagacion_donde = db.Column(db.String(255), nullable=True)
+    metodos_extincion = db.Column(db.Text, nullable=True)
+    tecnicas_extincion = db.Column(db.Text, nullable=True)
+    poseia_equipos = db.Column(db.Boolean, default=False)
+    fue_usado = db.Column(db.Boolean, default=False)
+    por_quien_uso = db.Column(db.String(150), nullable=True)
+    por_quien_ci = db.Column(db.String(20), nullable=True)
+    evaluacion_preliminar = db.Column(db.Text, nullable=True)
+
+    # Características del terreno (vegetación/forestal/árbol)
+    tipo_terreno = db.Column(db.String(100), nullable=True)
+    tipo_vegetacion = db.Column(db.String(100), nullable=True)
+    extension_terreno = db.Column(db.String(100), nullable=True)
+    extension_terreno_afectada = db.Column(db.String(100), nullable=True)
+    coordenadas = db.Column(db.String(100), nullable=True)
+
+    # Datos del vehículo (solo para subtipo vehiculo)
+    vehiculo_marca = db.Column(db.String(50), nullable=True)
+    vehiculo_modelo = db.Column(db.String(50), nullable=True)
+    vehiculo_placa = db.Column(db.String(20), nullable=True)
+    vehiculo_color = db.Column(db.String(30), nullable=True)
+    vehiculo_anio = db.Column(db.String(10), nullable=True)
+    vehiculo_tipo = db.Column(db.String(50), nullable=True)
+    propietario_nombre = db.Column(db.String(150), nullable=True)
+    propietario_cedula = db.Column(db.String(20), nullable=True)
+    propietario_edad = db.Column(db.Integer, nullable=True)
+    propietario_telefono = db.Column(db.String(30), nullable=True)
+
+    # Datos del propietario/habitante del inmueble (estructura)
+    inmueble_propietario_nombre = db.Column(db.String(150), nullable=True)
+    inmueble_propietario_cedula = db.Column(db.String(20), nullable=True)
+    inmueble_propietario_telefono = db.Column(db.String(30), nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'incendio',
+    }
+
+
+# ========================================================
+# SUBCLASES: RESCATE POR COLISIÓN/VOLCAMIENTO
+# ========================================================
+
+class ReporteRescateColision(Reporte):
+    """
+    Reporte unificado para rescate por Colisión/Volcamiento con/sin lesionado.
+    Se diferencia por el campo subtipo_rescate.
+    """
+    __tablename__ = 'reportes_rescate_colision'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Subtipo: colision_con_lesionado, colision_sin_lesionado, volcamiento_con_lesionado, volcamiento_sin_lesionado
+    subtipo_rescate = db.Column(db.String(50), nullable=False)
+
+    # Datos de vehículos involucrados (JSON serializado)
+    vehiculos_involucrados_json = db.Column(db.Text, nullable=True)
+
+    # Observaciones del custodio/responsable
+    observaciones_custodio = db.Column(db.Text, nullable=True)
+    vehiculo_cargo_nombre = db.Column(db.String(150), nullable=True)
+    vehiculo_cargo_cedula = db.Column(db.String(20), nullable=True)
+    vehiculo_cargo_telefono = db.Column(db.String(30), nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'rescate_colision',
+    }
+
+
+# ========================================================
+# SUBCLASES: RESCATE ESPECIALIZADO (6 SUBTIPOS)
+# ========================================================
+
+class ReporteRescateEspecializado(Reporte):
+    """
+    Reporte unificado para rescate especializado: Ascensor, Inmueble,
+    Altura, Tapiada, Golpeada, Caída.
+    Se diferencia por el campo subtipo_rescate.
+    """
+    __tablename__ = 'reportes_rescate_especializado'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Subtipo: ascensor, inmueble, altura, tapiada, golpeada, caida
+    subtipo_rescate = db.Column(db.String(50), nullable=False)
+
+    # Tipo de servicio específico (para tapiada, golpeada, caída)
+    tipo_servicio = db.Column(db.String(150), nullable=True)
+
+    # Despliegue operacional
+    despliegue_vehiculos = db.Column(db.Text, nullable=True)
+    despliegue_conductor_nombre = db.Column(db.String(150), nullable=True)
+    despliegue_conductor_ci = db.Column(db.String(20), nullable=True)
+    despliegue_jefe_nombre = db.Column(db.String(150), nullable=True)
+    despliegue_jefe_ci = db.Column(db.String(20), nullable=True)
+    despliegue_cantidad_bomberos = db.Column(db.Integer, nullable=True)
+    despliegue_material_usado = db.Column(db.Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'rescate_especializado',
+    }
+
+
 RANGOS_BOMBERILES = [
     'Primer General', 'General', 'Mayor', 'Teniente Coronel', 'Coronel', 'Capitán', 'Teniente',
     'Primer Teniente', 'Sargento Segundo', 'Sargento Primero', 'Sargento Mayor', 'Cabo Segundo',
