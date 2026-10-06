@@ -3,6 +3,51 @@
 {% block title %}{{ title }} - Cuerpo de Bomberos{% endblock %}
 
 {% block content %}
+<script>
+    // Funciones globales definidas ANTES del HTML para que estén disponibles en handlers inline
+    function manejarOtros(select, inputId) {
+        const input = document.getElementById(inputId);
+        if (select.value === 'Otro') {
+            input.style.display = 'block';
+            input.required = true;
+        } else {
+            input.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    }
+
+    function agregarVehiculo() {
+        const contenedor = document.getElementById('contenedor-vehiculos');
+        const plantilla = document.getElementById('plantilla-vehiculo').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function agregarCombatiente() {
+        const contenedor = document.getElementById('contenedor-combatientes');
+        const plantilla = document.getElementById('plantilla-combatiente').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function agregarOrganismo() {
+        const contenedor = document.getElementById('contenedor-organismos');
+        const plantilla = document.getElementById('plantilla-organismo').content.cloneNode(true);
+        contenedor.appendChild(plantilla);
+        lucide.createIcons();
+    }
+
+    function eliminarFila(boton) {
+        const fila = boton.closest('tr');
+        fila.remove();
+    }
+
+    function eliminarCombatiente(boton) {
+        const fila = boton.closest('.fila-combatiente');
+        fila.remove();
+    }
+</script>
 <div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Encabezado -->
@@ -187,28 +232,21 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Riesgo del Producto</label>
-                    <select name="riesgo_producto"
+                    <select name="riesgo_producto" onchange="manejarOtros(this, 'riesgo_producto_otro')"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="Inflamable">Inflamable</option>
-                        <option value="Explosivo">Explosivo</option>
-                        <option value="Asfixiante">Asfixiante</option>
-                        <option value="Tóxico">Tóxico</option>
-                        <option value="Otro">Otro</option>
+                        <option value="Clase 1 - Explosivos">Clase 1: Explosivos</option>
+                        <option value="Clase 2 - Gases">Clase 2: Gases</option>
+                        <option value="Clase 3 - Líquidos inflamables">Clase 3: Líquidos inflamables</option>
+                        <option value="Clase 4 - Sólidos inflamables">Clase 4: Sólidos inflamables</option>
+                        <option value="Clase 5 - Comburentes y peróxidos orgánicos">Clase 5: Sustancias comburentes y peróxidos orgánicos</option>
+                        <option value="Clase 6 - Tóxicas e infecciosas">Clase 6: Sustancias tóxicas e infecciosas</option>
+                        <option value="Clase 7 - Material radiactivo">Clase 7: Material radiactivo</option>
+                        <option value="Clase 8 - Sustancias corrosivas">Clase 8: Sustancias corrosivas</option>
+                        <option value="Clase 9 - Peligrosos varios">Clase 9: Sustancias y objetos peligrosos varios</option>
+                        <option value="Otro">Otro (especificar)</option>
                     </select>
-                </div>
-            </div>
-            <!-- Riesgo del Producto -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Riesgo del Producto</label>
-                    <select name="riesgo_producto"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="Inflamable">Inflamable</option>
-                        <option value="Explosivo">Explosivo</option>
-                        <option value="Asfixiante">Asfixiante</option>
-                        <option value="Tóxico">Tóxico</option>
-                        <option value="Otro">Otro</option>
-                    </select>
+                    <input type="text" name="riesgo_producto_otro" id="riesgo_producto_otro" placeholder="Especifique el riesgo" style="display:none"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2">
                 </div>
             </div>
             <!-- Propietario -->
@@ -3222,73 +3260,9 @@
 
 {% block extra_js %}
 <script>
-    // JS dinámico para añadir filas en vehículos actuantes, combatientes y organismos
-    
-    function agregarVehiculo() {
-        const contenedor = document.getElementById('contenedor-vehiculos');
-        const plantilla = document.getElementById('plantilla-vehiculo').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
-        lucide.createIcons(); // Recargar iconos Lucide en el nuevo nodo
-    }
-
-    function agregarCombatiente() {
-        const contenedor = document.getElementById('contenedor-combatientes');
-        const plantilla = document.getElementById('plantilla-combatiente').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
-        lucide.createIcons();
-    }
-
-    function agregarOrganismo() {
-        const contenedor = document.getElementById('contenedor-organismos');
-        const plantilla = document.getElementById('plantilla-organismo').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
-        lucide.createIcons();
-    }
-
-    function eliminarFila(boton) {
-        const fila = boton.closest('tr');
-        fila.remove();
-    }
-
-    function eliminarCombatiente(boton) {
-        const fila = boton.closest('.fila-combatiente');
-        fila.remove();
-    }
-
-    // Función para manejar opción "Otro" en selects
-    function manejarOtros(select, inputId) {
-        const input = document.getElementById(inputId);
-        if (select.value === 'Otro') {
-            input.style.display = 'block';
-            input.required = true;
-        } else {
-            input.style.display = 'none';
-            input.required = false;
-            input.value = '';
-        }
-    }
-
-    // Agregar opción "Otro" al select de riesgo GLP
+    // Inicializar con un organismo vacío
     document.addEventListener("DOMContentLoaded", function() {
         agregarOrganismo();
-        
-        // GLP: Riesgo del Producto - agregar "Otro"
-        const riesgoGlp = document.querySelector('select[name="riesgo_producto"]');
-        if (riesgoGlp) {
-            const otroOpt = document.createElement('option');
-            otroOpt.value = 'Otro';
-            otroOpt.textContent = 'Otro (especificar)';
-            riesgoGlp.appendChild(otroOpt);
-            const otroInput = document.createElement('input');
-            otroInput.type = 'text';
-            otroInput.name = 'riesgo_producto_otro';
-            otroInput.id = 'riesgo_producto_otro';
-            otroInput.placeholder = 'Especifique el riesgo';
-            otroInput.style.display = 'none';
-            otroInput.className = 'block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2';
-            riesgoGlp.parentNode.appendChild(otroInput);
-            riesgoGlp.setAttribute('onchange', "manejarOtros(this, 'riesgo_producto_otro')");
-        }
     });
 
     // Personas Afectadas (para APH y Rescates)
@@ -3340,25 +3314,25 @@
         }
     }
 
-document.addEventListener('input', function(e) {
+    document.addEventListener('input', function(e) {
         if (e.target.name && e.target.name.startsWith('regla_9_')) {
             calcularRegla9();
         }
     });
 
     // Plantilla para personas afectadas
-    <template id="plantilla-persona">
-        <div class="fila-persona grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-950/20 p-2 rounded-lg border border-slate-800/40 relative">
-            <select name="pa_nombre[]" required
-                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 sm:col-span-3">
-                <option value="">— Seleccione una persona —</option>
-            </select>
-            <div class="flex items-center justify-end space-x-2">
-                <button type="button" onclick="eliminarPersona(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors" title="Quitar persona">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-            </div>
+</script>
+<template id="plantilla-persona">
+    <div class="fila-persona grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-950/20 p-2 rounded-lg border border-slate-800/40 relative">
+        <select name="pa_nombre[]" required
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 sm:col-span-3">
+            <option value="">— Seleccione una persona —</option>
+        </select>
+        <div class="flex items-center justify-end space-x-2">
+            <button type="button" onclick="eliminarPersona(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors" title="Quitar persona">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
         </div>
-    </template>
-
+    </div>
+</template>
 {% endblock %}
