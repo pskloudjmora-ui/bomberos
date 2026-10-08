@@ -294,7 +294,7 @@ class ReporteMatpelOtros(Reporte):
 
 class ReportePreHospitalario(Reporte):
     """
-    5. Reporte de Atención Pre-Hospitalaria / Traslado de Emergencia.
+    5. Reporte de Atención Pre-Hospitalaria / Traslado Rutinario.
     """
     __tablename__ = 'reportes_pre_hospitalario'
     

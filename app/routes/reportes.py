@@ -94,7 +94,7 @@ REPORT_TITLE_MAP = {
     'matpel_combustible': 'Reporte MATPEL - Derrame de Combustible',
     'matpel_quimico': 'Reporte MATPEL - Derrame de Sustancia Química',
     'matpel_otros': 'Reporte MATPEL - Otras Sustancias Peligrosas',
-    'pre_hospitalario': 'Atención Pre-Hospitalaria / Traslado de Emergencia',
+    'pre_hospitalario': 'Atención Pre-Hospitalaria / Traslado Rutinario',
     'servicio_agua': 'Servicio Especial - Abastecimiento de Agua',
     'servicio_insectos': 'Servicio Especial - Control y Re-ubicación de Insectos',
     'servicio_animal': 'Servicio Especial - Control de Animal Doméstico',
