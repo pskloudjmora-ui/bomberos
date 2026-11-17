@@ -1,0 +1,53 @@
+{# Macros compartidos para mostrar la causa y los datos del paciente (reportes APH) #}
+
+{% macro causa_paciente(reporte, etiqueta='Causa del Traslado') %}
+<div class="border-t border-slate-800/40 pt-2 col-span-3">
+    <span class="block font-semibold text-slate-500">{{ etiqueta }}:</span>
+    <span class="text-white text-sm font-medium block">{{ reporte.causa_traslado or 'No especificada' }}</span>
+</div>
+{% endmacro %}
+
+{% macro recomendaciones_paciente(reporte) %}
+{% if reporte.recomendaciones %}
+<div class="border-t border-slate-800/40 pt-2 col-span-3">
+    <span class="block font-semibold text-slate-500">Recomendaciones Especiales:</span>
+    <span class="text-white text-sm font-medium block">{{ reporte.recomendaciones }}</span>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro tabla_paciente(reporte, titulo='Datos del Paciente') %}
+<div class="border-t border-slate-800/80">
+    <div class="bg-slate-900/40 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ titulo }}</div>
+    {% if reporte.personas_afectadas %}
+        {% for pa in reporte.personas_afectadas %}
+        <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs{% if not loop.first %} border-t border-slate-800/40{% endif %}">
+            <div class="sm:col-span-2">
+                <span class="block font-semibold text-slate-500">Nombre Paciente:</span>
+                <span class="text-white text-sm font-bold">{{ pa.nombre_apellido }}</span>
+            </div>
+            <div>
+                <span class="block font-semibold text-slate-500">Cédula:</span>
+                <span class="text-white text-sm font-medium">{{ pa.cedula_pasaporte or '--' }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <span class="block font-semibold text-slate-500">Edad:</span>
+                    <span class="text-white text-sm font-medium">{{ pa.edad if pa.edad is not none else '--' }}{% if pa.edad is not none %} Años{% endif %}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Género:</span>
+                    <span class="text-white text-sm font-medium">{{ pa.sexo or '--' }}</span>
+                </div>
+            </div>
+            <div class="border-t border-slate-800/40 pt-2 sm:col-span-3">
+                <span class="block font-semibold text-slate-500">Diagnóstico / Condición Clínica:</span>
+                <span class="text-white text-sm font-medium block">{{ pa.lesion or '--' }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <p class="px-4 py-3 text-xs text-slate-500">No se registraron datos del paciente.</p>
+    {% endif %}
+</div>
+{% endmacro %}

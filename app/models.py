@@ -21,7 +21,7 @@ class Usuario(db.Model, UserMixin):
     rango = db.Column(db.String(50), nullable=True)  # Ej: Distinguido, Sargento, Teniente, etc.
     rol = db.Column(db.String(20), nullable=False, default='bombero')  # 'bombero' o 'administrador'
     activo = db.Column(db.Boolean, default=True)
-    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_registro = db.Column(db.DateTime, default=datetime.now)
 
     # Relaciones de auditoría
     reportes_creados = db.relationship('Reporte', backref='creador', foreign_keys='Reporte.creador_id', lazy=True)
@@ -92,8 +92,8 @@ class Reporte(db.Model):
     creador_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     estado = db.Column(db.String(20), default='Borrador')  # Borrador, Enviado, Validado, Rechazado
     observaciones_generales = db.Column(db.Text, nullable=True)
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
-    fecha_modificacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    fecha_creacion = db.Column(db.DateTime, default=datetime.now)
+    fecha_modificacion = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
     # Columnas para la herencia polimórfica
     tipo_reporte = db.Column(db.String(50), nullable=False)
@@ -107,6 +107,26 @@ class Reporte(db.Model):
         'polymorphic_on': tipo_reporte,
         'polymorphic_identity': 'general'
     }
+
+    @property
+    def tipo_especifico(self):
+        """
+        Tipo de reporte "de negocio" (el que ve el usuario), no la identidad
+        polimórfica.
+
+        La herencia polimórfica guarda en ``tipo_reporte`` una identidad
+        genérica ('incendio', 'rescate_colision', 'rescate_especializado'),
+        pero las vistas, el PDF y el dashboard necesitan el subtipo real
+        (p. ej. 'incendio_estructura' o 'rescate_caida'). Esta propiedad
+        compone ese valor a partir del subtipo almacenado.
+        """
+        if self.tipo_reporte == 'incendio':
+            subtipo = getattr(self, 'subtipo_incendio', None)
+            return f'incendio_{subtipo}' if subtipo else self.tipo_reporte
+        if self.tipo_reporte in ('rescate_colision', 'rescate_especializado'):
+            subtipo = getattr(self, 'subtipo_rescate', None)
+            return f'rescate_{subtipo}' if subtipo else self.tipo_reporte
+        return self.tipo_reporte
 
     def __repr__(self):
         return f'<Reporte {self.nro_control} [{self.tipo_reporte}]>'
@@ -193,6 +213,7 @@ class ReporteMatpelGLP(Reporte):
     un_numero = db.Column(db.String(10), nullable=True)  # Ej: UN 1075
     riesgo_producto = db.Column(db.String(150), nullable=True)  # Inflamable, Explosivo, Asfixiante, etc.
     tipo_almacenamiento = db.Column(db.String(100), nullable=True)  # Cilindro, Tanque Estacionario, Cisterna
+    serial_cilindro = db.Column(db.String(50), nullable=True)  # N° de serie del cilindro
     
     # Certificaciones y Permisologías
     certificado_bomberil = db.Column(db.Boolean, default=False)
@@ -273,15 +294,37 @@ class ReporteMatpelQuimico(Reporte):
 
 class ReporteMatpelOtros(Reporte):
     """
-    4. Reporte MATPEL - Otras Sustancias Peligrosas.
+    4. Reporte MATPEL - Control de Escape de Gas Natural.
     """
     __tablename__ = 'reportes_matpel_otros'
     
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
     
+    # Campos heredados de reportes antiguos (se conservan para no perder datos)
     descripcion_sustancia = db.Column(db.Text, nullable=True)
     riesgos_identificados = db.Column(db.Text, nullable=True)
     medidas_seguridad_adoptadas = db.Column(db.Text, nullable=True)
+
+    # Mismos campos que Control de Escape de GLP (gas natural)
+    clasificacion_servicio = db.Column(db.String(100), nullable=True)
+    nombre_producto = db.Column(db.String(150), nullable=True)
+    un_numero = db.Column(db.String(10), nullable=True)
+    riesgo_producto = db.Column(db.String(150), nullable=True)
+    tipo_almacenamiento = db.Column(db.String(100), nullable=True)
+    serial_cilindro = db.Column(db.String(50), nullable=True)  # N° de serie del cilindro
+    certificado_bomberil = db.Column(db.Boolean, default=False)
+    nro_certificado = db.Column(db.String(50), nullable=True)
+    propietario_nombre = db.Column(db.String(150), nullable=True)
+    propietario_rif_ci = db.Column(db.String(30), nullable=True)
+    empresa_distribuidora = db.Column(db.String(150), nullable=True)
+    vehiculo_marca = db.Column(db.String(50), nullable=True)
+    vehiculo_modelo = db.Column(db.String(50), nullable=True)
+    vehiculo_placa = db.Column(db.String(20), nullable=True)
+    vehiculo_color = db.Column(db.String(30), nullable=True)
+    vehiculo_afecto = db.Column(db.Boolean, default=False)
+    hoja_seguridad = db.Column(db.Boolean, default=False)
+    extintor = db.Column(db.Boolean, default=False)
+    equipo_derrame = db.Column(db.Boolean, default=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'matpel_otros',
@@ -458,6 +501,12 @@ class ReporteAPHTraslado(Reporte):
 
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
 
+    # Causa / motivo por el que se realizó el traslado (texto libre)
+    causa_traslado = db.Column(db.Text, nullable=True)
+
+    # Recomendaciones especiales para el paciente
+    recomendaciones = db.Column(db.Text, nullable=True)
+
     # Signos Vitales
     signos_vitales_pa = db.Column(db.String(20), nullable=True)
     signos_vitales_fc = db.Column(db.Integer, nullable=True)
@@ -509,6 +558,12 @@ class ReporteAPHNoTraslado(Reporte):
     __tablename__ = 'reportes_aph_no_traslado'
 
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Causa / motivo de la atención (no se concretó el traslado)
+    causa_traslado = db.Column(db.Text, nullable=True)
+
+    # Recomendaciones especiales para el paciente
+    recomendaciones = db.Column(db.Text, nullable=True)
 
     # Signos Vitales
     signos_vitales_pa = db.Column(db.String(20), nullable=True)
@@ -566,6 +621,12 @@ class ReporteAPHInterhospitalario(Reporte):
 
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
 
+    # Causa / motivo del traslado entre centros hospitalarios (texto libre)
+    causa_traslado = db.Column(db.Text, nullable=True)
+
+    # Recomendaciones especiales para el paciente
+    recomendaciones = db.Column(db.Text, nullable=True)
+
     # Signos Vitales
     signos_vitales_pa = db.Column(db.String(20), nullable=True)
     signos_vitales_fc = db.Column(db.Integer, nullable=True)
@@ -621,6 +682,12 @@ class ReporteAPHSinTraslado(Reporte):
     __tablename__ = 'reportes_aph_sin_traslado'
 
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Causa / motivo de la atención (sin traslado)
+    causa_traslado = db.Column(db.Text, nullable=True)
+
+    # Recomendaciones especiales para el paciente
+    recomendaciones = db.Column(db.Text, nullable=True)
 
     # Signos Vitales
     signos_vitales_pa = db.Column(db.String(20), nullable=True)
@@ -738,6 +805,22 @@ class ReporteIncendio(Reporte):
 # SUBCLASES: RESCATE POR COLISIÓN/VOLCAMIENTO
 # ========================================================
 
+class ReporteFalsaAlarma(Reporte):
+    """
+    Reporte de Falsa Alarma por Incendio de Estructura o Incendio de Vehículo.
+    """
+    __tablename__ = 'reportes_falsa_alarma'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    # Tipo de falsa alarma: incendio_estructura o incendio_vehiculo
+    tipo_alarma = db.Column(db.String(50), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'falsa_alarma',
+    }
+
+
 class ReporteRescateColision(Reporte):
     """
     Reporte unificado para rescate por Colisión/Volcamiento con/sin lesionado.
@@ -771,7 +854,7 @@ class ReporteRescateColision(Reporte):
 class ReporteRescateEspecializado(Reporte):
     """
     Reporte unificado para rescate especializado: Ascensor, Inmueble,
-    Altura, Tapiada, Golpeada, Caída.
+    Altura, Tapiada, Golpeada, Caída en Altura.
     Se diferencia por el campo subtipo_rescate.
     """
     __tablename__ = 'reportes_rescate_especializado'
@@ -783,6 +866,9 @@ class ReporteRescateEspecializado(Reporte):
 
     # Tipo de servicio específico (para tapiada, golpeada, caída)
     tipo_servicio = db.Column(db.String(150), nullable=True)
+
+    # Tipo de terreno donde se produjo el rescate (principalmente para caída en altura)
+    tipo_terreno = db.Column(db.String(100), nullable=True)
 
     # Despliegue operacional
     despliegue_vehiculos = db.Column(db.Text, nullable=True)

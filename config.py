@@ -1,12 +1,33 @@
 import os
+from datetime import timedelta
+
 from dotenv import load_dotenv
 
 # Cargar variables de entorno desde .env si existe
 load_dotenv()
 
+
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'super-secret-key-bomberos-2026'
-    
+    # Entorno: Render define RENDER=true; también se admite FLASK_ENV=production
+    ES_PRODUCCION = bool(
+        os.environ.get('RENDER')
+        or os.environ.get('FLASK_ENV', '').lower() == 'production'
+    )
+
+    # La clave de sesión NO puede tener un valor por defecto en producción:
+    # con una clave conocida cualquiera podría falsificar la cookie de sesión
+    # y hacerse pasar por un administrador.
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY:
+        if ES_PRODUCCION:
+            raise RuntimeError(
+                'Falta la variable de entorno SECRET_KEY. '
+                'Defínala con un valor aleatorio antes de iniciar en producción '
+                '(por ejemplo: python -c "import secrets; print(secrets.token_hex(32))").'
+            )
+        # Solo para desarrollo local
+        SECRET_KEY = 'dev-only-secret-key-bomberos'
+
     # Intentar obtener la URL de conexión completa directamente
     DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('RENDER_DATABASE_URL')
 
@@ -34,8 +55,25 @@ class Config:
             # Fallback seguro por defecto para desarrollo local sin configurar nada: SQLite
             basedir = os.path.abspath(os.path.dirname(__file__))
             SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(basedir, "bomberos.db")}'
-            
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
+    # Evita conexiones muertas en PostgreSQL (Render corta conexiones inactivas)
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True, 'pool_recycle': 280}
+
     # Flask-Login config
-    REMEMBER_COOKIE_DURATION = 3600  # 1 hora
+    REMEMBER_COOKIE_DURATION = timedelta(days=7)
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SAMESITE = 'Lax'
+    REMEMBER_COOKIE_SECURE = ES_PRODUCCION
+
+    # Cookies de sesión endurecidas
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = ES_PRODUCCION
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
+
+    # Los usuarios de prueba (admin/admin123) solo se crean en desarrollo.
+    SEED_DEMO_USERS = not ES_PRODUCCION and os.environ.get('SEED_DEMO_USERS', '1') != '0'
+
+    # CSRF: Flask-WTF lo valida en todos los POST. Se mantiene activo siempre.
+    WTF_CSRF_TIME_LIMIT = None

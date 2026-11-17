@@ -162,7 +162,7 @@
                                     </a>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='matpel_otros') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
-                                        <span>Otras Sustancias Peligrosas</span>
+                                        <span>Control de Gas Natural</span>
                                     </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">ATENCIÓN PRE-HOSPITALARIA</div>
@@ -216,6 +216,10 @@
                                         <i data-lucide="tree-pine" class="w-4 h-4 text-lime-500"></i>
                                         <span>Incendio de Árbol</span>
                                     </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='falsa_alarma') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="bell-off" class="w-4 h-4 text-rose-400"></i>
+                                        <span>Falsa Alarma</span>
+                                    </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">RESCATE COLISIÓN / VOLCAMIENTO</div>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_colision_con_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
@@ -244,10 +248,6 @@
                                         <i data-lucide="building" class="w-4 h-4 text-slate-400"></i>
                                         <span>Rescate Inmueble</span>
                                     </a>
-                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_altura') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
-                                        <i data-lucide="mountain" class="w-4 h-4 text-cyan-500"></i>
-                                        <span>Rescate en Altura</span>
-                                    </a>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_tapiada') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="lock" class="w-4 h-4 text-purple-400"></i>
                                         <span>Rescate Tapiada</span>
@@ -258,7 +258,7 @@
                                     </a>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_caida') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="arrow-down" class="w-4 h-4 text-teal-400"></i>
-                                        <span>Rescate Caída</span>
+                                        <span>Rescate de Persona Caída en Altura</span>
                                     </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">SERVICIOS ESPECIALES</div>
@@ -293,9 +293,12 @@
                         <span class="text-sm font-medium text-slate-200">{{ current_user.nombre }} {{ current_user.apellido }}</span>
                     </div>
                     <div class="relative">
-                        <a href="{{ url_for('auth.logout') }}" class="p-2 bg-slate-900 border border-slate-800 hover:bg-fire-950/40 hover:border-fire-900 rounded-lg text-slate-400 hover:text-fire-400 flex items-center justify-center transition-all duration-200">
-                            <i data-lucide="log-out" class="w-5 h-5"></i>
-                        </a>
+                        <form method="POST" action="{{ url_for('auth.logout') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" title="Cerrar sesión" class="p-2 bg-slate-900 border border-slate-800 hover:bg-fire-950/40 hover:border-fire-900 rounded-lg text-slate-400 hover:text-fire-400 flex items-center justify-center transition-all duration-200 cursor-pointer">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

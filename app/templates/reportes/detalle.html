@@ -44,6 +44,7 @@
 {% endblock %}
 
 {% block content %}
+{% import 'reportes/_macros_paciente.html' as paciente %}
 <div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Botones de Acción (no imprimibles) -->
@@ -70,6 +71,7 @@
             
             {% if current_user.es_admin and reporte.estado == 'Enviado' %}
             <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="accion" value="validar">
                 <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold transition-all flex items-center space-x-1.5 shadow-lg shadow-emerald-950/20 cursor-pointer">
                     <i data-lucide="check" class="w-4 h-4"></i>
@@ -92,7 +94,7 @@
             </div>
             <div class="text-center sm:text-right space-y-1">
                 <div class="inline-flex px-3 py-1 bg-slate-800 border border-slate-700/50 rounded-full text-xs font-bold text-white mb-1">
-                    {{ reporte.tipo_reporte|upper
+                    {{ reporte.tipo_especifico|upper
                         |replace('MATPEL_GLP', 'CONTROL DE ESCAPE DE GLP')
                         |replace('MATPEL_COMBUSTIBLE', 'DERRAME DE COMBUSTIBLE')
                         |replace('MATPEL_QUIMICO', 'DERRAME DE SUSTANCIA QUÍMICA')
@@ -109,10 +111,9 @@
                         |replace('RESCATE_VOLCAMIENTO_SIN_LESIONADO', 'RESCATE VOLCAMIENTO SIN LESIONADO')
                         |replace('RESCATE_ASCENSOR', 'RESCATE ASCENSOR')
                         |replace('RESCATE_INMUEBLE', 'RESCATE INMUEBLE')
-                        |replace('RESCATE_ALTURA', 'RESCATE EN ALTURA')
                         |replace('RESCATE_TAPIADA', 'RESCATE TAPIADA')
                         |replace('RESCATE_GOLPEADA', 'RESCATE GOLPEADA')
-                        |replace('RESCATE_CAIDA', 'RESCATE CAÍDA')
+                        |replace('RESCATE_CAIDA', 'RESCATE DE PERSONA CAÍDA EN ALTURA')
                         |replace('SERVICIO_AGUA', 'ABASTECIMIENTO DE AGUA')
                         |replace('SERVICIO_INSECTOS', 'CONTROL Y REUBICACIÓN DE INSECTOS')
                         |replace('SERVICIO_ANIMAL', 'CONTROL DE ANIMAL DOMÉSTICO')
@@ -202,11 +203,11 @@
         <!-- 2. DETALLE ESPECÍFICO (SEGÚN TIPO DE REPORTE) -->
         
         {# 2.1 ESCAPE GLP #}
-        {% if reporte.tipo_reporte == 'matpel_glp' %}
+        {% if reporte.tipo_especifico in ('matpel_glp', 'matpel_otros') %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
-                <span>2. Parámetros Técnicos MATPEL (Escape GLP)</span>
+                <span>2. Parámetros Técnicos MATPEL ({{ 'Escape GLP' if reporte.tipo_especifico == 'matpel_glp' else 'Gas Natural' }})</span>
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div>
@@ -220,6 +221,10 @@
                 <div>
                     <span class="block font-semibold text-slate-500">Tipo de Almacenamiento:</span>
                     <span class="text-white text-sm font-medium">{{ reporte.tipo_almacenamiento }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">N° de Serie del Cilindro:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.serial_cilindro or '--' }}</span>
                 </div>
                 
                 <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -275,7 +280,7 @@
         </div>
 
         {# 2.2 DERRAME COMBUSTIBLE #}
-        {% elif reporte.tipo_reporte == 'matpel_combustible' %}
+        {% elif reporte.tipo_especifico == 'matpel_combustible' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
@@ -337,7 +342,7 @@
         </div>
 
         {# 2.3 DERRAME QUÍMICO #}
-        {% elif reporte.tipo_reporte == 'matpel_quimico' %}
+        {% elif reporte.tipo_especifico == 'matpel_quimico' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
@@ -394,31 +399,8 @@
             </div>
         </div>
 
-        {# 2.4 MATPEL OTROS #}
-        {% elif reporte.tipo_reporte == 'matpel_otros' %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="shield-alert" class="w-4 h-4 text-red-500"></i>
-                <span>2. Parámetros Técnicos MATPEL (Otras Sustancias)</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 gap-4 text-xs">
-                <div>
-                    <span class="block font-semibold text-slate-500">Descripción de Sustancia:</span>
-                    <span class="text-white text-sm font-medium">{{ reporte.descripcion_sustancia }}</span>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2">
-                    <span class="block font-semibold text-slate-500">Riesgos Identificados:</span>
-                    <span class="text-white text-sm font-medium block">{{ reporte.riesgos_identificados }}</span>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2">
-                    <span class="block font-semibold text-slate-500">Medidas de Seguridad Adoptadas:</span>
-                    <span class="text-white text-sm font-medium block">{{ reporte.medidas_seguridad_adoptadas }}</span>
-                </div>
-            </div>
-        </div>
-
         {# 2.5 PRE-HOSPITALARIO #}
-        {% elif reporte.tipo_reporte == 'pre_hospitalario' %}
+        {% elif reporte.tipo_especifico == 'pre_hospitalario' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="activity" class="w-4 h-4 text-emerald-500"></i>
@@ -477,7 +459,7 @@
         </div>
 
         {# 2.6 SERVICIO AGUA #}
-        {% elif reporte.tipo_reporte == 'servicio_agua' %}
+        {% elif reporte.tipo_especifico == 'servicio_agua' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
@@ -505,7 +487,7 @@
         </div>
 
         {# 2.7 CONTROL INSECTOS #}
-        {% elif reporte.tipo_reporte == 'servicio_insectos' %}
+        {% elif reporte.tipo_especifico == 'servicio_insectos' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="bug" class="w-4 h-4 text-yellow-500"></i>
@@ -544,7 +526,7 @@
         </div>
 
         {# 2.8 CONTROL ANIMAL #}
-        {% elif reporte.tipo_reporte == 'servicio_animal' %}
+        {% elif reporte.tipo_especifico == 'servicio_animal' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="paw-print" class="w-4 h-4 text-amber-600"></i>
@@ -578,7 +560,7 @@
         </div>
 
         {# 2.9 ACHICAMIENTO #}
-        {% elif reporte.tipo_reporte == 'servicio_achicamiento' %}
+        {% elif reporte.tipo_especifico == 'servicio_achicamiento' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
@@ -621,7 +603,7 @@
         </div>
 
         {# 2.10 BALDEO #}
-        {% elif reporte.tipo_reporte == 'servicio_baldeo' %}
+        {% elif reporte.tipo_especifico == 'servicio_baldeo' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="waves" class="w-4 h-4 text-blue-500"></i>
@@ -654,13 +636,30 @@
                 {% endif %}
             </div>
         </div>
-        {% if reporte.tipo_reporte == 'aph_traslado' %}
+        {% endif %}
+        {% if reporte.tipo_especifico == 'falsa_alarma' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="bell-off" class="w-4 h-4 text-rose-400"></i>
+                <span>2. Falsa Alarma por Incendio</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Falsa Alarma:</span>
+                    <span class="text-white text-sm font-medium">{{ {'incendio_estructura': 'Incendio de Estructura', 'incendio_vehiculo': 'Incendio de Vehículo'}.get(reporte.tipo_alarma, reporte.tipo_alarma) }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if reporte.tipo_especifico == 'aph_traslado' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="ambulance" class="w-4 h-4 text-emerald-500"></i>
                 <span>2. Ficha Atención Pre-Hospitalaria: Traslado de Emergencia</span>
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                {{ paciente.causa_paciente(reporte, 'Causa del Traslado') }}
+                {{ paciente.recomendaciones_paciente(reporte) }}
                 <div class="border-t border-slate-800/40 pt-2 col-span-3">
                     <span class="block font-semibold text-slate-500">Signos Vitales:</span>
                     <span class="text-white text-sm font-medium">PA: {{ reporte.signos_vitales_pa or 'N/A' }} | FC: {{ reporte.signos_vitales_fc or '--' }} ppm | FR: {{ reporte.signos_vitales_fr or '--' }} rpm | Temp: {{ reporte.signos_vitales_temperatura or 'N/A' }}</span>
@@ -701,14 +700,17 @@
                     <div><span class="block font-semibold text-slate-500">Rechazo - Firma:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.rechazo_firma else 'No' }}</span></div>
                 </div>
             </div>
+            {{ paciente.tabla_paciente(reporte) }}
         </div>
-        {% elif reporte.tipo_reporte == 'aph_no_traslado' %}
+        {% elif reporte.tipo_especifico == 'aph_no_traslado' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="ambulance" class="w-4 h-4 text-amber-500"></i>
                 <span>2. Ficha Atención Pre-Hospitalaria: Traslado No Realizado</span>
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                {{ paciente.causa_paciente(reporte, 'Causa de la Atención') }}
+                {{ paciente.recomendaciones_paciente(reporte) }}
                 <div class="border-t border-slate-800/40 pt-2 col-span-3">
                     <span class="block font-semibold text-slate-500">Signos Vitales:</span>
                     <span class="text-white text-sm font-medium">PA: {{ reporte.signos_vitales_pa or 'N/A' }} | FC: {{ reporte.signos_vitales_fc or '--' }} ppm | FR: {{ reporte.signos_vitales_fr or '--' }} rpm | Temp: {{ reporte.signos_vitales_temperatura or 'N/A' }}</span>
@@ -757,14 +759,17 @@
                     <div><span class="block font-semibold text-slate-500">Rechazo - Firma:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.rechazo_firma else 'No' }}</span></div>
                 </div>
             </div>
+            {{ paciente.tabla_paciente(reporte) }}
         </div>
-        {% elif reporte.tipo_reporte == 'aph_interhospitalario' %}
+        {% elif reporte.tipo_especifico == 'aph_interhospitalario' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="ambulance" class="w-4 h-4 text-blue-500"></i>
                 <span>2. Ficha Atención Pre-Hospitalaria: Traslado Interhospitalario</span>
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                {{ paciente.causa_paciente(reporte, 'Causa del Traslado') }}
+                {{ paciente.recomendaciones_paciente(reporte) }}
                 <div class="border-t border-slate-800/40 pt-2 col-span-3">
                     <span class="block font-semibold text-slate-500">Signos Vitales:</span>
                     <span class="text-white text-sm font-medium">PA: {{ reporte.signos_vitales_pa or 'N/A' }} | FC: {{ reporte.signos_vitales_fc or '--' }} ppm | FR: {{ reporte.signos_vitales_fr or '--' }} rpm | Temp: {{ reporte.signos_vitales_temperatura or 'N/A' }}</span>
@@ -809,14 +814,17 @@
                     <div><span class="block font-semibold text-slate-500">Rechazo - Firma:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.rechazo_firma else 'No' }}</span></div>
                 </div>
             </div>
+            {{ paciente.tabla_paciente(reporte) }}
         </div>
-        {% elif reporte.tipo_reporte == 'aph_sin_traslado' %}
+        {% elif reporte.tipo_especifico == 'aph_sin_traslado' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="ambulance" class="w-4 h-4 text-purple-500"></i>
                 <span>2. Ficha Atención Pre-Hospitalaria Sin Traslado</span>
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                {{ paciente.causa_paciente(reporte, 'Causa de la Atención') }}
+                {{ paciente.recomendaciones_paciente(reporte) }}
                 <div class="border-t border-slate-800/40 pt-2 col-span-3">
                     <span class="block font-semibold text-slate-500">Signos Vitales:</span>
                     <span class="text-white text-sm font-medium">PA: {{ reporte.signos_vitales_pa or 'N/A' }} | FC: {{ reporte.signos_vitales_fc or '--' }} ppm | FR: {{ reporte.signos_vitales_fr or '--' }} rpm | Temp: {{ reporte.signos_vitales_temperatura or 'N/A' }}</span>
@@ -855,8 +863,10 @@
                     <div><span class="block font-semibold text-slate-500">Rechazo - Firma:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.rechazo_firma else 'No' }}</span></div>
                 </div>
             </div>
+            {{ paciente.tabla_paciente(reporte) }}
         </div>
-        {{ if reporte.tipo_reporte == 'incendio_estructura' }}
+        {% endif %}
+        {% if reporte.tipo_especifico == 'incendio_estructura'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="flame" class="w-4 h-4 text-orange-500"></i>
@@ -896,7 +906,7 @@
                 </div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'incendio_apoyo' }}
+        {% elif reporte.tipo_especifico == 'incendio_apoyo'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
@@ -904,6 +914,7 @@
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Tipo de Incendio:</span><span class="text-white text-sm font-medium">{{ {'incendio_estructura': 'Incendio de Estructura', 'incendio_vehiculo': 'Incendio de Vehículo'}.get(reporte.tipo_incendio, reporte.tipo_incendio or '--') }}</span></div>
                 
                 <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
@@ -931,7 +942,7 @@
                 
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'incendio_electrico' }}
+        {% elif reporte.tipo_especifico == 'incendio_electrico'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
@@ -966,7 +977,7 @@
                 
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'incendio_vehiculo' }}
+        {% elif reporte.tipo_especifico == 'incendio_vehiculo'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="car" class="w-4 h-4 text-red-400"></i>
@@ -1017,7 +1028,7 @@
                 </div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'incendio_desechos' }}
+        {% elif reporte.tipo_especifico == 'incendio_desechos'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="trash-2" class="w-4 h-4 text-emerald-400"></i>
@@ -1052,7 +1063,7 @@
                 
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'incendio_vegetacion' }}
+        {% elif reporte.tipo_especifico == 'incendio_vegetacion'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="trees" class="w-4 h-4 text-green-500"></i>
@@ -1097,7 +1108,7 @@
                 </div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'incendio_arbol' }}
+        {% elif reporte.tipo_especifico == 'incendio_arbol'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="tree-pine" class="w-4 h-4 text-lime-500"></i>
@@ -1142,7 +1153,8 @@
                 </div>
             </div>
         </div>
-        {{ if reporte.tipo_reporte == 'rescate_colision_con_lesionado' }}
+        {% endif %}
+        {% if reporte.tipo_especifico == 'rescate_colision_con_lesionado'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="siren" class="w-4 h-4 text-red-500"></i>
@@ -1159,7 +1171,7 @@
                 </div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_colision_sin_lesionado' }}
+        {% elif reporte.tipo_especifico == 'rescate_colision_sin_lesionado'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="siren" class="w-4 h-4 text-amber-500"></i>
@@ -1176,7 +1188,7 @@
                 </div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_volcamiento_con_lesionado' }}
+        {% elif reporte.tipo_especifico == 'rescate_volcamiento_con_lesionado'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="siren" class="w-4 h-4 text-orange-500"></i>
@@ -1193,7 +1205,7 @@
                 </div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_volcamiento_sin_lesionado' }}
+        {% elif reporte.tipo_especifico == 'rescate_volcamiento_sin_lesionado'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="siren" class="w-4 h-4 text-yellow-500"></i>
@@ -1210,7 +1222,8 @@
                 </div>
             </div>
         </div>
-        {{ if reporte.tipo_reporte == 'rescate_ascensor' }}
+        {% endif %}
+        {% if reporte.tipo_especifico == 'rescate_ascensor'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="arrow-up-down" class="w-4 h-4 text-blue-400"></i>
@@ -1228,7 +1241,7 @@
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_inmueble' }}
+        {% elif reporte.tipo_especifico == 'rescate_inmueble'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="building" class="w-4 h-4 text-slate-400"></i>
@@ -1246,25 +1259,7 @@
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_altura' }}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="mountain" class="w-4 h-4 text-cyan-500"></i>
-                <span>2. Rescate en Altura</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Tipo de Rescate:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_rescate|replace('_', ' ')|upper }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Tipo de Servicio / Especialidad:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_servicio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Vehículos Desplegados:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_vehiculos or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Conductor:</span><span class="text-white text-sm font-medium">{{ reporte.despliegue_conductor_nombre or '--' }} ({{ reporte.despliegue_conductor_ci or '--' }})</span></div>
-                    <div><span class="block font-semibold text-slate-500">Jefe de Unidad:</span><span class="text-white text-sm font-medium">{{ reporte.despliegue_jefe_nombre or '--' }} ({{ reporte.despliegue_jefe_ci or '--' }})</span></div>
-                    <div><span class="block font-semibold text-slate-500">Cantidad Bomberos:</span><span class="text-white text-sm font-bold text-fire-400">{{ reporte.despliegue_cantidad_bomberos or '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
-            </div>
-        </div>
-        {{ elif reporte.tipo_reporte == 'rescate_tapiada' }}
+        {% elif reporte.tipo_especifico == 'rescate_tapiada'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="lock" class="w-4 h-4 text-purple-400"></i>
@@ -1282,7 +1277,7 @@
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_golpeada' }}
+        {% elif reporte.tipo_especifico == 'rescate_golpeada'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="shield" class="w-4 h-4 text-pink-400"></i>
@@ -1300,27 +1295,54 @@
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
             </div>
         </div>
-        {{ elif reporte.tipo_reporte == 'rescate_caida' }}
+        {% elif reporte.tipo_especifico == 'rescate_caida' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="arrow-down" class="w-4 h-4 text-teal-400"></i>
-                <span>2. Rescate Caída</span>
+                <span>2. Rescate de Persona Caída en Altura</span>
             </div>
             <div class="p-4 grid grid-cols-1 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Tipo de Rescate:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_rescate|replace('_', ' ')|upper }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Tipo de Servicio / Especialidad:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_servicio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Vehículos Desplegados:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_vehiculos or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Conductor:</span><span class="text-white text-sm font-medium">{{ reporte.despliegue_conductor_nombre or '--' }} ({{ reporte.despliegue_conductor_ci or '--' }})</span></div>
-                    <div><span class="block font-semibold text-slate-500">Jefe de Unidad:</span><span class="text-white text-sm font-medium">{{ reporte.despliegue_jefe_nombre or '--' }} ({{ reporte.despliegue_jefe_ci or '--' }})</span></div>
-                    <div><span class="block font-semibold text-slate-500">Cantidad Bomberos:</span><span class="text-white text-sm font-bold text-fire-400">{{ reporte.despliegue_cantidad_bomberos or '--' }}</span></div>
+                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Tipo de Terreno:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_terreno or '--' }}</span></div>
+            </div>
+            <div class="border-t border-slate-800/80">
+                <div class="bg-slate-900/40 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Datos del Lesionado</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-800/80 bg-slate-900/20">
+                                <th class="py-2 px-4 font-semibold">Nombre y Apellido</th>
+                                <th class="py-2 px-4 font-semibold">C.I. / Pasaporte</th>
+                                <th class="py-2 px-4 font-semibold">Edad</th>
+                                <th class="py-2 px-4 font-semibold">Sexo</th>
+                                <th class="py-2 px-4 font-semibold">Lesión</th>
+                                <th class="py-2 px-4 font-semibold">Residencia</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/40">
+                            {% for pa in reporte.personas_afectadas %}
+                            <tr class="text-white">
+                                <td class="py-2 px-4 font-medium">{{ pa.nombre_apellido }}</td>
+                                <td class="py-2 px-4">{{ pa.cedula_pasaporte or '--' }}</td>
+                                <td class="py-2 px-4">{{ pa.edad if pa.edad is not none else '--' }}</td>
+                                <td class="py-2 px-4">{{ pa.sexo or '--' }}</td>
+                                <td class="py-2 px-4">{{ pa.lesion or '--' }}</td>
+                                <td class="py-2 px-4">{{ pa.residencia or '--' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="py-4 text-center text-slate-500">No se registraron lesionados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
             </div>
         </div>
 
         {% endif %}
 
+        {% if reporte.tipo_especifico != 'rescate_caida' %}
         <!-- 3. VEHÍCULOS / UNIDADES ACTUANTES -->
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
@@ -1421,12 +1443,13 @@
                 </table>
             </div>
         </div>
+        {% endif %}
 
         <!-- 6. OBSERVACIONES / ACTUACIÓN -->
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="align-left" class="w-4 h-4 text-purple-500"></i>
-                <span>6. Detalle de la Actuación Operacional / Relato Técnico</span>
+                <span>{% if reporte.tipo_especifico == 'rescate_caida' %}3{% else %}6{% endif %}. Detalle de la Actuación Operacional / Relato Técnico</span>
             </div>
             <div class="p-4 text-xs text-slate-200 leading-relaxed whitespace-pre-line font-mono bg-slate-950/20">
                 {{ reporte.observaciones_generales }}

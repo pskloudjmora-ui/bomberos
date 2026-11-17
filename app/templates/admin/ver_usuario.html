@@ -101,7 +101,7 @@
                 <tr class="hover:bg-slate-900/20 transition-colors">
                     <td class="py-3 px-6 font-bold text-white">{{ reporte.nro_control }}</td>
                     <td class="py-3 px-6">{{ reporte.fecha.strftime('%d/%m/%Y') }}</td>
-                    <td class="py-3 px-6">{{ reporte.tipo_reporte|upper|replace('MATPEL_GLP', 'MATPEL GLP')|replace('SERVICIO_AGUA', 'Serv. Agua')|replace('PRE_HOSPITALARIO', 'Pre-Hospitalaria')|replace('SERVICIO_BALDEO', 'Baldeo')|replace('SERVICIO_INSECTOS', 'Insectos')|replace('SERVICIO_ANIMAL', 'Animal')|replace('SERVICIO_ACHICAMIENTO', 'Achicamiento')|replace('MATPEL_COMBUSTIBLE', 'MATPEL Comb.' )|replace('MATPEL_QUIMICO', 'MATPEL Quím.')|replace('MATPEL_OTROS', 'MATPEL Otros') }}</td>
+                    <td class="py-3 px-6">{{ reporte.tipo_especifico|etiqueta_tipo }}</td>
                     <td class="py-3 px-6">
                         {% set est_color = 'bg-slate-800 text-slate-400' %}
                         {% if reporte.estado == 'Validado' %}

@@ -28,7 +28,8 @@ NOMBRE_SERVICIO = {
     'matpel_glp': 'CONTROL DE ESCAPE DE GAS LICUADO DE PETRÓLEO (GLP)',
     'matpel_combustible': 'DERRAME DE COMBUSTIBLE',
     'matpel_quimico': 'DERRAME DE SUSTANCIA QUÍMICA',
-    'matpel_otros': 'OTRAS SUSTANCIAS PELIGROSAS',
+    'matpel_otros': 'CONTROL DE ESCAPE DE GAS NATURAL',
+    'falsa_alarma': 'FALSA ALARMA POR INCENDIO',
     'pre_hospitalario': 'ATENCIÓN PRE-HOSPITALARIA / TRASLADO DE EMERGENCIA',
     'aph_traslado': 'APH - TRASLADO DE EMERGENCIA',
     'aph_no_traslado': 'APH - TRASLADO NO REALIZADO',
@@ -47,10 +48,9 @@ NOMBRE_SERVICIO = {
     'rescate_volcamiento_sin_lesionado': 'RESCATE VOLCAMIENTO SIN LESIONADO',
     'rescate_ascensor': 'RESCATE ESPECIALIZADO - ASCENSOR',
     'rescate_inmueble': 'RESCATE ESPECIALIZADO - INMUEBLE',
-    'rescate_altura': 'RESCATE ESPECIALIZADO - EN ALTURA',
     'rescate_tapiada': 'RESCATE ESPECIALIZADO - TAPIADA',
     'rescate_golpeada': 'RESCATE ESPECIALIZADO - GOLPEADA',
-    'rescate_caida': 'RESCATE ESPECIALIZADO - CAÍDA',
+    'rescate_caida': 'RESCATE DE PERSONA CAÍDA EN ALTURA',
     'servicio_agua': 'ABASTECIMIENTO DE AGUA',
     'servicio_insectos': 'CONTROL Y REUBICACIÓN DE INSECTOS',
     'servicio_animal': 'CONTROL DE ANIMAL DOMÉSTICO',
@@ -63,7 +63,8 @@ TITULO_SECCION_2 = {
     'matpel_glp': '2. DETALLE TÉCNICO - ESCAPE DE GLP (MATPEL)',
     'matpel_combustible': '2. DETALLE TÉCNICO - DERRAME DE COMBUSTIBLE (MATPEL)',
     'matpel_quimico': '2. DETALLE TÉCNICO - DERRAME DE SUSTANCIA QUÍMICA (MATPEL)',
-    'matpel_otros': '2. DETALLE TÉCNICO - OTRAS SUSTANCIAS PELIGROSAS (MATPEL)',
+    'matpel_otros': '2. DETALLE TÉCNICO - CONTROL DE GAS NATURAL (MATPEL)',
+    'falsa_alarma': '2. DETALLE - FALSA ALARMA POR INCENDIO',
     'pre_hospitalario': '2. FICHA DE ATENCIÓN PRE-HOSPITALARIA / TRASLADO',
     'aph_traslado': '2. FICHA APH - TRASLADO DE EMERGENCIA',
     'aph_no_traslado': '2. FICHA APH - TRASLADO NO REALIZADO',
@@ -82,10 +83,9 @@ TITULO_SECCION_2 = {
     'rescate_volcamiento_sin_lesionado': '2. DETALLE DEL RESCATE - VOLCAMIENTO SIN LESIONADO',
     'rescate_ascensor': '2. DETALLE DEL RESCATE ESPECIALIZADO - ASCENSOR',
     'rescate_inmueble': '2. DETALLE DEL RESCATE ESPECIALIZADO - INMUEBLE',
-    'rescate_altura': '2. DETALLE DEL RESCATE ESPECIALIZADO - EN ALTURA',
     'rescate_tapiada': '2. DETALLE DEL RESCATE ESPECIALIZADO - TAPIADA',
     'rescate_golpeada': '2. DETALLE DEL RESCATE ESPECIALIZADO - GOLPEADA',
-    'rescate_caida': '2. DETALLE DEL RESCATE ESPECIALIZADO - CAÍDA',
+    'rescate_caida': '2. DETALLE DEL RESCATE DE PERSONA CAÍDA EN ALTURA',
     'servicio_agua': '2. PARÁMETROS DEL ABASTECIMIENTO DE AGUA',
     'servicio_insectos': '2. PARÁMETROS DEL CONTROL Y REUBICACIÓN DE INSECTOS',
     'servicio_animal': '2. PARÁMETROS DEL CONTROL DE ANIMAL DOMÉSTICO',
@@ -100,6 +100,7 @@ SECCIONES_ESPECIFICAS = {
         ('Nombre del Producto', 'nombre_producto', 'plain'),
         ('Número UN', 'un_numero', 'plain'),
         ('Tipo de Almacenamiento', 'tipo_almacenamiento', 'plain'),
+        ('N° de Serie del Cilindro', 'serial_cilindro', 'plain'),
         ('Riesgo del Producto', 'riesgo_producto', 'plain'),
         ('Certificado Bomberil', 'certificado_bomberil', 'bool'),
         ('N° Certificado Bomberil', 'nro_certificado', 'plain'),
@@ -143,10 +144,30 @@ SECCIONES_ESPECIFICAS = {
         ('Color del Vehículo', 'vehiculo_color', 'plain'),
     ],
     'matpel_otros': [
-        ('Descripción de la Sustancia', 'descripcion_sustancia', 'plain'),
-        ('Riesgos Identificados', 'riesgos_identificados', 'plain'),
-        ('Medidas de Seguridad Adoptadas', 'medidas_seguridad_adoptadas', 'plain'),
+        ('Clasificación del Servicio', 'clasificacion_servicio', 'plain'),
+        ('Nombre del Producto', 'nombre_producto', 'plain'),
+        ('Número UN', 'un_numero', 'plain'),
+        ('Tipo de Almacenamiento', 'tipo_almacenamiento', 'plain'),
+        ('N° de Serie del Cilindro', 'serial_cilindro', 'plain'),
+        ('Riesgo del Producto', 'riesgo_producto', 'plain'),
+        ('Certificado Bomberil', 'certificado_bomberil', 'bool'),
+        ('N° Certificado Bomberil', 'nro_certificado', 'plain'),
+        ('Propietario / Responsable del Inmueble', 'propietario_nombre', 'plain'),
+        ('C.I. / RIF del Propietario', 'propietario_rif_ci', 'plain'),
+        ('Empresa / Distribuidor', 'empresa_distribuidora', 'plain'),
+        ('Vehículo de Carga - Marca', 'vehiculo_marca', 'plain'),
+        ('Vehículo de Carga - Modelo', 'vehiculo_modelo', 'plain'),
+        ('Vehículo de Carga - Placa', 'vehiculo_placa', 'plain'),
+        ('Vehículo de Carga - Color', 'vehiculo_color', 'plain'),
+        ('Vehículo Afectó el Inmueble', 'vehiculo_afecto', 'bool'),
+        ('Hoja de Seguridad (HDS) en Sitio', 'hoja_seguridad', 'bool'),
+        ('Extintor en el Sitio', 'extintor', 'bool'),
+        ('Equipo para Control de Derrames', 'equipo_derrame', 'bool'),
     ],
+    'falsa_alarma': [
+        ('Tipo de Alarma', 'tipo_alarma', 'alarma'),
+    ],
+
     'pre_hospitalario': [
         ('Nombre del Paciente', 'paciente_nombre', 'plain'),
         ('Cédula del Paciente', 'paciente_cedula', 'plain'),
@@ -198,6 +219,8 @@ SECCIONES_ESPECIFICAS = {
     ],
     # --- APH TRASLADO ---
     'aph_traslado': [
+        ('Causa del Traslado', 'causa_traslado', 'plain'),
+        ('Recomendaciones Especiales', 'recomendaciones', 'plain'),
         ('Presión Arterial', 'signos_vitales_pa', 'plain'),
         ('Frecuencia Cardíaca', 'signos_vitales_fc', 'plain'),
         ('Frecuencia Respiratoria', 'signos_vitales_fr', 'plain'),
@@ -228,6 +251,8 @@ SECCIONES_ESPECIFICAS = {
     ],
     # --- APH NO TRASLADO ---
     'aph_no_traslado': [
+        ('Causa de la Atención', 'causa_traslado', 'plain'),
+        ('Recomendaciones Especiales', 'recomendaciones', 'plain'),
         ('Presión Arterial', 'signos_vitales_pa', 'plain'),
         ('Frecuencia Cardíaca', 'signos_vitales_fc', 'plain'),
         ('Frecuencia Respiratoria', 'signos_vitales_fr', 'plain'),
@@ -249,6 +274,8 @@ SECCIONES_ESPECIFICAS = {
     ],
     # --- APH INTERHOSPITALARIO ---
     'aph_interhospitalario': [
+        ('Causa del Traslado', 'causa_traslado', 'plain'),
+        ('Recomendaciones Especiales', 'recomendaciones', 'plain'),
         ('Presión Arterial', 'signos_vitales_pa', 'plain'),
         ('Frecuencia Cardíaca', 'signos_vitales_fc', 'plain'),
         ('Frecuencia Respiratoria', 'signos_vitales_fr', 'plain'),
@@ -267,6 +294,8 @@ SECCIONES_ESPECIFICAS = {
     ],
     # --- APH SIN TRASLADO ---
     'aph_sin_traslado': [
+        ('Causa de la Atención', 'causa_traslado', 'plain'),
+        ('Recomendaciones Especiales', 'recomendaciones', 'plain'),
         ('Presión Arterial', 'signos_vitales_pa', 'plain'),
         ('Frecuencia Cardíaca', 'signos_vitales_fc', 'plain'),
         ('Frecuencia Respiratoria', 'signos_vitales_fr', 'plain'),
@@ -310,6 +339,7 @@ SECCIONES_ESPECIFICAS = {
     ],
     'incendio_apoyo': [
         ('Subtipo', 'subtipo_incendio', 'plain'),
+        ('Tipo de Incendio', 'tipo_incendio', 'alarma'),
         ('Clase de Incendio', 'clase_incendio', 'plain'),
         ('Intensidad', 'intensidad', 'plain'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
@@ -350,6 +380,7 @@ SECCIONES_ESPECIFICAS = {
         ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
         ('Métodos de Extinción', 'metodos_extincion', 'plain'),
+        ('Técnicas de Extinción', 'tecnicas_extincion', 'plain'),
         ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
         ('Marca Vehículo', 'vehiculo_marca', 'plain'),
         ('Modelo Vehículo', 'vehiculo_modelo', 'plain'),
@@ -470,17 +501,6 @@ SECCIONES_ESPECIFICAS = {
         ('Cantidad Bomberos', 'despliegue_cantidad_bomberos', 'plain'),
         ('Material Utilizado', 'despliegue_material_usado', 'plain'),
     ],
-    'rescate_altura': [
-        ('Subtipo', 'subtipo_rescate', 'plain'),
-        ('Tipo de Servicio', 'tipo_servicio', 'plain'),
-        ('Vehículos Desplegados', 'despliegue_vehiculos', 'plain'),
-        ('Conductor', 'despliegue_conductor_nombre', 'plain'),
-        ('C.I. Conductor', 'despliegue_conductor_ci', 'plain'),
-        ('Jefe de Unidad', 'despliegue_jefe_nombre', 'plain'),
-        ('C.I. Jefe', 'despliegue_jefe_ci', 'plain'),
-        ('Cantidad Bomberos', 'despliegue_cantidad_bomberos', 'plain'),
-        ('Material Utilizado', 'despliegue_material_usado', 'plain'),
-    ],
     'rescate_tapiada': [
         ('Subtipo', 'subtipo_rescate', 'plain'),
         ('Tipo de Servicio', 'tipo_servicio', 'plain'),
@@ -503,16 +523,11 @@ SECCIONES_ESPECIFICAS = {
         ('Cantidad Bomberos', 'despliegue_cantidad_bomberos', 'plain'),
         ('Material Utilizado', 'despliegue_material_usado', 'plain'),
     ],
+    # Caída en altura: se muestran los datos del lesionado (personas afectadas)
+    # y el tipo de terreno donde ocurrió el rescate, en lugar del despliegue.
     'rescate_caida': [
-        ('Subtipo', 'subtipo_rescate', 'plain'),
-        ('Tipo de Servicio', 'tipo_servicio', 'plain'),
-        ('Vehículos Desplegados', 'despliegue_vehiculos', 'plain'),
-        ('Conductor', 'despliegue_conductor_nombre', 'plain'),
-        ('C.I. Conductor', 'despliegue_conductor_ci', 'plain'),
-        ('Jefe de Unidad', 'despliegue_jefe_nombre', 'plain'),
-        ('C.I. Jefe', 'despliegue_jefe_ci', 'plain'),
-        ('Cantidad Bomberos', 'despliegue_cantidad_bomberos', 'plain'),
-        ('Material Utilizado', 'despliegue_material_usado', 'plain'),
+        ('Tipo de Rescate', 'subtipo_rescate', 'plain'),
+        ('Tipo de Terreno', 'tipo_terreno', 'plain'),
     ],
 }
 
@@ -521,7 +536,8 @@ MATERIAL_ATTR = {
     'matpel_glp': None,
     'matpel_combustible': 'mitigacion_efectuada',
     'matpel_quimico': 'materiales_absorbentes_usados',
-    'matpel_otros': 'medidas_seguridad_adoptadas',
+    'matpel_otros': None,
+    'falsa_alarma': None,
     'pre_hospitalario': 'material_medico_utilizado',
     'aph_traslado': 'material_medico_usado',
     'aph_no_traslado': 'material_medico_usado',
@@ -540,10 +556,9 @@ MATERIAL_ATTR = {
     'rescate_volcamiento_sin_lesionado': None,
     'rescate_ascensor': 'despliegue_material_usado',
     'rescate_inmueble': 'despliegue_material_usado',
-    'rescate_altura': 'despliegue_material_usado',
     'rescate_tapiada': 'despliegue_material_usado',
     'rescate_golpeada': 'despliegue_material_usado',
-    'rescate_caida': 'despliegue_material_usado',
+    'rescate_caida': None,
     'servicio_agua': 'material_usado',
     'servicio_insectos': 'materiales_utilizados',
     'servicio_animal': None,
@@ -561,6 +576,11 @@ def _formatear_valor(valor, tipo):
         return '—'
     if tipo == 'bool':
         return 'SÍ' if valor else 'NO'
+    if tipo == 'alarma':
+        return {
+            'incendio_estructura': 'Incendio de Estructura',
+            'incendio_vehiculo': 'Incendio de Vehículo',
+        }.get(str(valor), str(valor))
     return str(valor)
 
 
@@ -667,7 +687,7 @@ def serializar_reporte(reporte):
       "estado":              "Enviado"
     }
     """
-    tipo = reporte.tipo_reporte
+    tipo = reporte.tipo_especifico
 
     especifico = []
     for etiqueta, attr, tipo_dato in SECCIONES_ESPECIFICAS.get(tipo, []):
@@ -708,11 +728,22 @@ def serializar_reporte(reporte):
     material = getattr(reporte, attr_material, None) if attr_material else None
     material = str(material).strip() if material else 'No registrado'
 
-    fecha_emision = reporte.fecha_creacion or datetime.utcnow()
+    fecha_emision = reporte.fecha_creacion or datetime.now()
+
+    # Personas afectadas / lesionados (APH y rescates)
+    personas_afectadas = [{
+        'nombre': p.nombre_apellido or '—',
+        'cedula': p.cedula_pasaporte or '—',
+        'edad': p.edad if p.edad is not None else '—',
+        'sexo': p.sexo or '—',
+        'lesion': p.lesion or '—',
+        'residencia': p.residencia or '—',
+    } for p in reporte.personas_afectadas]
 
     return {
         'logo': '',
         'reporte_id': reporte.id,
+        'tipo_reporte': tipo,
         'nro_control': reporte.nro_control,
         'nombre_servicio': NOMBRE_SERVICIO.get(tipo, tipo.upper()),
         'titulo_seccion_2': TITULO_SECCION_2.get(tipo, '2. DETALLE DEL SERVICIO'),
@@ -741,6 +772,7 @@ def serializar_reporte(reporte):
         'elaborado_por': _formatear_personal(elaborado),
         'combatientes': combatientes,
         'otros_organismos': otros_organismos,
+        'personas_afectadas': personas_afectadas,
         'observaciones': _nl2br_html(reporte.observaciones_generales),
         'estado': reporte.estado or '—',
     }

@@ -53,15 +53,9 @@
                 <select name="tipo_reporte" 
                     class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                     <option value="Todos" {% if filtro_tipo == 'Todos' %}selected{% endif %}>Todos los Tipos</option>
-                    <option value="matpel_glp" {% if filtro_tipo == 'matpel_glp' %}selected{% endif %}>MATPEL - Escape de GLP</option>
-                    <option value="matpel_combustible" {% if filtro_tipo == 'matpel_combustible' %}selected{% endif %}>MATPEL - Derrame Combustible</option>
-                    <option value="matpel_quimico" {% if filtro_tipo == 'matpel_quimico' %}selected{% endif %}>MATPEL - Derrame Químico</option>
-                    <option value="pre_hospitalario" {% if filtro_tipo == 'pre_hospitalario' %}selected{% endif %}>Atención Pre-Hospitalaria</option>
-                    <option value="servicio_agua" {% if filtro_tipo == 'servicio_agua' %}selected{% endif %}>Servicio Especial - Abastecimiento Agua</option>
-                    <option value="servicio_insectos" {% if filtro_tipo == 'servicio_insectos' %}selected{% endif %}>Servicio Especial - Control Insectos</option>
-                    <option value="servicio_animal" {% if filtro_tipo == 'servicio_animal' %}selected{% endif %}>Servicio Especial - Control Animal</option>
-                    <option value="servicio_achicamiento" {% if filtro_tipo == 'servicio_achicamiento' %}selected{% endif %}>Servicio Especial - Achicamiento</option>
-                    <option value="servicio_baldeo" {% if filtro_tipo == 'servicio_baldeo' %}selected{% endif %}>Servicio Especial - Baldeo de Vías</option>
+                    {% for clave, nombre in tipos_reporte.items() %}
+                    <option value="{{ clave }}" {% if filtro_tipo == clave %}selected{% endif %}>{{ nombre }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="flex items-end space-x-2">
@@ -119,8 +113,8 @@
         <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex items-center justify-between shadow-xl">
             <div class="space-y-1">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Servicio más Común</span>
-                <div class="text-base font-extrabold text-white truncate max-w-[170px]" title="{{ tipo_mas_frecuente }}">
-                    {{ tipo_mas_frecuente|replace('matpel_glp', 'GLP')|replace('servicio_agua', 'Agua')|replace('servicio_baldeo', 'Baldeo')|replace('pre_hospitalario', 'Salud')|replace('servicio_insectos', 'Insectos')|upper }}
+                <div class="text-base font-extrabold text-white truncate max-w-[170px]" title="{{ tipo_mas_frecuente|etiqueta_tipo }}">
+                    {{ tipo_mas_frecuente|etiqueta_tipo|upper }}
                 </div>
                 <p class="text-[10px] text-slate-400 font-semibold">{{ tipo_mas_frecuente_cant }} reportes registrados</p>
             </div>
@@ -210,20 +204,8 @@
                             </div>
                         </td>
                         <td class="py-4 px-6">
-                            {% set label = 'MATPEL - GLP' %}
-                            {% set badge_color = 'bg-red-500/10 border-red-500/20 text-red-400' %}
-                            {% if reporte.tipo_reporte == 'servicio_agua' %}
-                                {% set label = 'Serv. Especial - Agua' %}
-                                {% set badge_color = 'bg-blue-500/10 border-blue-500/20 text-blue-400' %}
-                            {% elif reporte.tipo_reporte == 'servicio_baldeo' %}
-                                {% set label = 'Serv. Especial - Baldeo' %}
-                                {% set badge_color = 'bg-blue-400/10 border-blue-400/20 text-blue-300' %}
-                            {% elif reporte.tipo_reporte == 'pre_hospitalario' %}
-                                {% set label = 'Atenc. Médica' %}
-                                {% set badge_color = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' %}
-                            {% endif %}
-                            <span class="inline-flex items-center px-2 py-0.5 border text-xs font-medium rounded-full {{ badge_color }}">
-                                {{ label }}
+                            <span class="inline-flex items-center px-2 py-0.5 border text-xs font-medium rounded-full {{ reporte.tipo_especifico|color_tipo }}">
+                                {{ reporte.tipo_especifico|etiqueta_tipo }}
                             </span>
                         </td>
                         <td class="py-4 px-6 truncate max-w-[200px]" title="{{ reporte.direccion }}">
@@ -264,6 +246,7 @@
                                 
                                 {% if reporte.estado == 'Enviado' %}
                                 <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="accion" value="validar">
                                     <button type="submit" class="p-1.5 bg-emerald-950/40 border border-emerald-800 text-emerald-400 hover:bg-emerald-800 hover:text-white rounded-lg transition-colors flex items-center justify-center"
                                             title="Validar Reporte">
@@ -271,6 +254,7 @@
                                     </button>
                                 </form>
                                 <form action="{{ url_for('main.validar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="accion" value="rechazar">
                                     <button type="submit" class="p-1.5 bg-fire-950/40 border border-fire-800/80 text-fire-400 hover:bg-fire-800 hover:text-white rounded-lg transition-colors flex items-center justify-center"
                                             title="Rechazar Reporte">
@@ -281,6 +265,7 @@
                                 
                                 <form action="{{ url_for('main.eliminar_reporte', reporte_id=reporte.id) }}" method="POST" class="inline" 
                                       onsubmit="return confirm('¿Está completamente seguro de eliminar permanentemente este reporte? Esta acción no se puede deshacer.');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="p-1.5 bg-slate-800 hover:bg-fire-950/40 hover:border-fire-900 hover:text-fire-400 border border-transparent rounded-lg transition-colors flex items-center justify-center"
                                             title="Eliminar Reporte">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>

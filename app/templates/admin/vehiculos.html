@@ -71,11 +71,13 @@
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
                                 </a>
                                 <form action="{{ url_for('main.toggle_vehiculo', vehiculo_id=vehiculo.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-400 hover:text-amber-400 transition-all" title="{{ 'Desactivar' if vehiculo.activo else 'Activar' }}">
                                         <i data-lucide="{{ 'eye-off' if vehiculo.activo else 'eye' }}" class="w-4 h-4"></i>
                                     </button>
                                 </form>
                                 <form action="{{ url_for('main.eliminar_vehiculo', vehiculo_id=vehiculo.id) }}" method="POST" class="inline" onsubmit="return confirm('¿Estás seguro de eliminar la unidad {{ vehiculo.unidad }}?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="p-2 bg-slate-800 hover:bg-red-950 border border-slate-700 hover:border-red-900 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="Eliminar">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>

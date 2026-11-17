@@ -2,6 +2,7 @@ flask>=3.0.0
 flask-sqlalchemy>=3.1.0
 flask-login>=0.6.3
 flask-migrate>=4.0.0
+flask-wtf>=1.2.1
 psycopg2-binary>=2.9.9
 werkzeug>=3.0.0
 gunicorn>=21.2.0

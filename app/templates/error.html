@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ codigo }} - {{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="glass-panel max-w-lg w-full p-8 rounded-2xl border border-slate-800 text-center space-y-6">
+        <div class="mx-auto w-16 h-16 rounded-2xl bg-fire-950/40 border border-fire-900 flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-8 h-8 text-fire-500"></i>
+        </div>
+        <div class="space-y-2">
+            <p class="text-5xl font-extrabold text-fire-500">{{ codigo }}</p>
+            <h1 class="text-xl font-bold text-white">{{ titulo }}</h1>
+            <p class="text-sm text-slate-400">{{ mensaje }}</p>
+        </div>
+        <div class="flex items-center justify-center space-x-3">
+            <a href="{{ url_for('main.index') }}"
+                class="px-5 py-2.5 bg-fire-600 hover:bg-fire-500 text-white rounded-xl text-sm font-bold transition-all flex items-center space-x-2">
+                <i data-lucide="home" class="w-4 h-4"></i>
+                <span>Volver al inicio</span>
+            </a>
+            <a href="javascript:history.back()"
+                class="px-5 py-2.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 rounded-xl text-sm font-semibold transition-all">
+                Regresar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

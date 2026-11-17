@@ -19,22 +19,25 @@
 
     function agregarVehiculo() {
         const contenedor = document.getElementById('contenedor-vehiculos');
-        const plantilla = document.getElementById('plantilla-vehiculo').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
+        const plantilla = document.getElementById('plantilla-vehiculo');
+        if (!contenedor || !plantilla) return;
+        contenedor.appendChild(plantilla.content.cloneNode(true));
         lucide.createIcons();
     }
 
     function agregarCombatiente() {
         const contenedor = document.getElementById('contenedor-combatientes');
-        const plantilla = document.getElementById('plantilla-combatiente').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
+        const plantilla = document.getElementById('plantilla-combatiente');
+        if (!contenedor || !plantilla) return;
+        contenedor.appendChild(plantilla.content.cloneNode(true));
         lucide.createIcons();
     }
 
     function agregarOrganismo() {
         const contenedor = document.getElementById('contenedor-organismos');
-        const plantilla = document.getElementById('plantilla-organismo').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
+        const plantilla = document.getElementById('plantilla-organismo');
+        if (!contenedor || !plantilla) return;
+        contenedor.appendChild(plantilla.content.cloneNode(true));
         lucide.createIcons();
     }
 
@@ -61,6 +64,8 @@
                     <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500 animate-pulse"></i>
                 {% elif tipo_reporte.startswith('aph_') or tipo_reporte == 'pre_hospitalario' %}
                     <i data-lucide="ambulance" class="w-6 h-6 text-emerald-500"></i>
+                {% elif tipo_reporte == 'falsa_alarma' %}
+                    <i data-lucide="bell-off" class="w-6 h-6 text-rose-400"></i>
                 {% elif tipo_reporte.startswith('incendio_') %}
                     <i data-lucide="flame" class="w-6 h-6 text-orange-500"></i>
                 {% elif tipo_reporte.startswith('rescate_colision') or tipo_reporte.startswith('rescate_volcamiento') %}
@@ -78,6 +83,7 @@
 
     <!-- Formulario Completo -->
     <form action="{{ url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte) }}" method="POST" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         
         <!-- SECCIÓN 1: DATOS GENERALES DE LA LLAMADA Y TIEMPOS -->
         <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
@@ -228,6 +234,13 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
             </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">N° de Serie del Cilindro</label>
+                    <input type="text" name="serial_cilindro" placeholder="ej: SN-2024-001234"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
             <!-- Riesgo del Producto -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -345,7 +358,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Almacenamiento *</label>
-                    <select name="tipo_almacenamiento" required onchange="manejarOtros(this, 'almacenamiento_combustible_otro')"
+                    <select name="tipo_almacenamiento" required onchange="manejarOtros(this, 'tipo_almacenamiento_otro')"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                         <option value="Tanque Subterraneo">Tanque Subterráneo</option>
                         <option value="Tanque Superficial">Tanque Superficial</option>
@@ -354,7 +367,7 @@
                         <option value="Tambores / Envases">Tambores / Envases menores</option>
                         <option value="Otro">Otro</option>
                     </select>
-                    <input type="text" name="almacenamiento_combustible_otro" id="almacenamiento_combustible_otro" placeholder="Especifique el tipo de almacenamiento" style="display:none"
+                    <input type="text" name="tipo_almacenamiento_otro" id="tipo_almacenamiento_otro" placeholder="Especifique el tipo de almacenamiento" style="display:none"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2">
                 </div>
                 <div>
@@ -505,24 +518,147 @@
                 </label>
             </div>
 
-            {# 2.4 MATPEL OTROS #}
+            {# 2.4 MATPEL GAS NATURAL #}
             {% elif tipo_reporte == 'matpel_otros' %}
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Descripción de la Sustancia Peligrosa *</label>
-                    <input type="text" name="descripcion_sustancia" required placeholder="Describa la sustancia no clasificada previamente..."
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Estructura *</label>
+                    <select name="clasificacion_servicio" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Residencial">Residencial</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Transporte">Transporte / Distribuidor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Almacenamiento *</label>
+                    <select name="tipo_almacenamiento" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Cilindro GLP 10kg">Cilindro GLP (10kg)</option>
+                        <option value="Cilindro GLP 18kg">Cilindro GLP (18kg)</option>
+                        <option value="Cilindro GLP 43kg">Cilindro GLP (27kg)</option>
+                        <option value="Cilindro GLP 18kg">Cilindro GLP (43kg)</option>
+                        <option value="Cilindro GLP 43kg">Cilindro GLP (47kg)</option>
+                        <option value="Tanque Estacionario">Tanque Estacionario</option>
+                        <option value="Cisterna / Camion">Camión Cisterna de Gas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Producto *</label>
+                    <input type="text" name="nombre_producto" value="Gas Natural" required
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Riesgos Identificados *</label>
-                    <textarea name="riesgos_identificados" required rows="2" placeholder="Describa los riesgos (explosivo, radiactivo, peligro biológico...)"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Código ONU (UN)</label>
+                    <input type="text" name="un_numero" value="UN 1971" placeholder="ej: UN 1971"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">N° de Serie del Cilindro</label>
+                    <input type="text" name="serial_cilindro" placeholder="ej: SN-2024-001234"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <!-- Riesgo del Producto -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Riesgo del Producto</label>
+                    <select name="riesgo_producto" onchange="manejarOtros(this, 'riesgo_producto_otro')"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Clase 1 - Explosivos">Clase 1: Explosivos</option>
+                        <option value="Clase 2 - Gases">Clase 2: Gases</option>
+                        <option value="Clase 3 - Líquidos inflamables">Clase 3: Líquidos inflamables</option>
+                        <option value="Clase 4 - Sólidos inflamables">Clase 4: Sólidos inflamables</option>
+                        <option value="Clase 5 - Comburentes y peróxidos orgánicos">Clase 5: Sustancias comburentes y peróxidos orgánicos</option>
+                        <option value="Clase 6 - Tóxicas e infecciosas">Clase 6: Sustancias tóxicas e infecciosas</option>
+                        <option value="Clase 7 - Material radiactivo">Clase 7: Material radiactivo</option>
+                        <option value="Clase 8 - Sustancias corrosivas">Clase 8: Sustancias corrosivas</option>
+                        <option value="Clase 9 - Peligrosos varios">Clase 9: Sustancias y objetos peligrosos varios</option>
+                        <option value="Otro">Otro (especificar)</option>
+                    </select>
+                    <input type="text" name="riesgo_producto_otro" id="riesgo_producto_otro" placeholder="Especifique el riesgo" style="display:none"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2">
+                </div>
+            </div>
+            <!-- Propietario -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Propietario / Responsable</label>
+                    <input type="text" name="propietario_nombre" placeholder="Nombre del dueño"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Medidas de Seguridad Adoptadas *</label>
-                    <textarea name="medidas_seguridad_adoptadas" required rows="2" placeholder="Perímetro de seguridad establecido, evacuación, uso de EPP especial..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">RIF o Cédula Propietario</label>
+                    <input type="text" name="propietario_rif_ci" placeholder="V-12345678-0"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Empresa Distribuidora</label>
+                    <input type="text" name="empresa_distribuidora" placeholder="ej: Pdvsa Gas"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+            </div>
+            <!-- Certificados -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Tiene Certificado Bomberil?</label>
+                    <select name="certificado_bomberil"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">N° de Certificado (Si aplica)</label>
+                    <input type="text" name="nro_certificado" placeholder="Nro de Certificado"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                <div class="flex flex-col justify-center space-y-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Controles en Sitio</span>
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="hoja_seguridad" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">HDS</span>
+                        </label>
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="extintor" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">Extintor</span>
+                        </label>
+                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                            <input type="checkbox" name="equipo_derrame" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                            <span class="ml-1.5">Eq. Derrame</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Vehículo Transportador Involucrado -->
+            <div class="border-t border-slate-800/40 pt-4 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos de Vehículo Transportador de Gas Natural Involucrado (Si Aplica)</span>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div>
+                        <input type="text" name="vehiculo_marca" placeholder="Marca (ej: Chevrolet Cargo)"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_modelo" placeholder="Modelo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_placa" placeholder="Placa Vehículo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <input type="text" name="vehiculo_color" placeholder="Color Vehículo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                </div>
+                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" name="vehiculo_afecto" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <span class="ml-1.5">El vehículo afectó el inmueble (Sí aplica)</span>
+                </label>
             </div>
 
             {# 2.5 PRE-HOSPITALARIO #}
@@ -826,718 +962,193 @@
             {# 2.11 APH TRASLADO DE EMERGENCIA #}
 
             {% elif tipo_reporte == 'aph_traslado' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presión Arterial (PA)</label>
-                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca (FC)</label>
-                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (FR)</label>
-                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
+            {% include 'reportes/_paciente_aph.html' %}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Temperatura</label>
-                    <input type="text" name="signos_vitales_temperatura" placeholder="ej: 36.5°C" 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tensión Arterial (TA)</label>
+                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Apertura Ocular</label>
-                    <select name="glasgow_apertura_ocular" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Al dolor</option>
-                        <option value="3">3 - Al verbal</option>
-                        <option value="4">4 - Espontánea</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Verbal</label>
-                    <select name="glasgow_respuesta_verbal" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Incomprensible</option>
-                        <option value="3">3 - Inapropiada</option>
-                        <option value="4">4 - Confusa</option>
-                        <option value="5">5 - Orientada</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Motora</label>
-                    <select name="glasgow_respuesta_motora" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Extensión</option>
-                        <option value="3">3 - Flexión anómala</option>
-                        <option value="4">4 - Retirada</option>
-                        <option value="5">5 - Localiza</option>
-                        <option value="6">6 - Obedece</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow Total</label>
-                    <input type="number" name="glasgow_total" min="3" max="15" placeholder="3-15"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca / Pulso (ppm)</label>
+                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (rpm)</label>
+                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
             </div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4 bg-slate-950/20 p-3 rounded-xl border border-slate-800/30">
-                <div class="sm:col-span-4">
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Regla de los 9 - Quemaduras (%)</span>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cabeza</label>
-                    <input type="number" step="0.01" name="regla_9_cabeza" placeholder="0"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro de Traslado (Destino) *</label>
+                    <input type="text" name="centro_hospitalario" required placeholder="ej: Hospital Central, Centro Clínico Universitario"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tórax</label>
-                    <input type="number" step="0.01" name="regla_9_torax" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Abdomen</label>
-                    <input type="number" step="0.01" name="regla_9_abdomen" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">TOTAL %</label>
-                    <input type="number" step="0.01" name="regla_9_total" placeholder="Total"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Procedimientos Paraclínicos</label>
-                    <textarea name="procedimiento_paraclinico" rows="2" placeholder="Procedimientos realizados en sitio..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Medicinas Utilizadas</label>
-                    <textarea name="medicinas_usadas" rows="2" placeholder="Medicamentos administrados..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
-                    <textarea name="material_medico_usado" rows="2" placeholder="Inmovilizadores, gasas, soluciones..."
+                    <input type="text" name="material_medico_usado" placeholder="ej: Inmovilizador cervical, soluciones salinas, cánula nasal, gasas"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones Especiales</label>
+                    <textarea name="recomendaciones" rows="2" placeholder="Mantener reposo absoluto, evaluación por traumatólogo de guardia..."
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro Hospitalario de Destino</label>
-                    <input type="text" name="centro_hospitalario" required placeholder="ej: Hospital Central de San Diego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Médico que Recibe</label>
-                    <input type="text" name="medico_recibe" required placeholder="Nombre del médico" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula del Médico</label>
-                    <input type="text" name="medico_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">MSDS / MSDES</label>
-                    <input type="text" name="medico_msds" placeholder="Nro de registro" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="medico_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma del Médico</span>
-                </label>
-</div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rechazo a la Atención y Traslado</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre de quien rechaza</label>
-                    <input type="text" name="rechazo_nombre" placeholder="Nombre completo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="rechazo_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div class="flex flex-col justify-center">
-                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="rechazo_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma de conformidad</span>
-                </label>
-                    </div>
                 </div>
             </div>
 
             {% elif tipo_reporte == 'aph_no_traslado' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presión Arterial (PA)</label>
-                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca (FC)</label>
-                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (FR)</label>
-                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
+            {% include 'reportes/_paciente_aph.html' %}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Temperatura</label>
-                    <input type="text" name="signos_vitales_temperatura" placeholder="ej: 36.5°C" 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tensión Arterial (TA)</label>
+                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Apertura Ocular</label>
-                    <select name="glasgow_apertura_ocular" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Al dolor</option>
-                        <option value="3">3 - Al verbal</option>
-                        <option value="4">4 - Espontánea</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Verbal</label>
-                    <select name="glasgow_respuesta_verbal" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Incomprensible</option>
-                        <option value="3">3 - Inapropiada</option>
-                        <option value="4">4 - Confusa</option>
-                        <option value="5">5 - Orientada</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Motora</label>
-                    <select name="glasgow_respuesta_motora" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Extensión</option>
-                        <option value="3">3 - Flexión anómala</option>
-                        <option value="4">4 - Retirada</option>
-                        <option value="5">5 - Localiza</option>
-                        <option value="6">6 - Obedece</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow Total</label>
-                    <input type="number" name="glasgow_total" min="3" max="15" placeholder="3-15"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca / Pulso (ppm)</label>
+                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (rpm)</label>
+                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
             </div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4 bg-slate-950/20 p-3 rounded-xl border border-slate-800/30">
-                <div class="sm:col-span-4">
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Regla de los 9 - Quemaduras (%)</span>
-                </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cabeza</label>
-                    <input type="number" step="0.01" name="regla_9_cabeza" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tórax</label>
-                    <input type="number" step="0.01" name="regla_9_torax" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Abdomen</label>
-                    <input type="number" step="0.01" name="regla_9_abdomen" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">TOTAL %</label>
-                    <input type="number" step="0.01" name="regla_9_total" placeholder="Total"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Procedimientos Paraclínicos</label>
-                    <textarea name="procedimiento_paraclinico" rows="2" placeholder="Procedimientos realizados en sitio..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Medicinas Utilizadas</label>
-                    <textarea name="medicinas_usadas" rows="2" placeholder="Medicamentos administrados..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
-                    <textarea name="material_medico_usado" rows="2" placeholder="Inmovilizadores, gasas, soluciones..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro Hospitalario de Destino</label>
-                    <input type="text" name="centro_hospitalario" required placeholder="ej: Hospital Central de San Diego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Médico que Recibe</label>
-                    <input type="text" name="medico_recibe" required placeholder="Nombre del médico" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula del Médico</label>
-                    <input type="text" name="medico_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">MSDS / MSDES</label>
-                    <input type="text" name="medico_msds" placeholder="Nro de registro" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="medico_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma del Médico</span>
-                </label>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Motivo del No Traslado</label>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Motivo del No Traslado *</label>
                     <textarea name="motivo_no_traslado" required rows="2" placeholder="Indique el motivo..."
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
-<div>
+                <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Indicaciones Dejadas</label>
                     <textarea name="indicaciones_dejadas" rows="2" placeholder="Indicaciones al paciente..."
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
-</div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rechazo a la Atención y Traslado</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre de quien rechaza</label>
-                    <input type="text" name="rechazo_nombre" placeholder="Nombre completo" 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
+                    <input type="text" name="material_medico_usado" placeholder="ej: Inmovilizador cervical, soluciones salinas, cánula nasal, gasas"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="rechazo_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div class="flex flex-col justify-center">
-                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="rechazo_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma de conformidad</span>
-                </label>
-                    </div>
+
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones Especiales</label>
+                    <textarea name="recomendaciones" rows="2" placeholder="Mantener reposo absoluto, evaluación por traumatólogo de guardia..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
             </div>
 
             {% elif tipo_reporte == 'aph_interhospitalario' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presión Arterial (PA)</label>
-                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca (FC)</label>
-                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (FR)</label>
-                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
+            {% include 'reportes/_paciente_aph.html' %}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Temperatura</label>
-                    <input type="text" name="signos_vitales_temperatura" placeholder="ej: 36.5°C" 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tensión Arterial (TA)</label>
+                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Apertura Ocular</label>
-                    <select name="glasgow_apertura_ocular" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Al dolor</option>
-                        <option value="3">3 - Al verbal</option>
-                        <option value="4">4 - Espontánea</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Verbal</label>
-                    <select name="glasgow_respuesta_verbal" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Incomprensible</option>
-                        <option value="3">3 - Inapropiada</option>
-                        <option value="4">4 - Confusa</option>
-                        <option value="5">5 - Orientada</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Motora</label>
-                    <select name="glasgow_respuesta_motora" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Extensión</option>
-                        <option value="3">3 - Flexión anómala</option>
-                        <option value="4">4 - Retirada</option>
-                        <option value="5">5 - Localiza</option>
-                        <option value="6">6 - Obedece</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow Total</label>
-                    <input type="number" name="glasgow_total" min="3" max="15" placeholder="3-15"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca / Pulso (ppm)</label>
+                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (rpm)</label>
+                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
             </div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4 bg-slate-950/20 p-3 rounded-xl border border-slate-800/30">
-                <div class="sm:col-span-4">
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Regla de los 9 - Quemaduras (%)</span>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cabeza</label>
-                    <input type="number" step="0.01" name="regla_9_cabeza" placeholder="0"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro de Origen *</label>
+                    <input type="text" name="centro_origen" required placeholder="Hospital/Clínica de origen"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tórax</label>
-                    <input type="number" step="0.01" name="regla_9_torax" placeholder="0"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro de Destino *</label>
+                    <input type="text" name="centro_destino" required placeholder="Hospital de destino"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Abdomen</label>
-                    <input type="number" step="0.01" name="regla_9_abdomen" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">TOTAL %</label>
-                    <input type="number" step="0.01" name="regla_9_total" placeholder="Total"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Procedimientos Paraclínicos</label>
-                    <textarea name="procedimiento_paraclinico" rows="2" placeholder="Procedimientos realizados en sitio..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Medicinas Utilizadas</label>
-                    <textarea name="medicinas_usadas" rows="2" placeholder="Medicamentos administrados..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
-                    <textarea name="material_medico_usado" rows="2" placeholder="Inmovilizadores, gasas, soluciones..."
+                    <input type="text" name="material_medico_usado" placeholder="ej: Inmovilizador cervical, soluciones salinas, cánula nasal, gasas"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones Especiales</label>
+                    <textarea name="recomendaciones" rows="2" placeholder="Mantener reposo absoluto, evaluación por traumatólogo de guardia..."
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro de Origen</label>
-                    <input type="text" name="centro_origen" required placeholder="Hospital/Clínica de origen" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Médico de Origen</label>
-                    <input type="text" name="medico_origen" placeholder="Nombre del médico" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Centro de Destino</label>
-                    <input type="text" name="centro_destino" required placeholder="Hospital de destino" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Médico que Recibe</label>
-                    <input type="text" name="medico_recibe" required placeholder="Nombre del médico" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula del Médico</label>
-                    <input type="text" name="medico_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">MSDS / MSDES</label>
-                    <input type="text" name="medico_msds" placeholder="Nro de registro" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="medico_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma del Médico</span>
-                </label>
-</div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rechazo a la Atención y Traslado</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre de quien rechaza</label>
-                    <input type="text" name="rechazo_nombre" placeholder="Nombre completo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="rechazo_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div class="flex flex-col justify-center">
-                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="rechazo_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma de conformidad</span>
-                </label>
-                    </div>
                 </div>
             </div>
 
             {% elif tipo_reporte == 'aph_sin_traslado' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presión Arterial (PA)</label>
-                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca (FC)</label>
-                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (FR)</label>
-                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-</div>
+            {% include 'reportes/_paciente_aph.html' %}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Temperatura</label>
-                    <input type="text" name="signos_vitales_temperatura" placeholder="ej: 36.5°C" 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tensión Arterial (TA)</label>
+                    <input type="text" name="signos_vitales_pa" placeholder="ej: 120/80 mmHg"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Apertura Ocular</label>
-                    <select name="glasgow_apertura_ocular" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Al dolor</option>
-                        <option value="3">3 - Al verbal</option>
-                        <option value="4">4 - Espontánea</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Verbal</label>
-                    <select name="glasgow_respuesta_verbal" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Incomprensible</option>
-                        <option value="3">3 - Inapropiada</option>
-                        <option value="4">4 - Confusa</option>
-                        <option value="5">5 - Orientada</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow: Respuesta Motora</label>
-                    <select name="glasgow_respuesta_motora" class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="">—</option>
-                        <option value="1">1 - Ninguna</option>
-                        <option value="2">2 - Extensión</option>
-                        <option value="3">3 - Flexión anómala</option>
-                        <option value="4">4 - Retirada</option>
-                        <option value="5">5 - Localiza</option>
-                        <option value="6">6 - Obedece</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Glasgow Total</label>
-                    <input type="number" name="glasgow_total" min="3" max="15" placeholder="3-15"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Cardíaca / Pulso (ppm)</label>
+                    <input type="number" name="signos_vitales_fc" placeholder="ej: 75"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Frecuencia Respiratoria (rpm)</label>
+                    <input type="number" name="signos_vitales_fr" placeholder="ej: 18"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+
             </div>
-<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-800/40 pt-4 bg-slate-950/20 p-3 rounded-xl border border-slate-800/30">
-                <div class="sm:col-span-4">
-                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Regla de los 9 - Quemaduras (%)</span>
-                </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cabeza</label>
-                    <input type="number" step="0.01" name="regla_9_cabeza" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tórax</label>
-                    <input type="number" step="0.01" name="regla_9_torax" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Abdomen</label>
-                    <input type="number" step="0.01" name="regla_9_abdomen" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Superior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_superior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Derecho</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_d" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">M. Inferior Izquierdo</label>
-                    <input type="number" step="0.01" name="regla_9_miembro_inferior_i" placeholder="0"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">TOTAL %</label>
-                    <input type="number" step="0.01" name="regla_9_total" placeholder="Total"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Procedimientos Paraclínicos</label>
-                    <textarea name="procedimiento_paraclinico" rows="2" placeholder="Procedimientos realizados en sitio..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Medicinas Utilizadas</label>
-                    <textarea name="medicinas_usadas" rows="2" placeholder="Medicamentos administrados..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
-                    <textarea name="material_medico_usado" rows="2" placeholder="Inmovilizadores, gasas, soluciones..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-<div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Conducta Adoptada</label>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Conducta Adoptada *</label>
                     <textarea name="conducta_adoptada" required rows="2" placeholder="Describa la conducta adoptada..."
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
-<div>
+                <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Indicaciones Dejadas</label>
                     <textarea name="indicaciones_dejadas" rows="2" placeholder="Indicaciones al paciente..."
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
-</div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rechazo a la Atención y Traslado</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre de quien rechaza</label>
-                    <input type="text" name="rechazo_nombre" placeholder="Nombre completo" 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Médico Utilizado</label>
+                    <input type="text" name="material_medico_usado" placeholder="ej: Inmovilizador cervical, soluciones salinas, cánula nasal, gasas"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="rechazo_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Recomendaciones Especiales</label>
+                    <textarea name="recomendaciones" rows="2" placeholder="Mantener reposo absoluto, evaluación por traumatólogo de guardia..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
-                    <div class="flex flex-col justify-center">
-                        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="rechazo_firma" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Firma de conformidad</span>
-                </label>
-                    </div>
+            </div>
+
+            {% elif tipo_reporte == 'falsa_alarma' %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Falsa Alarma *</label>
+                    <select name="tipo_alarma" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="incendio_estructura">Incendio de Estructura</option>
+                        <option value="incendio_vehiculo">Incendio de Vehículo</option>
+                    </select>
                 </div>
             </div>
 
@@ -1682,6 +1293,14 @@
             {% elif tipo_reporte == 'incendio_apoyo' %}
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <input type="hidden" name="subtipo_incendio" value="apoyo">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Incendio *</label>
+                    <select name="tipo_incendio" required
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="incendio_estructura">Incendio de Estructura</option>
+                        <option value="incendio_vehiculo">Incendio de Vehículo</option>
+                    </select>
+                </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
@@ -2773,64 +2392,6 @@
                 </div>
             </div>
 
-            {# 2.25 RESCATE EN ALTURA #}
-
-            {% elif tipo_reporte == 'rescate_altura' %}
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="hidden" name="subtipo_rescate" value="altura">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Servicio / Especialidad</label>
-                    <input type="text" name="tipo_servicio" required placeholder="ej: Rescate en estructura colapsada" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Despliegue Operacional</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Vehículos Desplegados</label>
-                    <input type="text" name="despliegue_vehiculos" placeholder="ej: B-05, M-12" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cantidad de Bomberos</label>
-                    <input type="number" name="despliegue_cantidad_bomberos" placeholder="ej: 8" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Conductor</label>
-                    <input type="text" name="despliegue_conductor_nombre" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. Conductor</label>
-                    <input type="text" name="despliegue_conductor_ci" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Jefe de Unidad</label>
-                    <input type="text" name="despliegue_jefe_nombre" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. Jefe</label>
-                    <input type="text" name="despliegue_jefe_ci" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Utilizado</label>
-                    <textarea name="despliegue_material_usado" rows="2" placeholder="EPP, cuerdas, escaleras, herramientas de corte..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                </div>
-            </div>
-
             {# 2.26 RESCATE TAPIADA #}
 
             {% elif tipo_reporte == 'rescate_tapiada' %}
@@ -2947,68 +2508,49 @@
                 </div>
             </div>
 
-            {# 2.28 RESCATE CAÍDA #}
+            {# 2.28 RESCATE DE PERSONA CAÍDA EN ALTURA #}
 
             {% elif tipo_reporte == 'rescate_caida' %}
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="hidden" name="subtipo_rescate" value="caida">
+            <input type="hidden" name="subtipo_rescate" value="caida">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Servicio / Especialidad</label>
-                    <input type="text" name="tipo_servicio" required placeholder="ej: Rescate en estructura colapsada" 
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Terreno donde ocurrió el Rescate *</label>
+                    <select name="tipo_terreno" required onchange="manejarOtros(this, 'tipo_terreno_otro')"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="">— Seleccione el tipo de terreno —</option>
+                        <option value="Urbano">Urbano (calle / avenida)</option>
+                        <option value="Residencial">Residencial / vivienda</option>
+                        <option value="Comercial / Industrial">Comercial / Industrial</option>
+                        <option value="Estructura en construcción">Estructura en construcción</option>
+                        <option value="Zona rural / agrícola">Zona rural / agrícola</option>
+                        <option value="Zona boscosa / vegetación">Zona boscosa / vegetación</option>
+                        <option value="Montaña / cerro / quebrada">Montaña / cerro / quebrada</option>
+                        <option value="Área deportiva / recreativa">Área deportiva / recreativa</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <input type="text" name="tipo_terreno_otro" id="tipo_terreno_otro" placeholder="Especifique el tipo de terreno" style="display:none"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2">
                 </div>
             </div>
-            <div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Despliegue Operacional</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Vehículos Desplegados</label>
-                    <input type="text" name="despliegue_vehiculos" placeholder="ej: B-05, M-12" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+
+            <div class="border-t border-slate-800/40 pt-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Lesionado</span>
+                    <button type="button" onclick="agregarPersonaAfectada()"
+                        class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Añadir Lesionado</span>
+                    </button>
                 </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cantidad de Bomberos</label>
-                    <input type="number" name="despliegue_cantidad_bomberos" placeholder="ej: 8" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Conductor</label>
-                    <input type="text" name="despliegue_conductor_nombre" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. Conductor</label>
-                    <input type="text" name="despliegue_conductor_ci" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Jefe de Unidad</label>
-                    <input type="text" name="despliegue_jefe_nombre" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. Jefe</label>
-                    <input type="text" name="despliegue_jefe_ci" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Material Utilizado</label>
-                    <textarea name="despliegue_material_usado" rows="2" placeholder="EPP, cuerdas, escaleras, herramientas de corte..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                </div>
+                <div id="contenedor-personas" class="space-y-2"></div>
             </div>
 
             {% endif %}
 
         </div>
 
+        {% if incluye_secciones_operativas %}
         <!-- SECCIÓN 3: VEHÍCULOS / UNIDADES ACTUANTES (DINÁMICA) -->
         <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800/60 pb-2">
@@ -3154,6 +2696,7 @@
                 </table>
             </div>
         </div>
+        {% endif %}
 
         <!-- SECCIÓN 6: DETALLE DE ACTUACIÓN / OBSERVACIONES -->
         <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
@@ -3260,22 +2803,25 @@
 
 {% block extra_js %}
 <script>
-    // Inicializar con un organismo vacío
     document.addEventListener("DOMContentLoaded", function() {
+        // Inicializar con un organismo vacío (solo si la sección existe)
         agregarOrganismo();
+        // Precargar una fila de lesionado en el reporte de caída en altura
+        agregarPersonaAfectada();
     });
 
-    // Personas Afectadas (para APH y Rescates)
+    // Personas afectadas / lesionados (para APH y Rescates)
     function agregarPersonaAfectada() {
         const contenedor = document.getElementById('contenedor-personas');
-        const plantilla = document.getElementById('plantilla-persona').content.cloneNode(true);
-        contenedor.appendChild(plantilla);
+        const plantilla = document.getElementById('plantilla-persona');
+        if (!contenedor || !plantilla) return;
+        contenedor.appendChild(plantilla.content.cloneNode(true));
         lucide.createIcons();
     }
 
     function eliminarPersona(boton) {
         const fila = boton.closest('.fila-persona');
-        fila.remove();
+        if (fila) fila.remove();
     }
 
     // Calculadora de Glasgow
@@ -3320,16 +2866,28 @@
         }
     });
 
-    // Plantilla para personas afectadas
+    // Plantilla para personas afectadas / lesionados
 </script>
 <template id="plantilla-persona">
-    <div class="fila-persona grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-950/20 p-2 rounded-lg border border-slate-800/40 relative">
-        <select name="pa_nombre[]" required
-            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1 sm:col-span-3">
-            <option value="">— Seleccione una persona —</option>
+    <div class="fila-persona grid grid-cols-1 sm:grid-cols-6 gap-2 bg-slate-950/20 p-2 rounded-lg border border-slate-800/40 relative">
+        <input type="text" name="pa_nombre[]" placeholder="Nombre y apellido *" required
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        <input type="text" name="pa_cedula[]" placeholder="C.I. / Pasaporte"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        <input type="number" name="pa_edad[]" min="0" max="120" placeholder="Edad"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        <select name="pa_sexo[]"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            <option value="">Sexo</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
         </select>
-        <div class="flex items-center justify-end space-x-2">
-            <button type="button" onclick="eliminarPersona(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors" title="Quitar persona">
+        <input type="text" name="pa_lesion[]" placeholder="Lesión / diagnóstico"
+            class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        <div class="flex items-center space-x-1">
+            <input type="text" name="pa_residencia[]" placeholder="Residencia"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            <button type="button" onclick="eliminarPersona(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors" title="Quitar lesionado">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
         </div>

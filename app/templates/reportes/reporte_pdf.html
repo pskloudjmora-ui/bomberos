@@ -278,6 +278,37 @@
     {% endfor %}
 </table>
 
+<!-- ============ 2B. DATOS DEL PACIENTE / LESIONADO ============ -->
+{% set es_aph = dto.tipo_reporte.startswith('aph_') %}
+{% if dto.tipo_reporte == 'rescate_caida' or es_aph %}
+<table class="tarjeta no-cortar">
+    <tr>
+        <td class="titulo-seccion" colspan="{{ 5 if es_aph else 6 }}">{% if es_aph %}Datos del Paciente{% else %}Datos del Lesionado{% endif %}</td>
+    </tr>
+    <tr>
+        <th style="width: 22%;">Nombre y Apellido</th>
+        <th style="width: 14%;">C.I. / Pasaporte</th>
+        <th style="width: 8%;">Edad</th>
+        <th style="width: 12%;">Sexo</th>
+        <th style="width: 24%;">{% if es_aph %}Diagn&oacute;stico / Lesi&oacute;n{% else %}Lesi&oacute;n{% endif %}</th>
+        {% if not es_aph %}<th style="width: 22%;">Residencia</th>{% endif %}
+    </tr>
+    {% for pa in dto.personas_afectadas %}
+    <tr>
+        <td class="tvalor"><b>{{ pa.nombre }}</b></td>
+        <td class="tvalor">{{ pa.cedula }}</td>
+        <td class="tvalor centro">{{ pa.edad }}</td>
+        <td class="tvalor">{{ pa.sexo }}</td>
+        <td class="tvalor texto-largo">{{ pa.lesion }}</td>
+        {% if not es_aph %}<td class="tvalor texto-largo">{{ pa.residencia }}</td>{% endif %}
+    </tr>
+    {% else %}
+    <tr><td colspan="{{ 5 if es_aph else 6 }}" class="tvalor centro">{% if es_aph %}No se registraron datos del paciente.{% else %}No se registraron lesionados.{% endif %}</td></tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if dto.tipo_reporte != 'rescate_caida' %}
 <!-- ============ 3. VEHÍCULOS Y UNIDADES ACTUANTES ============ -->
 <table class="tarjeta no-cortar">
     <tr>
@@ -364,11 +395,12 @@
     <tr><td colspan="4" class="tvalor centro">No actuaron organismos externos de apoyo.</td></tr>
     {% endfor %}
 </table>
+{% endif %}
 
 <!-- ============ 6. OBSERVACIONES Y RELATO OPERACIONAL ============ -->
 <table class="tarjeta">
     <tr>
-        <td class="titulo-seccion">6. Observaciones Generales y Relato Operacional</td>
+        <td class="titulo-seccion">{% if dto.tipo_reporte == 'rescate_caida' %}3{% else %}6{% endif %}. Observaciones Generales y Relato Operacional</td>
     </tr>
     <tr>
         <td class="tvalor texto-largo" style="min-height: 70pt;">{{ dto.observaciones|safe }}</td>

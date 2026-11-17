@@ -1,14 +1,17 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, Response
+from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, url_for
 from flask_login import login_required, current_user
 from datetime import datetime
 import json
+
+from sqlalchemy.exc import IntegrityError
 from app.models import (
     db, Usuario, Vehiculo, Reporte, ReporteVehiculoActuante, ReportePersonalActuante, ReporteOtroOrganismo,
     ReporteMatpelGLP, ReporteMatpelCombustible, ReporteMatpelQuimico, ReporteMatpelOtros,
     ReportePreHospitalario, ReporteServicioAgua, ReporteServicioInsectos, ReporteServicioAnimal,
     ReporteServicioAchicamiento, ReporteServicioBaldeo,
     ReporteAPHTraslado, ReporteAPHNoTraslado, ReporteAPHInterhospitalario, ReporteAPHSinTraslado,
-    ReporteIncendio, ReporteRescateColision, ReporteRescateEspecializado, ReportePersonaAfectada
+    ReporteIncendio, ReporteRescateColision, ReporteRescateEspecializado, ReportePersonaAfectada,
+    ReporteFalsaAlarma
 )
 from app.services.pdf_service import generar_pdf_reporte, renderizar_html_reporte
 
@@ -20,6 +23,7 @@ REPORT_MODEL_MAP = {
     'matpel_combustible': ReporteMatpelCombustible,
     'matpel_quimico': ReporteMatpelQuimico,
     'matpel_otros': ReporteMatpelOtros,
+    'falsa_alarma': ReporteFalsaAlarma,
     'pre_hospitalario': ReportePreHospitalario,
     'servicio_agua': ReporteServicioAgua,
     'servicio_insectos': ReporteServicioInsectos,
@@ -47,7 +51,6 @@ REPORT_MODEL_MAP = {
     # Nuevos: Rescate Especializado
     'rescate_ascensor': ReporteRescateEspecializado,
     'rescate_inmueble': ReporteRescateEspecializado,
-    'rescate_altura': ReporteRescateEspecializado,
     'rescate_tapiada': ReporteRescateEspecializado,
     'rescate_golpeada': ReporteRescateEspecializado,
     'rescate_caida': ReporteRescateEspecializado,
@@ -58,7 +61,8 @@ REPORT_PREFIX_MAP = {
     'matpel_glp': 'GLP',
     'matpel_combustible': 'COMB',
     'matpel_quimico': 'QUIM',
-    'matpel_otros': 'MAT_OTH',
+    'matpel_otros': 'GN',
+    'falsa_alarma': 'FAL',
     'pre_hospitalario': 'APH',
     'servicio_agua': 'AGUA',
     'servicio_insectos': 'INS',
@@ -82,7 +86,6 @@ REPORT_PREFIX_MAP = {
     'rescate_volcamiento_sin_lesionado': 'RES_VOL_S',
     'rescate_ascensor': 'RES_ASC',
     'rescate_inmueble': 'RES_INM',
-    'rescate_altura': 'RES_ALT',
     'rescate_tapiada': 'RES_TAP',
     'rescate_golpeada': 'RES_GOL',
     'rescate_caida': 'RES_CAID',
@@ -93,7 +96,8 @@ REPORT_TITLE_MAP = {
     'matpel_glp': 'Reporte MATPEL - Control de Escape de GLP',
     'matpel_combustible': 'Reporte MATPEL - Derrame de Combustible',
     'matpel_quimico': 'Reporte MATPEL - Derrame de Sustancia Química',
-    'matpel_otros': 'Reporte MATPEL - Otras Sustancias Peligrosas',
+    'matpel_otros': 'Reporte MATPEL - Control de Gas Natural',
+    'falsa_alarma': 'Falsa Alarma por Incendio de Estructura o Vehículo',
     'pre_hospitalario': 'Atención Pre-Hospitalaria / Traslado Rutinario',
     'servicio_agua': 'Servicio Especial - Abastecimiento de Agua',
     'servicio_insectos': 'Servicio Especial - Control y Re-ubicación de Insectos',
@@ -117,17 +121,16 @@ REPORT_TITLE_MAP = {
     'rescate_volcamiento_sin_lesionado': 'Rescate por Volcamiento sin Lesionado',
     'rescate_ascensor': 'Rescate de Persona Incomunicada en Ascensor',
     'rescate_inmueble': 'Rescate de Persona Incomunicada en Inmueble',
-    'rescate_altura': 'Rescate de Persona en Altura',
     'rescate_tapiada': 'Rescate de Persona Tapiada',
     'rescate_golpeada': 'Rescate de Persona Golpeada por',
-    'rescate_caida': 'Rescate de Persona Caída en',
+    'rescate_caida': 'Rescate de Persona Caída en Altura',
 }
 
 # Campos específicos que corresponden a cada clase de reporte
 REPORT_FIELDS_MAP = {
     'matpel_glp': [
         'clasificacion_servicio', 'nombre_producto', 'un_numero', 'riesgo_producto', 'tipo_almacenamiento',
-        'certificado_bomberil', 'nro_certificado', 'propietario_nombre', 'propietario_rif_ci',
+        'serial_cilindro', 'certificado_bomberil', 'nro_certificado', 'propietario_nombre', 'propietario_rif_ci',
         'empresa_distribuidora', 'vehiculo_marca', 'vehiculo_modelo', 'vehiculo_placa', 'vehiculo_color',
         'vehiculo_afecto', 'hoja_seguridad', 'extintor', 'equipo_derrame'
     ],
@@ -142,7 +145,13 @@ REPORT_FIELDS_MAP = {
         'vehiculo_marca', 'vehiculo_modelo', 'vehiculo_placa', 'vehiculo_color', 'vehiculo_afecto'
     ],
     'matpel_otros': [
-        'descripcion_sustancia', 'riesgos_identificados', 'medidas_seguridad_adoptadas'
+        'clasificacion_servicio', 'nombre_producto', 'un_numero', 'riesgo_producto', 'tipo_almacenamiento',
+        'serial_cilindro', 'certificado_bomberil', 'nro_certificado', 'propietario_nombre', 'propietario_rif_ci',
+        'empresa_distribuidora', 'vehiculo_marca', 'vehiculo_modelo', 'vehiculo_placa', 'vehiculo_color',
+        'vehiculo_afecto', 'hoja_seguridad', 'extintor', 'equipo_derrame'
+    ],
+    'falsa_alarma': [
+        'tipo_alarma'
     ],
     'pre_hospitalario': [
         'paciente_nombre', 'paciente_edad', 'paciente_genero', 'paciente_cedula',
@@ -169,6 +178,7 @@ REPORT_FIELDS_MAP = {
         'observaciones_baldeo'
     ],
     'aph_traslado': [
+        'causa_traslado', 'recomendaciones',
         'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
         'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
         'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
@@ -178,6 +188,7 @@ REPORT_FIELDS_MAP = {
         'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
     ],
     'aph_no_traslado': [
+        'causa_traslado', 'recomendaciones',
         'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
         'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
         'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
@@ -188,6 +199,7 @@ REPORT_FIELDS_MAP = {
         'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
     ],
     'aph_interhospitalario': [
+        'causa_traslado', 'recomendaciones',
         'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
         'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
         'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
@@ -198,6 +210,7 @@ REPORT_FIELDS_MAP = {
         'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
     ],
     'aph_sin_traslado': [
+        'causa_traslado', 'recomendaciones',
         'signos_vitales_pa', 'signos_vitales_fc', 'signos_vitales_fr', 'signos_vitales_temperatura',
         'glasgow_apertura_ocular', 'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
         'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_miembro_superior_d',
@@ -217,7 +230,7 @@ REPORT_FIELDS_MAP = {
         'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono'
     ],
     'incendio_apoyo': [
-        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'subtipo_incendio', 'tipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
         'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
         'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
         'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
@@ -303,11 +316,6 @@ REPORT_FIELDS_MAP = {
         'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
         'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
     ],
-    'rescate_altura': [
-        'subtipo_rescate', 'tipo_servicio',
-        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
-        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
-    ],
     'rescate_tapiada': [
         'subtipo_rescate', 'tipo_servicio',
         'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
@@ -318,10 +326,11 @@ REPORT_FIELDS_MAP = {
         'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
         'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
     ],
+    # Caída en altura: se registran los datos del lesionado (tabla
+    # reporte_personas_afectadas) y el tipo de terreno, en lugar del
+    # despliegue operacional.
     'rescate_caida': [
-        'subtipo_rescate', 'tipo_servicio',
-        'despliegue_vehiculos', 'despliegue_conductor_nombre', 'despliegue_conductor_ci',
-        'despliegue_jefe_nombre', 'despliegue_jefe_ci', 'despliegue_cantidad_bomberos', 'despliegue_material_usado'
+        'subtipo_rescate', 'tipo_terreno'
     ],
 }
 
@@ -334,50 +343,167 @@ def resolver_personal_seleccionado(clave_usuario_id, clave_nombre, clave_ci, cla
     """
     usuario_id = request.form.get(clave_usuario_id)
     if usuario_id:
-        usuario = Usuario.query.get(int(usuario_id))
+        try:
+            usuario = db.session.get(Usuario, int(usuario_id))
+        except (TypeError, ValueError):
+            usuario = None
         if usuario:
             return f'{usuario.nombre} {usuario.apellido}', usuario.cedula, usuario.rango
     return request.form.get(clave_nombre), request.form.get(clave_ci), request.form.get(clave_rango)
 
 
+# Tipos de dato por campo específico del formulario
+CAMPOS_BOOLEANOS = {
+    'certificado_bomberil', 'hoja_seguridad', 'extintor', 'equipo_derrame',
+    'limpieza_vias_efectuada', 'vehiculo_afecto', 'medico_firma',
+    'rechazo_firma', 'hubo_propagacion', 'poseia_equipos', 'fue_usado',
+}
+
+CAMPOS_ENTEROS = {
+    'paciente_edad', 'signos_vitales_pulso', 'signos_vitales_fr',
+    'litros_distribuidos', 'beneficiarios_estimados', 'litros_agua_utilizados',
+    'signos_vitales_fc', 'glasgow_apertura_ocular', 'glasgow_respuesta_verbal',
+    'glasgow_respuesta_motora', 'glasgow_total', 'propietario_edad',
+    'despliegue_cantidad_bomberos',
+}
+
+CAMPOS_DECIMALES = {
+    'cantidad_estimada_derrame', 'capacidad_tanque_litros',
+    'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen', 'regla_9_total',
+    'regla_9_miembro_superior_d', 'regla_9_miembro_superior_i',
+    'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i',
+    'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+}
+
+# Campos de tipo hora (columnas db.Time) que no forman parte de la cabecera
+CAMPOS_HORA = {
+    'hora_control', 'hora_extincion_total',
+}
+
+
+def _a_entero(valor):
+    """Convierte a entero sin lanzar excepción (None si no es válido)."""
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return None
+
+
 def parse_field_value(field_name, raw_val):
     """
-    Parsea los valores raw provenientes del formulario de acuerdo a sus tipos de datos requeridos en la BD.
+    Parsea los valores raw provenientes del formulario de acuerdo a sus tipos
+    de datos requeridos en la BD. Un valor no numérico produce un error de
+    validación en lugar de guardarse silenciosamente como 0.
     """
     if raw_val is None or raw_val == '':
         return None
-    # Booleanos
-    if field_name in ['certificado_bomberil', 'hoja_seguridad', 'extintor', 'equipo_derrame', 'limpieza_vias_efectuada', 'vehiculo_afecto',
-                       'medico_firma', 'rechazo_firma', 'hubo_propagacion', 'poseia_equipos', 'fue_usado']:
+    if field_name in CAMPOS_BOOLEANOS:
         return raw_val in ['Si', 'on', 'true', '1', True]
-    # Enteros
-    if field_name in ['paciente_edad', 'signos_vitales_pulso', 'signos_vitales_fr', 'litros_distribuidos',
-                       'beneficiarios_estimados', 'litros_agua_utilizados',
-                       'signos_vitales_fc', 'signos_vitales_fr', 'glasgow_apertura_ocular',
-                       'glasgow_respuesta_verbal', 'glasgow_respuesta_motora', 'glasgow_total',
-                       'regla_9_total', 'propietario_edad', 'despliegue_cantidad_bomberos']:
+    etiqueta = field_name.replace('_', ' ')
+    if field_name in CAMPOS_ENTEROS:
         try:
             return int(raw_val)
-        except ValueError:
-            return 0
-    # Flotantes / Decimales
-    if field_name in ['cantidad_estimada_derrame', 'capacidad_tanque_litros',
-                       'regla_9_cabeza', 'regla_9_torax', 'regla_9_abdomen',
-                       'regla_9_miembro_superior_d', 'regla_9_miembro_superior_i',
-                       'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i',
-                       'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total']:
+        except (TypeError, ValueError):
+            raise ValueError(f'El campo "{etiqueta}" debe ser un número entero.')
+    if field_name in CAMPOS_DECIMALES:
         try:
-            return float(raw_val)
-        except ValueError:
-            return 0.0
+            return float(str(raw_val).replace(',', '.'))
+        except (TypeError, ValueError):
+            raise ValueError(f'El campo "{etiqueta}" debe ser un número.')
+    if field_name in CAMPOS_HORA:
+        try:
+            return datetime.strptime(str(raw_val).strip(), '%H:%M').time()
+        except (TypeError, ValueError):
+            raise ValueError(f'El campo "{etiqueta}" debe tener formato de hora HH:MM.')
     return raw_val
+
+
+def _siguiente_nro_control(prefix, tipo_reporte):
+    """
+    Calcula el siguiente número de control tomando el mayor consecutivo
+    existente del tipo en el año. A diferencia de contar filas, esto no genera
+    duplicados cuando se elimina un reporte.
+
+    El prefijo es único por tipo de reporte, así que se filtra por él en lugar
+    de por ``tipo_reporte`` (que solo guarda la identidad polimórfica genérica).
+    """
+    anio = datetime.now().year
+    base = f'{prefix}-{anio}-'
+    numeros = db.session.query(Reporte.nro_control).filter(
+        Reporte.nro_control.like(f'{base}%'),
+    ).all()
+
+    maximo = 0
+    for (nro_control,) in numeros:
+        try:
+            maximo = max(maximo, int(str(nro_control).rsplit('-', 1)[-1]))
+        except (TypeError, ValueError):
+            continue
+    return f'{base}{maximo + 1:04d}'
+
+
+def _leer_cabecera(form):
+    """
+    Valida y normaliza los datos comunes del reporte.
+    Devuelve (diccionario_de_datos, lista_de_errores).
+    """
+    errores = []
+
+    fecha_valor = (form.get('fecha') or '').strip()
+    fecha = None
+    if not fecha_valor:
+        errores.append('La fecha del evento es obligatoria.')
+    else:
+        try:
+            fecha = datetime.strptime(fecha_valor, '%Y-%m-%d').date()
+        except ValueError:
+            errores.append('La fecha del evento no es válida.')
+
+    horas = {}
+    for campo, etiqueta in (
+        ('hora_aviso', 'hora de aviso'),
+        ('hora_salida', 'hora de salida'),
+        ('hora_llegada', 'hora de llegada'),
+        ('hora_regreso', 'hora de regreso'),
+    ):
+        valor = (form.get(campo) or '').strip()
+        if not valor:
+            errores.append(f'La {etiqueta} es obligatoria.')
+            horas[campo] = None
+            continue
+        try:
+            horas[campo] = datetime.strptime(valor, '%H:%M').time()
+        except ValueError:
+            errores.append(f'La {etiqueta} no es válida (formato HH:MM).')
+            horas[campo] = None
+
+    clase_aviso = (form.get('clase_aviso') or '').strip()
+    if not clase_aviso:
+        errores.append('La clase de aviso es obligatoria.')
+
+    receptor_aviso = (form.get('receptor_aviso') or '').strip()
+    if not receptor_aviso:
+        errores.append('Debe indicar quién recibió el aviso.')
+
+    direccion = (form.get('direccion') or '').strip()
+    if not direccion:
+        errores.append('La dirección del evento es obligatoria.')
+
+    return {
+        'fecha': fecha,
+        'clase_aviso': clase_aviso,
+        'receptor_aviso': receptor_aviso,
+        'direccion': direccion,
+        **horas,
+    }, errores
 
 
 @reportes_bp.route('/crear/<tipo_reporte>', methods=['GET', 'POST'])
 @login_required
 def crear_reporte(tipo_reporte):
     """
-    Controlador dinámico unificado que procesa la creación de los 10 tipos de reportes de actuación.
+    Controlador dinámico unificado que procesa la creación de todos los tipos
+    de reportes de actuación.
     """
     if tipo_reporte not in REPORT_MODEL_MAP:
         flash('Tipo de reporte no válido.', 'danger')
@@ -388,34 +514,28 @@ def crear_reporte(tipo_reporte):
     title = REPORT_TITLE_MAP[tipo_reporte]
     fields = REPORT_FIELDS_MAP[tipo_reporte]
 
+    # En el reporte de caída en altura no se solicitan las secciones de
+    # vehículos, personal actuante ni organismos de apoyo.
+    incluye_secciones_operativas = tipo_reporte != 'rescate_caida'
+
     if request.method == 'POST':
         try:
-            # 1. AUTOGENERAR N° DE CONTROL SECUENCIAL ÚNICO
-            año_actual = datetime.utcnow().year
-            conteo_año = Reporte.query.filter(
-                db.extract('year', Reporte.fecha) == año_actual,
-                Reporte.tipo_reporte == tipo_reporte
-            ).count()
-            nro_control = f"{prefix}-{año_actual}-{str(conteo_año + 1).zfill(4)}"
+            # 1. VALIDAR DATOS COMUNES DE CABECERA
+            cabecera, errores = _leer_cabecera(request.form)
+            if errores:
+                for error in errores:
+                    flash(error, 'danger')
+                return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
 
-            # 2. CAPTURAR DATOS COMUNES DE CABECERA
-            fecha_str = request.form.get('fecha')
-            fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date() if fecha_str else datetime.utcnow().date()
-            
-            hora_aviso = datetime.strptime(request.form.get('hora_aviso'), '%H:%M').time()
-            hora_salida = datetime.strptime(request.form.get('hora_salida'), '%H:%M').time()
-            hora_llegada = datetime.strptime(request.form.get('hora_llegada'), '%H:%M').time()
-            hora_regreso = datetime.strptime(request.form.get('hora_regreso'), '%H:%M').time()
+            # 2. AUTOGENERAR N° DE CONTROL SECUENCIAL ÚNICO
+            nro_control = _siguiente_nro_control(prefix, tipo_reporte)
 
-            solicitante_nombre = request.form.get('solicitante_nombre')
-            solicitante_cedula = request.form.get('solicitante_cedula')
-            solicitante_telefono = request.form.get('solicitante_telefono')
-            receptor_aviso = request.form.get('receptor_aviso')
-            receptor_cedula = request.form.get('receptor_cedula')
-            
-            direccion = request.form.get('direccion')
-            punto_referencia = request.form.get('punto_referencia')
-            observaciones_generales = request.form.get('observaciones_generales')
+            solicitante_nombre = (request.form.get('solicitante_nombre') or '').strip() or None
+            solicitante_cedula = (request.form.get('solicitante_cedula') or '').strip() or None
+            solicitante_telefono = (request.form.get('solicitante_telefono') or '').strip() or None
+            receptor_cedula = (request.form.get('receptor_cedula') or '').strip() or None
+            punto_referencia = (request.form.get('punto_referencia') or '').strip() or None
+            observaciones_generales = (request.form.get('observaciones_generales') or '').strip() or None
 
             # 3. EXTRAER Y PARSEAR CAMPOS ESPECÍFICOS DE LA SUBCLASE
             specific_kwargs = {}
@@ -423,12 +543,12 @@ def crear_reporte(tipo_reporte):
                 raw_val = request.form.get(field)
                 # Si el campo tiene opción "Otro", usar el valor del input de texto
                 if raw_val == 'Otro':
-                    otro_val = request.form.get(f'{field}_otro')
+                    otro_val = (request.form.get(f'{field}_otro') or '').strip()
                     if otro_val:
                         raw_val = otro_val
                 specific_kwargs[field] = parse_field_value(field, raw_val)
 
-            # 4. INSTANCIAR Y GUARDAR REPORTE POLIMÓRFICO
+            # 4. DEFINIR SUBTIPOS Y DATOS ADICIONALES SEGÚN EL TIPO
             extra_kwargs = {}
             # Subtipo para incendios
             if tipo_reporte.startswith('incendio_'):
@@ -448,7 +568,8 @@ def crear_reporte(tipo_reporte):
                     'rescate_volcamiento_sin_lesionado': 'volcamiento_sin_lesionado',
                 }
                 extra_kwargs['subtipo_rescate'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('rescate_', ''))
-                # Serializar vehículos involucrados
+                # Si el formulario envía el detalle estructurado de los vehículos,
+                # se serializa. Si no, se conserva el texto libre del campo.
                 veh_inv_marca = request.form.getlist('veh_inv_marca[]')
                 veh_inv_modelo = request.form.getlist('veh_inv_modelo[]')
                 veh_inv_placa = request.form.getlist('veh_inv_placa[]')
@@ -471,42 +592,40 @@ def crear_reporte(tipo_reporte):
                         'cedula': veh_inv_cedula[i] if i < len(veh_inv_cedula) else '',
                         'telefono': veh_inv_telefono[i] if i < len(veh_inv_telefono) else '',
                     })
-                extra_kwargs['vehiculos_involucrados_json'] = json.dumps(vehiculos_lista) if vehiculos_lista else None
+                if vehiculos_lista:
+                    extra_kwargs['vehiculos_involucrados_json'] = json.dumps(vehiculos_lista)
             # Subtipo para rescate especializado
             if tipo_reporte.startswith('rescate_') and not tipo_reporte.startswith('rescate_colision_') and not tipo_reporte.startswith('rescate_volcamiento_'):
                 subtipos_map = {
                     'rescate_ascensor': 'ascensor', 'rescate_inmueble': 'inmueble',
-                    'rescate_altura': 'altura', 'rescate_tapiada': 'tapiada',
-                    'rescate_golpeada': 'golpeada', 'rescate_caida': 'caida',
+                    'rescate_tapiada': 'tapiada', 'rescate_golpeada': 'golpeada',
+                    'rescate_caida': 'caida',
                 }
                 extra_kwargs['subtipo_rescate'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('rescate_', ''))
 
+            # 5. INSTANCIAR EL REPORTE POLIMÓRFICO
+            # Se combinan ambos diccionarios para que ningún campo se pase dos
+            # veces como argumento (los subtipos y datos calculados ganan).
+            parametros = {**specific_kwargs, **extra_kwargs}
+
             reporte_inst = model_class(
                 nro_control=nro_control,
-                fecha=fecha,
-                clase_aviso=request.form.get('clase_aviso', 'Radial'),
-                hora_aviso=hora_aviso,
-                hora_salida=hora_salida,
-                hora_llegada=hora_llegada,
-                hora_regreso=hora_regreso,
+                **cabecera,
                 solicitante_nombre=solicitante_nombre,
                 solicitante_cedula=solicitante_cedula,
                 solicitante_telefono=solicitante_telefono,
-                receptor_aviso=receptor_aviso,
                 receptor_cedula=receptor_cedula,
-                direccion=direccion,
                 punto_referencia=punto_referencia,
                 creador_id=current_user.id,
                 estado='Enviado',
                 observaciones_generales=observaciones_generales,
-                **specific_kwargs,
-                **extra_kwargs
+                **parametros
             )
-            
+
             db.session.add(reporte_inst)
             db.session.flush()
 
-            # 5. REGISTRAR PERSONAS AFECTADAS (para APH y Rescates)
+            # 6. REGISTRAR PERSONAS AFECTADAS / LESIONADOS (APH y Rescates)
             if tipo_reporte.startswith('aph_') or tipo_reporte.startswith('rescate_'):
                 pa_nombres = request.form.getlist('pa_nombre[]')
                 pa_cedulas = request.form.getlist('pa_cedula[]')
@@ -515,122 +634,145 @@ def crear_reporte(tipo_reporte):
                 pa_lesiones = request.form.getlist('pa_lesion[]')
                 pa_residencias = request.form.getlist('pa_residencia[]')
 
-                for i in range(max(len(pa_nombres), 0)):
-                    nombre = pa_nombres[i] if i < len(pa_nombres) else ''
-                    if nombre:
-                        persona = ReportePersonaAfectada(
-                            reporte_id=reporte_inst.id,
-                            nombre_apellido=nombre,
-                            cedula_pasaporte=pa_cedulas[i] if i < len(pa_cedulas) else '',
-                            edad=int(pa_edades[i]) if i < len(pa_edades) and pa_edades[i] else None,
-                            sexo=pa_sexos[i] if i < len(pa_sexos) else '',
-                            lesion=pa_lesiones[i] if i < len(pa_lesiones) else '',
-                            residencia=pa_residencias[i] if i < len(pa_residencias) else '',
-                        )
-                        db.session.add(persona)
+                for i, nombre in enumerate(pa_nombres):
+                    nombre = (nombre or '').strip()
+                    if not nombre:
+                        continue
+                    persona = ReportePersonaAfectada(
+                        reporte_id=reporte_inst.id,
+                        nombre_apellido=nombre,
+                        cedula_pasaporte=(pa_cedulas[i] if i < len(pa_cedulas) else '').strip() or None,
+                        edad=_a_entero(pa_edades[i]) if i < len(pa_edades) else None,
+                        sexo=(pa_sexos[i] if i < len(pa_sexos) else '').strip() or None,
+                        lesion=(pa_lesiones[i] if i < len(pa_lesiones) else '').strip() or None,
+                        residencia=(pa_residencias[i] if i < len(pa_residencias) else '').strip() or None,
+                    )
+                    db.session.add(persona)
 
-            # 6. REGISTRAR VEHÍCULOS ACTUANTES
-            vehiculos_ids = request.form.getlist('vehiculos_actuantes[]')
-            conductores = request.form.getlist('conductores[]')
-            kms_salida = request.form.getlist('kms_salida[]')
-            kms_llegada = request.form.getlist('kms_llegada[]')
-            
-            for i in range(len(vehiculos_ids)):
-                if vehiculos_ids[i]:
+            # 7. REGISTRAR VEHÍCULOS ACTUANTES
+            if incluye_secciones_operativas:
+                vehiculos_ids = request.form.getlist('vehiculos_actuantes[]')
+                conductores = request.form.getlist('conductores[]')
+                kms_salida = request.form.getlist('kms_salida[]')
+                kms_llegada = request.form.getlist('kms_llegada[]')
+
+                for i, vehiculo_id in enumerate(vehiculos_ids):
+                    if not vehiculo_id:
+                        continue
                     vehiculo_act = ReporteVehiculoActuante(
                         reporte_id=reporte_inst.id,
-                        vehiculo_id=int(vehiculos_ids[i]),
-                        conductor_nombre=conductores[i] if i < len(conductores) else "No especificado",
-                        km_salida=float(kms_salida[i]) if i < len(kms_salida) and kms_salida[i] else 0.0,
-                        km_llegada=float(kms_llegada[i]) if i < len(kms_llegada) and kms_llegada[i] else 0.0
+                        vehiculo_id=int(vehiculo_id),
+                        conductor_nombre=(conductores[i] if i < len(conductores) else '') or 'No especificado',
+                        km_salida=parse_field_value('capacidad_tanque_litros', kms_salida[i]) if i < len(kms_salida) else 0.0,
+                        km_llegada=parse_field_value('capacidad_tanque_litros', kms_llegada[i]) if i < len(kms_llegada) else 0.0,
                     )
                     db.session.add(vehiculo_act)
 
-            # 7. REGISTRAR PERSONAL ACTUANTE (Jefe de Comisión, Conductor y Elaborado Por)
-            jefe_nombre, jefe_ci, jefe_rango = resolver_personal_seleccionado(
-                'jefe_comision_usuario_id', 'jefe_comision_nombre', 'jefe_comision_ci', 'jefe_comision_rango')
-            conductor_nombre, conductor_ci, conductor_rango = resolver_personal_seleccionado(
-                'conductor_unidad_usuario_id', 'conductor_unidad_nombre', 'conductor_unidad_ci', 'conductor_unidad_rango')
-
+            # 8. REGISTRAR PERSONAL ACTUANTE
+            # "Reporte Elaborado Por" se registra siempre (firma del documento);
+            # jefe de comisión, conductor y combatientes solo cuando el tipo de
+            # reporte incluye la sección de personal.
             roles_personal = [
-                ('Jefe de Comisión', jefe_nombre, jefe_ci, jefe_rango),
-                ('Conductor Unidad', conductor_nombre, conductor_ci, conductor_rango),
-                ('Reporte Elaborado Por', current_user.nombre + " " + current_user.apellido, current_user.cedula, current_user.rango)
+                ('Reporte Elaborado Por',
+                 f'{current_user.nombre} {current_user.apellido}',
+                 current_user.cedula, current_user.rango),
             ]
-            
+
+            if incluye_secciones_operativas:
+                jefe_nombre, jefe_ci, jefe_rango = resolver_personal_seleccionado(
+                    'jefe_comision_usuario_id', 'jefe_comision_nombre', 'jefe_comision_ci', 'jefe_comision_rango')
+                conductor_nombre, conductor_ci, conductor_rango = resolver_personal_seleccionado(
+                    'conductor_unidad_usuario_id', 'conductor_unidad_nombre', 'conductor_unidad_ci', 'conductor_unidad_rango')
+                roles_personal = [
+                    ('Jefe de Comisión', jefe_nombre, jefe_ci, jefe_rango),
+                    ('Conductor Unidad', conductor_nombre, conductor_ci, conductor_rango),
+                ] + roles_personal
+
             for rol, nombre, ci, rango in roles_personal:
                 if nombre:
-                    pers_act = ReportePersonalActuante(
+                    db.session.add(ReportePersonalActuante(
                         reporte_id=reporte_inst.id,
                         nombre_completo=nombre,
                         cedula=ci,
                         rango=rango,
                         rol_en_servicio=rol
-                    )
-                    db.session.add(pers_act)
+                    ))
 
-            # Combatientes dinámicos (selección de bomberos del sistema o texto manual)
-            combatientes_usuario_ids = request.form.getlist('combatientes_usuario_id[]')
-            combatientes_nombres = request.form.getlist('combatientes_nombres[]')
-            combatientes_cis = request.form.getlist('combatientes_cis[]')
-            combatientes_rangos = request.form.getlist('combatientes_rangos[]')
-            
-            for i in range(max(len(combatientes_usuario_ids), len(combatientes_nombres))):
-                nombre = ci = rango = None
-                if i < len(combatientes_usuario_ids) and combatientes_usuario_ids[i]:
-                    usuario = Usuario.query.get(int(combatientes_usuario_ids[i]))
-                    if usuario:
-                        nombre, ci, rango = f'{usuario.nombre} {usuario.apellido}', usuario.cedula, usuario.rango
-                if not nombre and i < len(combatientes_nombres) and combatientes_nombres[i]:
-                    nombre = combatientes_nombres[i]
-                    ci = combatientes_cis[i] if i < len(combatientes_cis) else ""
-                    rango = combatientes_rangos[i] if i < len(combatientes_rangos) else ""
-                if nombre:
-                    pers_act = ReportePersonalActuante(
-                        reporte_id=reporte_inst.id,
-                        nombre_completo=nombre,
-                        cedula=ci,
-                        rango=rango,
-                        rol_en_servicio='Combatiente'
-                    )
-                    db.session.add(pers_act)
+            if incluye_secciones_operativas:
+                # Combatientes dinámicos (selección de bomberos del sistema o texto manual)
+                combatientes_usuario_ids = request.form.getlist('combatientes_usuario_id[]')
+                combatientes_nombres = request.form.getlist('combatientes_nombres[]')
+                combatientes_cis = request.form.getlist('combatientes_cis[]')
+                combatientes_rangos = request.form.getlist('combatientes_rangos[]')
 
-            # 8. REGISTRAR ACTUACIÓN DE OTROS ORGANISMOS
-            organismos_nombres = request.form.getlist('organismo_nombre[]')
-            organismos_jefes = request.form.getlist('organismo_jefe[]')
-            organismos_matriculas = request.form.getlist('organismo_matricula[]')
-            organismos_cantidades = request.form.getlist('organismo_cantidad[]')
-            
-            for i in range(len(organismos_nombres)):
-                if organismos_nombres[i]:
-                    org_act = ReporteOtroOrganismo(
+                for i in range(max(len(combatientes_usuario_ids), len(combatientes_nombres))):
+                    nombre = ci = rango = None
+                    if i < len(combatientes_usuario_ids) and combatientes_usuario_ids[i]:
+                        usuario = db.session.get(Usuario, _a_entero(combatientes_usuario_ids[i]))
+                        if usuario:
+                            nombre, ci, rango = f'{usuario.nombre} {usuario.apellido}', usuario.cedula, usuario.rango
+                    if not nombre and i < len(combatientes_nombres) and combatientes_nombres[i]:
+                        nombre = combatientes_nombres[i]
+                        ci = combatientes_cis[i] if i < len(combatientes_cis) else ''
+                        rango = combatientes_rangos[i] if i < len(combatientes_rangos) else ''
+                    if nombre:
+                        db.session.add(ReportePersonalActuante(
+                            reporte_id=reporte_inst.id,
+                            nombre_completo=nombre,
+                            cedula=ci,
+                            rango=rango,
+                            rol_en_servicio='Combatiente'
+                        ))
+
+                # 9. REGISTRAR ACTUACIÓN DE OTROS ORGANISMOS
+                organismos_nombres = request.form.getlist('organismo_nombre[]')
+                organismos_jefes = request.form.getlist('organismo_jefe[]')
+                organismos_matriculas = request.form.getlist('organismo_matricula[]')
+                organismos_cantidades = request.form.getlist('organismo_cantidad[]')
+
+                for i, nombre_organismo in enumerate(organismos_nombres):
+                    if not nombre_organismo:
+                        continue
+                    db.session.add(ReporteOtroOrganismo(
                         reporte_id=reporte_inst.id,
-                        nombre_organismo=organismos_nombres[i],
-                        jefe_unidad=organismos_jefes[i] if i < len(organismos_jefes) else "",
-                        matricula_unidad=organismos_matriculas[i] if i < len(organismos_matriculas) else "",
-                        cantidad_unidades=int(organismos_cantidades[i]) if i < len(organismos_cantidades) and organismos_cantidades[i] else 1
-                    )
-                    db.session.add(org_act)
+                        nombre_organismo=nombre_organismo,
+                        jefe_unidad=organismos_jefes[i] if i < len(organismos_jefes) else '',
+                        matricula_unidad=organismos_matriculas[i] if i < len(organismos_matriculas) else '',
+                        cantidad_unidades=_a_entero(organismos_cantidades[i]) if i < len(organismos_cantidades) else 1,
+                    ))
 
             db.session.commit()
             flash(f'Reporte {nro_control} creado y enviado con éxito.', 'success')
             return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte_inst.id))
 
-        except Exception as e:
+        except ValueError as error:
+            # Errores de validación con mensaje apto para el usuario
             db.session.rollback()
-            flash(f'Error al crear el reporte: {str(e)}', 'danger')
+            flash(str(error), 'danger')
+            return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
+        except IntegrityError:
+            db.session.rollback()
+            current_app.logger.exception('Conflicto de integridad al crear reporte %s', tipo_reporte)
+            flash('No se pudo guardar el reporte: el número de control ya existe. '
+                  'Intente guardar nuevamente.', 'danger')
+            return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
+        except Exception:
+            db.session.rollback()
+            current_app.logger.exception('Error al crear reporte %s', tipo_reporte)
+            flash('Ocurrió un error al guardar el reporte. Intente nuevamente o contacte al administrador.', 'danger')
             return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
 
     vehiculos = Vehiculo.query.filter_by(activo=True).all()
     bomberos = Usuario.query.filter_by(activo=True).order_by(Usuario.rango.asc(), Usuario.nombre.asc()).all()
-    date_today = datetime.utcnow().strftime('%Y-%m-%d')
+    date_today = datetime.now().strftime('%Y-%m-%d')
     return render_template(
         'reportes/crear.html',
         tipo_reporte=tipo_reporte,
         title=title,
         vehiculos=vehiculos,
         bomberos=bomberos,
-        date_today=date_today
+        date_today=date_today,
+        incluye_secciones_operativas=incluye_secciones_operativas,
     )
 
 
@@ -668,8 +810,9 @@ def descargar_pdf(reporte_id):
 
     try:
         pdf_bytes, motor = generar_pdf_reporte(reporte)
-    except Exception as e:
-        flash(f'Error al generar el PDF: {str(e)}', 'danger')
+    except Exception:
+        current_app.logger.exception('Error al generar el PDF del reporte %s', reporte.nro_control)
+        flash('No se pudo generar el PDF del reporte. Intente nuevamente.', 'danger')
         return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte.id))
 
     nombre_archivo = f"Reporte_{reporte.nro_control.replace('/', '_')}.pdf"
@@ -696,6 +839,7 @@ def imprimir_reporte(reporte_id):
 
     try:
         return renderizar_html_reporte(reporte)
-    except Exception as e:
-        flash(f'Error al preparar la impresión: {str(e)}', 'danger')
+    except Exception:
+        current_app.logger.exception('Error al preparar la impresión del reporte %s', reporte.nro_control)
+        flash('No se pudo preparar la impresión del reporte. Intente nuevamente.', 'danger')
         return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte.id))
