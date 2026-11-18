@@ -54,6 +54,7 @@ REPORT_MODEL_MAP = {
     'rescate_tapiada': ReporteRescateEspecializado,
     'rescate_golpeada': ReporteRescateEspecializado,
     'rescate_caida': ReporteRescateEspecializado,
+    'rescate_cadaver': ReporteRescateEspecializado,
 }
 
 # Prefijos correspondientes para la autogeneración del N° de Control
@@ -89,6 +90,7 @@ REPORT_PREFIX_MAP = {
     'rescate_tapiada': 'RES_TAP',
     'rescate_golpeada': 'RES_GOL',
     'rescate_caida': 'RES_CAID',
+    'rescate_cadaver': 'RES_CAD',
 }
 
 # Títulos de cabecera legibles para la plantilla crear.html
@@ -124,6 +126,7 @@ REPORT_TITLE_MAP = {
     'rescate_tapiada': 'Rescate de Persona Tapiada',
     'rescate_golpeada': 'Rescate de Persona Golpeada por',
     'rescate_caida': 'Rescate de Persona Caída en Altura',
+    'rescate_cadaver': 'Rescate de Cadáver',
 }
 
 # Campos específicos que corresponden a cada clase de reporte
@@ -332,6 +335,11 @@ REPORT_FIELDS_MAP = {
     'rescate_caida': [
         'subtipo_rescate', 'tipo_terreno'
     ],
+    # Cadáver: solo datos del cadáver y ubicación del hallazgo.
+    'rescate_cadaver': [
+        'subtipo_rescate',
+        'cadaver_nombre', 'cadaver_cedula', 'cadaver_edad', 'cadaver_sexo', 'cadaver_ubicacion'
+    ],
 }
 
 def resolver_personal_seleccionado(clave_usuario_id, clave_nombre, clave_ci, clave_rango):
@@ -516,7 +524,7 @@ def crear_reporte(tipo_reporte):
 
     # En el reporte de caída en altura no se solicitan las secciones de
     # vehículos, personal actuante ni organismos de apoyo.
-    incluye_secciones_operativas = tipo_reporte != 'rescate_caida'
+    incluye_secciones_operativas = tipo_reporte not in ('rescate_caida', 'rescate_cadaver')
 
     if request.method == 'POST':
         try:
@@ -599,7 +607,7 @@ def crear_reporte(tipo_reporte):
                 subtipos_map = {
                     'rescate_ascensor': 'ascensor', 'rescate_inmueble': 'inmueble',
                     'rescate_tapiada': 'tapiada', 'rescate_golpeada': 'golpeada',
-                    'rescate_caida': 'caida',
+                    'rescate_caida': 'caida', 'rescate_cadaver': 'cadaver',
                 }
                 extra_kwargs['subtipo_rescate'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('rescate_', ''))
 

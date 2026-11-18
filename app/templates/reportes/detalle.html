@@ -1340,9 +1340,25 @@
             </div>
         </div>
 
+        {% elif reporte.tipo_especifico == 'rescate_cadaver' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="user-x" class="w-4 h-4 text-slate-400"></i>
+                <span>2. Rescate de Cadáver</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div><span class="block font-semibold text-slate-500">Tipo de Rescate:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_rescate|replace('_', ' ')|upper }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Nombre del Fallecido:</span><span class="text-white text-sm font-medium">{{ reporte.cadaver_nombre or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Cédula / Pasaporte:</span><span class="text-white text-sm font-medium">{{ reporte.cadaver_cedula or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Edad:</span><span class="text-white text-sm font-medium">{{ reporte.cadaver_edad if reporte.cadaver_edad is not none else '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Sexo:</span><span class="text-white text-sm font-medium">{{ reporte.cadaver_sexo or '--' }}</span></div>
+                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Ubicación donde se encontró el Cadáver:</span><span class="text-white text-sm font-medium block">{{ reporte.cadaver_ubicacion or '--' }}</span></div>
+            </div>
+        </div>
+
         {% endif %}
 
-        {% if reporte.tipo_especifico != 'rescate_caida' %}
+        {% if reporte.tipo_especifico not in ('rescate_caida', 'rescate_cadaver') %}
         <!-- 3. VEHÍCULOS / UNIDADES ACTUANTES -->
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
@@ -1449,7 +1465,7 @@
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="align-left" class="w-4 h-4 text-purple-500"></i>
-                <span>{% if reporte.tipo_especifico == 'rescate_caida' %}3{% else %}6{% endif %}. Detalle de la Actuación Operacional / Relato Técnico</span>
+                <span>{% if reporte.tipo_especifico in ('rescate_caida', 'rescate_cadaver') %}3{% else %}6{% endif %}. Detalle de la Actuación Operacional / Relato Técnico</span>
             </div>
             <div class="p-4 text-xs text-slate-200 leading-relaxed whitespace-pre-line font-mono bg-slate-950/20">
                 {{ reporte.observaciones_generales }}

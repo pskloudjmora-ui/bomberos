@@ -53,6 +53,11 @@ COLUMNAS_NUEVAS = {
     },
     'reportes_rescate_especializado': {
         'tipo_terreno': 'VARCHAR(100)',
+        'cadaver_nombre': 'VARCHAR(150)',
+        'cadaver_cedula': 'VARCHAR(20)',
+        'cadaver_edad': 'INTEGER',
+        'cadaver_sexo': 'VARCHAR(20)',
+        'cadaver_ubicacion': 'VARCHAR(255)',
     },
     'reportes_aph_traslado': {
         'causa_traslado': 'TEXT',

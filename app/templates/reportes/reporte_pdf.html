@@ -308,7 +308,7 @@
 </table>
 {% endif %}
 
-{% if dto.tipo_reporte != 'rescate_caida' %}
+{% if dto.tipo_reporte not in ('rescate_caida', 'rescate_cadaver') %}
 <!-- ============ 3. VEHÍCULOS Y UNIDADES ACTUANTES ============ -->
 <table class="tarjeta no-cortar">
     <tr>
@@ -400,7 +400,7 @@
 <!-- ============ 6. OBSERVACIONES Y RELATO OPERACIONAL ============ -->
 <table class="tarjeta">
     <tr>
-        <td class="titulo-seccion">{% if dto.tipo_reporte == 'rescate_caida' %}3{% else %}6{% endif %}. Observaciones Generales y Relato Operacional</td>
+        <td class="titulo-seccion">{% if dto.tipo_reporte in ('rescate_caida', 'rescate_cadaver') %}3{% else %}6{% endif %}. Observaciones Generales y Relato Operacional</td>
     </tr>
     <tr>
         <td class="tvalor texto-largo" style="min-height: 70pt;">{{ dto.observaciones|safe }}</td>

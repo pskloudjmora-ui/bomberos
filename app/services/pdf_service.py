@@ -51,6 +51,7 @@ NOMBRE_SERVICIO = {
     'rescate_tapiada': 'RESCATE ESPECIALIZADO - TAPIADA',
     'rescate_golpeada': 'RESCATE ESPECIALIZADO - GOLPEADA',
     'rescate_caida': 'RESCATE DE PERSONA CAÍDA EN ALTURA',
+    'rescate_cadaver': 'RESCATE DE CADÁVER',
     'servicio_agua': 'ABASTECIMIENTO DE AGUA',
     'servicio_insectos': 'CONTROL Y REUBICACIÓN DE INSECTOS',
     'servicio_animal': 'CONTROL DE ANIMAL DOMÉSTICO',
@@ -86,6 +87,7 @@ TITULO_SECCION_2 = {
     'rescate_tapiada': '2. DETALLE DEL RESCATE ESPECIALIZADO - TAPIADA',
     'rescate_golpeada': '2. DETALLE DEL RESCATE ESPECIALIZADO - GOLPEADA',
     'rescate_caida': '2. DETALLE DEL RESCATE DE PERSONA CAÍDA EN ALTURA',
+    'rescate_cadaver': '2. DETALLE DEL RESCATE DE CADÁVER',
     'servicio_agua': '2. PARÁMETROS DEL ABASTECIMIENTO DE AGUA',
     'servicio_insectos': '2. PARÁMETROS DEL CONTROL Y REUBICACIÓN DE INSECTOS',
     'servicio_animal': '2. PARÁMETROS DEL CONTROL DE ANIMAL DOMÉSTICO',
@@ -529,6 +531,15 @@ SECCIONES_ESPECIFICAS = {
         ('Tipo de Rescate', 'subtipo_rescate', 'plain'),
         ('Tipo de Terreno', 'tipo_terreno', 'plain'),
     ],
+    # Cadáver: datos del fallecido y ubicación del hallazgo.
+    'rescate_cadaver': [
+        ('Tipo de Rescate', 'subtipo_rescate', 'plain'),
+        ('Nombre del Fallecido', 'cadaver_nombre', 'plain'),
+        ('C.I. / Pasaporte', 'cadaver_cedula', 'plain'),
+        ('Edad', 'cadaver_edad', 'plain'),
+        ('Sexo', 'cadaver_sexo', 'plain'),
+        ('Ubicación donde se encontró', 'cadaver_ubicacion', 'plain'),
+    ],
 }
 
 # Campo del modelo que describe el material/equipos usados en la actuación, según el tipo
@@ -559,6 +570,7 @@ MATERIAL_ATTR = {
     'rescate_tapiada': 'despliegue_material_usado',
     'rescate_golpeada': 'despliegue_material_usado',
     'rescate_caida': None,
+    'rescate_cadaver': None,
     'servicio_agua': 'material_usado',
     'servicio_insectos': 'materiales_utilizados',
     'servicio_animal': None,

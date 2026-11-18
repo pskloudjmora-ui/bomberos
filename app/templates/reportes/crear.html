@@ -103,7 +103,9 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                         <option value="Radial">Radial</option>
                         <option value="Telefonico">Telefónico</option>
+                        {% if tipo_reporte != 'incendio_vehiculo' %}
                         <option value="Personal">Personal</option>
+                        {% endif %}
                     </select>
                 </div>
                 <div>
@@ -121,6 +123,73 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
             </div>
+
+            {% if tipo_reporte == 'incendio_vehiculo' %}
+<div class="border-t border-slate-800/40 pt-4 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Vehículo Afectado</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Marca</label>
+                    <input type="text" name="vehiculo_marca" placeholder="ej: Toyota" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo</label>
+                    <input type="text" name="vehiculo_modelo" placeholder="ej: Hilux" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
+                    <input type="text" name="vehiculo_placa" placeholder="Placa del vehículo" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Color</label>
+                    <input type="text" name="vehiculo_color" placeholder="Color" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Año</label>
+                    <input type="text" name="vehiculo_anio" placeholder="ej: 2020" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Vehículo</label>
+                    <input type="text" name="vehiculo_tipo" placeholder="ej: Camioneta, Automóvil" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800/40 pt-4 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Propietario</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Propietario</label>
+                    <input type="text" name="propietario_nombre" placeholder="Nombre completo" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
+                    <input type="text" name="propietario_cedula" placeholder="V-12345678" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Edad</label>
+                    <input type="number" name="propietario_edad" placeholder="" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono</label>
+                    <input type="text" name="propietario_telefono" placeholder="0412-1234567" 
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Tiempos de actuación -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -1643,70 +1712,6 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
             </div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Vehículo Afectado</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Marca</label>
-                    <input type="text" name="vehiculo_marca" placeholder="ej: Toyota" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo</label>
-                    <input type="text" name="vehiculo_modelo" placeholder="ej: Hilux" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
-                    <input type="text" name="vehiculo_placa" placeholder="Placa del vehículo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Color</label>
-                    <input type="text" name="vehiculo_color" placeholder="Color" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Año</label>
-                    <input type="text" name="vehiculo_anio" placeholder="ej: 2020" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Vehículo</label>
-                    <input type="text" name="vehiculo_tipo" placeholder="ej: Camioneta, Automóvil" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
-            <div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Propietario</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Propietario</label>
-                    <input type="text" name="propietario_nombre" placeholder="Nombre completo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="propietario_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Edad</label>
-                    <input type="number" name="propietario_edad" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono</label>
-                    <input type="text" name="propietario_telefono" placeholder="0412-1234567" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
 
             {# 2.16 INCENDIO DESECHOS SÓLIDOS #}
 
@@ -2544,6 +2549,47 @@
                     </button>
                 </div>
                 <div id="contenedor-personas" class="space-y-2"></div>
+            </div>
+
+            {% elif tipo_reporte == 'rescate_cadaver' %}
+            <input type="hidden" name="subtipo_rescate" value="cadaver">
+
+            <div class="border-t border-slate-800/40 pt-4 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Cadáver</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Completo del Fallecido *</label>
+                        <input type="text" name="cadaver_nombre" required placeholder="Nombre y apellido"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula / Pasaporte</label>
+                        <input type="text" name="cadaver_cedula" placeholder="ej: V-15666777"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Edad (años)</label>
+                        <input type="number" name="cadaver_edad" placeholder=""
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Sexo</label>
+                        <select name="cadaver_sexo"
+                            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                            <option value="">— Seleccione —</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Ubicación donde se encontró el Cadáver *</label>
+                    <input type="text" name="cadaver_ubicacion" required placeholder="Dirección, sector, coordenadas o punto de referencia exacto"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
 
             {% endif %}

@@ -47,6 +47,7 @@ ETIQUETAS_TIPO = {
     'rescate_tapiada': 'Rescate - Tapiada',
     'rescate_golpeada': 'Rescate - Golpeada',
     'rescate_caida': 'Rescate - Caída en Altura',
+    'rescate_cadaver': 'Rescate de Cadáver',
 }
 
 # Clases Tailwind del badge (fondo, borde y texto)

@@ -870,6 +870,13 @@ class ReporteRescateEspecializado(Reporte):
     # Tipo de terreno donde se produjo el rescate (principalmente para caída en altura)
     tipo_terreno = db.Column(db.String(100), nullable=True)
 
+    # Datos del cadáver (solo para subtipo cadaver)
+    cadaver_nombre = db.Column(db.String(150), nullable=True)
+    cadaver_cedula = db.Column(db.String(20), nullable=True)
+    cadaver_edad = db.Column(db.Integer, nullable=True)
+    cadaver_sexo = db.Column(db.String(20), nullable=True)
+    cadaver_ubicacion = db.Column(db.String(255), nullable=True)
+
     # Despliegue operacional
     despliegue_vehiculos = db.Column(db.Text, nullable=True)
     despliegue_conductor_nombre = db.Column(db.String(150), nullable=True)

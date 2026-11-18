@@ -260,6 +260,10 @@
                                         <i data-lucide="arrow-down" class="w-4 h-4 text-teal-400"></i>
                                         <span>Rescate de Persona Caída en Altura</span>
                                     </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_cadaver') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="user-x" class="w-4 h-4 text-slate-400"></i>
+                                        <span>Rescate de Cadáver</span>
+                                    </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">SERVICIOS ESPECIALES</div>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_agua') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
