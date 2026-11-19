@@ -223,7 +223,7 @@ REPORT_FIELDS_MAP = {
         'rechazo_nombre', 'rechazo_cedula', 'rechazo_firma'
     ],
     'incendio_estructura': [
-        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
+        'subtipo_incendio', 'clase_incendio', 'tipo_estructura', 'lugar_desarrollo', 'presunto_punto_origen',
         'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
         'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
         'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
@@ -450,6 +450,16 @@ def _siguiente_nro_control(prefix, tipo_reporte):
     return f'{base}{maximo + 1:04d}'
 
 
+def _parsear_hora(valor):
+    """Acepta horas en formato HH:MM o HH:MM:SS (los segundos son opcionales)."""
+    for formato in ('%H:%M:%S', '%H:%M'):
+        try:
+            return datetime.strptime(valor, formato).time()
+        except ValueError:
+            continue
+    raise ValueError('formato de hora no válido')
+
+
 def _leer_cabecera(form):
     """
     Valida y normaliza los datos comunes del reporte.
@@ -480,9 +490,9 @@ def _leer_cabecera(form):
             horas[campo] = None
             continue
         try:
-            horas[campo] = datetime.strptime(valor, '%H:%M').time()
+            horas[campo] = _parsear_hora(valor)
         except ValueError:
-            errores.append(f'La {etiqueta} no es válida (formato HH:MM).')
+            errores.append(f'La {etiqueta} no es válida (formato HH:MM o HH:MM:SS).')
             horas[campo] = None
 
     clase_aviso = (form.get('clase_aviso') or '').strip()
@@ -497,11 +507,14 @@ def _leer_cabecera(form):
     if not direccion:
         errores.append('La dirección del evento es obligatoria.')
 
+    itinerario_ruta = (form.get('itinerario_ruta') or '').strip() or None
+
     return {
         'fecha': fecha,
         'clase_aviso': clase_aviso,
         'receptor_aviso': receptor_aviso,
         'direccion': direccion,
+        'itinerario_ruta': itinerario_ruta,
         **horas,
     }, errores
 
@@ -555,6 +568,10 @@ def crear_reporte(tipo_reporte):
                     if otro_val:
                         raw_val = otro_val
                 specific_kwargs[field] = parse_field_value(field, raw_val)
+
+            # "¿A dónde se propagó?" solo se guarda si se marcó "Hubo Propagación"
+            if 'propagacion_donde' in specific_kwargs and not specific_kwargs.get('hubo_propagacion'):
+                specific_kwargs['propagacion_donde'] = None
 
             # 4. DEFINIR SUBTIPOS Y DATOS ADICIONALES SEGÚN EL TIPO
             extra_kwargs = {}
@@ -663,16 +680,27 @@ def crear_reporte(tipo_reporte):
                 conductores = request.form.getlist('conductores[]')
                 kms_salida = request.form.getlist('kms_salida[]')
                 kms_llegada = request.form.getlist('kms_llegada[]')
+                horas_salida_vehiculo = request.form.getlist('horas_salida_vehiculo[]')
 
                 for i, vehiculo_id in enumerate(vehiculos_ids):
                     if not vehiculo_id:
                         continue
+
+                    hora_salida_vehiculo = None
+                    valor_hora = (horas_salida_vehiculo[i] if i < len(horas_salida_vehiculo) else '').strip()
+                    if valor_hora:
+                        try:
+                            hora_salida_vehiculo = _parsear_hora(valor_hora)
+                        except ValueError:
+                            hora_salida_vehiculo = None
+
                     vehiculo_act = ReporteVehiculoActuante(
                         reporte_id=reporte_inst.id,
                         vehiculo_id=int(vehiculo_id),
                         conductor_nombre=(conductores[i] if i < len(conductores) else '') or 'No especificado',
                         km_salida=parse_field_value('capacidad_tanque_litros', kms_salida[i]) if i < len(kms_salida) else 0.0,
                         km_llegada=parse_field_value('capacidad_tanque_litros', kms_llegada[i]) if i < len(kms_llegada) else 0.0,
+                        hora_salida=hora_salida_vehiculo,
                     )
                     db.session.add(vehiculo_act)
 

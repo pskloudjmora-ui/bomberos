@@ -316,7 +316,7 @@ SECCIONES_ESPECIFICAS = {
     'incendio_estructura': [
         ('Subtipo', 'subtipo_incendio', 'plain'),
         ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
+        ('Tipo de Estructura', 'tipo_estructura', 'plain'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
         ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
         ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
@@ -600,8 +600,10 @@ def _formatear_fecha(fecha):
     return fecha.strftime('%d/%m/%Y') if fecha else '—'
 
 
-def _formatear_hora(hora):
-    return hora.strftime('%H:%M') if hora else '—'
+def _formatear_hora(hora, con_segundos=False):
+    if not hora:
+        return '—'
+    return hora.strftime('%H:%M:%S' if con_segundos else '%H:%M')
 
 
 def _formatear_personal(persona):
@@ -718,6 +720,7 @@ def serializar_reporte(reporte):
             'tipo': vehiculo.tipo if vehiculo else '—',
             'placa': vehiculo.placa if vehiculo else '—',
             'conductor': va.conductor_nombre or '—',
+            'hora_salida': _formatear_hora(va.hora_salida, con_segundos=True),
             'km_salida': f'{km_salida:.2f}',
             'km_llegada': f'{km_llegada:.2f}',
             'recorrido': f'{km_llegada - km_salida:.2f}',
@@ -742,6 +745,9 @@ def serializar_reporte(reporte):
 
     fecha_emision = reporte.fecha_creacion or datetime.now()
 
+    # En los incendios de estructura y vehículo las horas se muestran con segundos
+    con_segundos = tipo in ('incendio_estructura', 'incendio_vehiculo')
+
     # Personas afectadas / lesionados (APH y rescates)
     personas_afectadas = [{
         'nombre': p.nombre_apellido or '—',
@@ -765,11 +771,12 @@ def serializar_reporte(reporte):
         'receptor_aviso': reporte.receptor_aviso or '—',
         'receptor_cedula': reporte.receptor_cedula or '—',
         'horas': [
-            {'etiqueta': 'Hora de Aviso', 'valor': _formatear_hora(reporte.hora_aviso)},
-            {'etiqueta': 'Hora de Salida', 'valor': _formatear_hora(reporte.hora_salida)},
-            {'etiqueta': 'Hora de Llegada', 'valor': _formatear_hora(reporte.hora_llegada)},
-            {'etiqueta': 'Hora de Regreso', 'valor': _formatear_hora(reporte.hora_regreso)},
+            {'etiqueta': 'Hora de Aviso', 'valor': _formatear_hora(reporte.hora_aviso, con_segundos)},
+            {'etiqueta': 'Hora de Salida', 'valor': _formatear_hora(reporte.hora_salida, con_segundos)},
+            {'etiqueta': 'Hora de Llegada', 'valor': _formatear_hora(reporte.hora_llegada, con_segundos)},
+            {'etiqueta': 'Hora de Regreso', 'valor': _formatear_hora(reporte.hora_regreso, con_segundos)},
         ],
+        'itinerario_ruta': reporte.itinerario_ruta or '—',
         'solicitante_nombre': reporte.solicitante_nombre or '—',
         'solicitante_cedula': reporte.solicitante_cedula or '—',
         'solicitante_telefono': reporte.solicitante_telefono or '—',

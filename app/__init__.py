@@ -27,6 +27,15 @@ def load_user(user_id):
 # `db.create_all()` no altera tablas existentes, por lo que estos ajustes se
 # aplican de forma idempotente al arrancar (compatible con SQLite y PostgreSQL).
 COLUMNAS_NUEVAS = {
+    'reportes': {
+        'itinerario_ruta': 'TEXT',
+    },
+    'reporte_vehiculos_actuantes': {
+        'hora_salida': 'TIME',
+    },
+    'reportes_incendio': {
+        'tipo_estructura': 'VARCHAR(100)',
+    },
     'reportes_matpel_glp': {
         'serial_cilindro': 'VARCHAR(50)',
     },

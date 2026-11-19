@@ -101,10 +101,10 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Aviso *</label>
                     <select name="clase_aviso" required
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="Radial">Radial</option>
+                        <option value="Radio Transmisor">Radio Transmisor</option>
                         <option value="Telefonico">Telefónico</option>
                         {% if tipo_reporte != 'incendio_vehiculo' %}
-                        <option value="Personal">Personal</option>
+                        <option value="Verbal">Verbal</option>
                         {% endif %}
                     </select>
                 </div>
@@ -191,16 +191,23 @@
             </div>
             {% endif %}
 
+            <!-- Itinerario de ruta seguido por las unidades -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Itinerario de Ruta</label>
+                <textarea name="itinerario_ruta" rows="2" placeholder="Describa el recorrido realizado por las unidades hasta el sitio del evento"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+            </div>
+
             <!-- Tiempos de actuación -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Aviso *</label>
-                    <input type="time" name="hora_aviso" required
+                    <input type="time" name="hora_aviso" required {% if tipo_reporte in ('incendio_estructura', 'incendio_vehiculo') %}step="1"{% endif %}
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Salida *</label>
-                    <input type="time" name="hora_salida" required
+                    <input type="time" name="hora_salida" required {% if tipo_reporte in ('incendio_estructura', 'incendio_vehiculo') %}step="1"{% endif %}
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
@@ -1230,18 +1237,19 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Estructura</label>
+                    <select name="tipo_estructura"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Recreacional">Recreacional</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Residencial">Residencial</option>
                     </select>
                 </div>
             </div>
@@ -1298,9 +1306,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1374,9 +1385,9 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
@@ -1442,9 +1453,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1490,9 +1504,9 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
@@ -1558,9 +1572,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1606,9 +1623,9 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
@@ -1674,9 +1691,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1722,9 +1742,9 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
@@ -1790,9 +1810,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1838,9 +1861,9 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
@@ -1906,9 +1929,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1986,9 +2012,9 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
                     <select name="clase_incendio"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era Alarma</option>
-                        <option value="2">2da Alarma</option>
-                        <option value="3">3era Alarma</option>
+                                                <option value="1">Clase 1</option>
+                        <option value="2">Clase 2</option>
+                        <option value="3">Clase 3</option>
                     </select>
                 </div>
                 <div>
@@ -2054,9 +2080,12 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
                     <span class="ml-1.5">Hubo Propagación</span>
-                </label><input type="text" name="propagacion_donde" placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </label>
+                <div data-campo-propagacion class="hidden sm:col-span-2">
+                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                </div>
             </div>
             <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -2615,7 +2644,8 @@
                     <thead>
                         <tr class="text-slate-400 border-b border-slate-800">
                             <th class="pb-2 pr-4 font-semibold w-1/3">Unidad Móvil *</th>
-                            <th class="pb-2 pr-4 font-semibold w-1/3">Conductor *</th>
+                            <th class="pb-2 pr-4 font-semibold">Conductor *</th>
+                            <th class="pb-2 pr-4 font-semibold">Hora Salida</th>
                             <th class="pb-2 pr-4 font-semibold">Km Salida</th>
                             <th class="pb-2 pr-4 font-semibold">Km Regreso</th>
                             <th class="pb-2 w-10"></th>
@@ -2634,6 +2664,10 @@
                             </td>
                             <td class="py-2 pr-4">
                                 <input type="text" name="conductores[]" required placeholder="Nombre Conductor"
+                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                            </td>
+                            <td class="py-2 pr-4">
+                                <input type="time" step="1" name="horas_salida_vehiculo[]"
                                     class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
                             </td>
                             <td class="py-2 pr-4">
@@ -2787,6 +2821,10 @@
                 class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
         </td>
         <td class="py-2 pr-4">
+            <input type="time" step="1" name="horas_salida_vehiculo[]"
+                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+        </td>
+        <td class="py-2 pr-4">
             <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"
                 class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
         </td>
@@ -2911,6 +2949,28 @@
             calcularRegla9();
         }
     });
+
+    // "¿A dónde se propagó?" solo se habilita si se marca "Hubo Propagación"
+    function alternarPropagacion(checkbox) {
+        const grupo = checkbox.closest('.grid');
+        const campo = grupo ? grupo.querySelector('[data-campo-propagacion]') : null;
+        if (!campo) return;
+        const input = campo.querySelector('input[name="propagacion_donde"]');
+        if (checkbox.checked) {
+            campo.classList.remove('hidden');
+            if (input) {
+                input.disabled = false;
+                input.required = true;
+            }
+        } else {
+            campo.classList.add('hidden');
+            if (input) {
+                input.disabled = true;
+                input.required = false;
+                input.value = '';
+            }
+        }
+    }
 
     // Plantilla para personas afectadas / lesionados
 </script>

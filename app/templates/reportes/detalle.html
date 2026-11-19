@@ -145,22 +145,23 @@
                     <span class="text-white text-sm font-medium">{{ reporte.receptor_aviso }}</span>
                 </div>
                 
+                {% set con_segundos = reporte.tipo_especifico in ('incendio_estructura', 'incendio_vehiculo') %}
                 <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-4 gap-2">
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Aviso:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_aviso.strftime('%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_aviso.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
                     </div>
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Salida:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_salida.strftime('%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_salida.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
                     </div>
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Llegada:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_llegada.strftime('%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_llegada.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
                     </div>
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Regreso:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_regreso.strftime('%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_regreso.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
                     </div>
                 </div>
 
@@ -197,6 +198,12 @@
                         <span class="text-slate-400 block mt-0.5">Ref: {{ reporte.punto_referencia }}</span>
                     {% endif %}
                 </div>
+                {% if reporte.itinerario_ruta %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Itinerario de Ruta:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.itinerario_ruta }}</span>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -875,8 +882,8 @@
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Tipo de Estructura:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_estructura or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
@@ -916,7 +923,7 @@
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Tipo de Incendio:</span><span class="text-white text-sm font-medium">{{ {'incendio_estructura': 'Incendio de Estructura', 'incendio_vehiculo': 'Incendio de Vehículo'}.get(reporte.tipo_incendio, reporte.tipo_incendio or '--') }}</span></div>
                 
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
@@ -951,7 +958,7 @@
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
@@ -986,7 +993,7 @@
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
@@ -1037,7 +1044,7 @@
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
@@ -1073,7 +1080,7 @@
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 
                 <div><span class="block font-semibold text-slate-500">Tipo Incendio:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_incendio or '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
@@ -1118,7 +1125,7 @@
                 <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
                 
                 <div><span class="block font-semibold text-slate-500">Tipo Incendio:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_incendio or '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Clase:</span><span class="text-white text-sm font-medium">{{ reporte.clase_incendio or '--' }}</span></div>
+                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
@@ -1372,6 +1379,7 @@
                             <th class="py-2 px-4 font-semibold">Unidad Móvil</th>
                             <th class="py-2 px-4 font-semibold">Placa</th>
                             <th class="py-2 px-4 font-semibold">Conductor</th>
+                            <th class="py-2 px-4 font-semibold">Hora Salida</th>
                             <th class="py-2 px-4 font-semibold text-right">Km Salida</th>
                             <th class="py-2 px-4 font-semibold text-right">Km Llegada</th>
                             <th class="py-2 px-4 font-semibold text-right">Recorrido</th>
@@ -1383,6 +1391,7 @@
                             <td class="py-2 px-4 font-medium">{{ va.vehiculo.unidad }} ({{ va.vehiculo.tipo }})</td>
                             <td class="py-2 px-4">{{ va.vehiculo.placa }}</td>
                             <td class="py-2 px-4">{{ va.conductor_nombre }}</td>
+                            <td class="py-2 px-4">{{ va.hora_salida.strftime('%H:%M:%S') if va.hora_salida else '--' }}</td>
                             <td class="py-2 px-4 text-right">{{ va.km_salida or 0.0 }} km</td>
                             <td class="py-2 px-4 text-right">{{ va.km_llegada or 0.0 }} km</td>
                             <td class="py-2 px-4 text-right font-semibold text-amber-500">
@@ -1395,7 +1404,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" class="py-4 text-center text-slate-500">No se registraron unidades bomberiles en el reporte.</td>
+                            <td colspan="7" class="py-4 text-center text-slate-500">No se registraron unidades bomberiles en el reporte.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

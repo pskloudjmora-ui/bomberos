@@ -87,6 +87,9 @@ class Reporte(db.Model):
     # Ubicación del evento
     direccion = db.Column(db.Text, nullable=False)
     punto_referencia = db.Column(db.String(255), nullable=True)
+
+    # Itinerario / ruta seguida por la unidad hasta el sitio del evento
+    itinerario_ruta = db.Column(db.Text, nullable=True)
     
     # Auditoría y Estados
     creador_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
@@ -150,6 +153,9 @@ class ReporteVehiculoActuante(db.Model):
     # Información de recorrido del servicio
     km_salida = db.Column(db.Numeric(10, 2), nullable=True)
     km_llegada = db.Column(db.Numeric(10, 2), nullable=True)
+
+    # Hora en que esta unidad salió del cuartel (puede diferir entre unidades)
+    hora_salida = db.Column(db.Time, nullable=True)
     
     # Conductor del vehículo
     conductor_nombre = db.Column(db.String(150), nullable=False)
@@ -751,8 +757,9 @@ class ReporteIncendio(Reporte):
     tipo_incendio = db.Column(db.String(100), nullable=True)
 
     # Características del incendio
-    clase_incendio = db.Column(db.String(20), nullable=True)  # 1era, 2da, 3era
-    intensidad = db.Column(db.String(20), nullable=True)  # 1era, 2da, 3era
+    clase_incendio = db.Column(db.String(20), nullable=True)  # Clase 1, 2 o 3
+    intensidad = db.Column(db.String(20), nullable=True)  # 1era, 2da, 3era (otros subtipos)
+    tipo_estructura = db.Column(db.String(100), nullable=True)  # Industrial, recreacional, comercial, residencial
     lugar_desarrollo = db.Column(db.String(255), nullable=True)
     presunto_punto_origen = db.Column(db.String(255), nullable=True)
     tipo_equipo_contra_incendio = db.Column(db.String(255), nullable=True)

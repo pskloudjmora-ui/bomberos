@@ -263,6 +263,10 @@
         <td class="tcampos">Punto de Referencia</td>
         <td class="tvalor" colspan="3">{{ dto.punto_referencia }}</td>
     </tr>
+    <tr>
+        <td class="tcampos">Itinerario de Ruta</td>
+        <td class="tvalor texto-largo" colspan="3">{{ dto.itinerario_ruta }}</td>
+    </tr>
 </table>
 
 <!-- ============ 2. DETALLE ESPECÍFICO DEL SERVICIO ============ -->
@@ -312,16 +316,17 @@
 <!-- ============ 3. VEHÍCULOS Y UNIDADES ACTUANTES ============ -->
 <table class="tarjeta no-cortar">
     <tr>
-        <td class="titulo-seccion" colspan="7">3. Veh&iacute;culos y Unidades Actuantes</td>
+        <td class="titulo-seccion" colspan="8">3. Veh&iacute;culos y Unidades Actuantes</td>
     </tr>
     <tr>
-        <th style="width: 14%;">Unidad</th>
-        <th style="width: 22%;">Tipo</th>
-        <th style="width: 9%;">Placa</th>
-        <th style="width: 20%;">Conductor</th>
-        <th style="width: 9%;">Km Salida</th>
-        <th style="width: 9%;">Km Llegada</th>
-        <th style="width: 9%;">Recorrido</th>
+        <th style="width: 13%;">Unidad</th>
+        <th style="width: 20%;">Tipo</th>
+        <th style="width: 8%;">Placa</th>
+        <th style="width: 18%;">Conductor</th>
+        <th style="width: 10%;">Hora Salida</th>
+        <th style="width: 8%;">Km Salida</th>
+        <th style="width: 8%;">Km Llegada</th>
+        <th style="width: 8%;">Recorrido</th>
     </tr>
     {% for v in dto.vehiculos %}
     <tr>
@@ -329,12 +334,13 @@
         <td class="tvalor">{{ v.tipo }}</td>
         <td class="tvalor">{{ v.placa }}</td>
         <td class="tvalor">{{ v.conductor }}</td>
+        <td class="tvalor centro">{{ v.hora_salida }}</td>
         <td class="tvalor centro">{{ v.km_salida }}</td>
         <td class="tvalor centro">{{ v.km_llegada }}</td>
         <td class="tvalor centro">{{ v.recorrido }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="7" class="tvalor centro">No se registraron unidades bomberiles en el servicio.</td></tr>
+    <tr><td colspan="8" class="tvalor centro">No se registraron unidades bomberiles en el servicio.</td></tr>
     {% endfor %}
 </table>
 
