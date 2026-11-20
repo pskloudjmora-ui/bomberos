@@ -1,7 +1,8 @@
 from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, url_for
 from flask_login import login_required, current_user
-from datetime import datetime
+from datetime import datetime, time
 import json
+import re
 
 from sqlalchemy.exc import IntegrityError
 from app.models import (
@@ -441,7 +442,7 @@ def parse_field_value(field_name, raw_val):
         try:
             return _parsear_hora(str(raw_val).strip())
         except (TypeError, ValueError):
-            raise ValueError(f'El campo "{etiqueta}" debe tener formato de hora HH:MM o HH:MM:SS.')
+            raise ValueError(f'El campo "{etiqueta}" debe tener formato de hora militar HH:MM:SS (00:00:00 a 23:59:59).')
     return raw_val
 
 
@@ -469,14 +470,33 @@ def _siguiente_nro_control(prefix, tipo_reporte):
     return f'{base}{maximo + 1:04d}'
 
 
+_HORA_24H_RE = re.compile(r'^(\d{1,2}):(\d{2})(?::(\d{2}))?$')
+
+
 def _parsear_hora(valor):
-    """Acepta horas en formato HH:MM o HH:MM:SS (los segundos son opcionales)."""
-    for formato in ('%H:%M:%S', '%H:%M'):
-        try:
-            return datetime.strptime(valor, formato).time()
-        except ValueError:
-            continue
-    raise ValueError('formato de hora no válido')
+    """
+    Normaliza y valida una hora en formato militar de 24 horas (00:00:00 a
+    23:59:59). Acepta HH:MM y HH:MM:SS con ':' o '.' como separador, y el
+    formato compacto de teclado numérico HHMM / HHMMSS. Devuelve datetime.time
+    y lanza ValueError si el formato o los rangos no son válidos.
+    """
+    texto = str(valor or '').strip()
+    # Formato compacto sin separadores (típico de teclados numéricos)
+    if re.fullmatch(r'\d{4}|\d{6}', texto):
+        if len(texto) == 4:
+            texto = f'{texto[:2]}:{texto[2:]}'
+        else:
+            texto = f'{texto[:2]}:{texto[2:4]}:{texto[4:]}'
+    texto = texto.replace('.', ':')
+    coincidencia = _HORA_24H_RE.match(texto)
+    if not coincidencia:
+        raise ValueError('formato de hora no válido')
+    hora = int(coincidencia.group(1))
+    minuto = int(coincidencia.group(2))
+    segundo = int(coincidencia.group(3) or 0)
+    if hora > 23 or minuto > 59 or segundo > 59:
+        raise ValueError('formato de hora no válido')
+    return time(hora, minuto, segundo)
 
 
 def _leer_cabecera(form):
@@ -511,7 +531,7 @@ def _leer_cabecera(form):
         try:
             horas[campo] = _parsear_hora(valor)
         except ValueError:
-            errores.append(f'La {etiqueta} no es válida (formato HH:MM o HH:MM:SS).')
+            errores.append(f'La {etiqueta} no es válida (formato militar HH:MM:SS, de 00:00:00 a 23:59:59).')
             horas[campo] = None
 
     clase_aviso = (form.get('clase_aviso') or '').strip()
@@ -757,7 +777,10 @@ def crear_reporte(tipo_reporte):
                         try:
                             hora_salida_vehiculo = _parsear_hora(valor_hora)
                         except ValueError:
-                            hora_salida_vehiculo = None
+                            raise ValueError(
+                                f'La hora de salida del vehículo actuante N° {i + 1} no es válida '
+                                '(formato militar HH:MM:SS, de 00:00:00 a 23:59:59).'
+                            )
 
                     vehiculo_act = ReporteVehiculoActuante(
                         reporte_id=reporte_inst.id,

@@ -3,21 +3,21 @@
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Salida Primera Máquina</label>
-        <input type="time" step="1" name="salida_primera_maquina"
-            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="salida_primera_maquina"
+            class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
     </div>
     {% if despacho_segunda is not defined or despacho_segunda %}
     <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Salida Segunda Máquina</label>
-        <input type="time" step="1" name="salida_segunda_maquina"
-            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="salida_segunda_maquina"
+            class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
     </div>
     {% endif %}
     {% if despacho_ambulancia %}
     <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Salida Ambulancia</label>
-        <input type="time" step="1" name="salida_ambulancia"
-            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="salida_ambulancia"
+            class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
     </div>
     {% endif %}
     {% if despacho_adicional %}
@@ -28,8 +28,8 @@
     </div>
     <div>
         <label class="block text-xs font-semibold text-slate-400 mb-1">Salida Unidad Adicional</label>
-        <input type="time" step="1" name="salida_unidad_adicional"
-            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="salida_unidad_adicional"
+            class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
     </div>
     {% endif %}
 </div>

@@ -50,6 +50,44 @@
         const fila = boton.closest('.fila-combatiente');
         fila.remove();
     }
+
+    // ============ CAMPOS DE HORA (formato militar 24h, independiente del locale) ============
+    // Los inputs .campo-hora son type="text" con máscara que siempre produce HH:MM[:SS].
+    function formatearHoraInput(input) {
+        const digitos = input.value.replace(/\D/g, '').slice(0, 6);
+        let salida = digitos.slice(0, 2);
+        if (digitos.length > 2) salida += ':' + digitos.slice(2, 4);
+        if (digitos.length > 4) salida += ':' + digitos.slice(4, 6);
+        input.value = salida;
+    }
+
+    function validarHoraInput(input) {
+        const valor = input.value.trim();
+        if (!valor) {
+            input.setCustomValidity('');
+            return;
+        }
+        if (!/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(valor)) {
+            input.setCustomValidity('Ingrese una hora valida en formato militar de 24 horas (HH:MM o HH:MM:SS, de 00:00:00 a 23:59:59).');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+
+    // Delegacion: cubre los campos estaticos y los agregados dinamicamente
+    document.addEventListener('input', function (evento) {
+        const campo = evento.target;
+        if (campo.classList && campo.classList.contains('campo-hora')) {
+            formatearHoraInput(campo);
+            validarHoraInput(campo);
+        }
+    });
+    document.addEventListener('change', function (evento) {
+        const campo = evento.target;
+        if (campo.classList && campo.classList.contains('campo-hora')) {
+            validarHoraInput(campo);
+        }
+    });
 </script>
 <div class="max-w-4xl mx-auto space-y-6">
 
@@ -141,23 +179,23 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Aviso *</label>
-                    <input type="time" name="hora_aviso" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="hora_aviso" required
+                        class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Salida *</label>
-                    <input type="time" name="hora_salida" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="hora_salida" required
+                        class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Llegada *</label>
-                    <input type="time" name="hora_llegada" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="hora_llegada" required
+                        class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Regreso *</label>
-                    <input type="time" name="hora_regreso" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="hora_regreso" required
+                        class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
             </div>
 
@@ -1722,8 +1760,8 @@
                                     class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
                             </td>
                             <td class="py-2 pr-4">
-                                <input type="time" step="1" name="horas_salida_vehiculo[]"
-                                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+                                <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="horas_salida_vehiculo[]"
+                                    class="campo-hora block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
                             </td>
                             <td class="py-2 pr-4">
                                 <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"
@@ -1876,8 +1914,8 @@
                 class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
         </td>
         <td class="py-2 pr-4">
-            <input type="time" step="1" name="horas_salida_vehiculo[]"
-                class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="horas_salida_vehiculo[]"
+                class="campo-hora block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
         </td>
         <td class="py-2 pr-4">
             <input type="number" step="0.1" name="kms_salida[]" placeholder="0.0"

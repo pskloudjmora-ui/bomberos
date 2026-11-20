@@ -863,8 +863,8 @@ def serializar_reporte(reporte):
 
     fecha_emision = reporte.fecha_creacion or datetime.now()
 
-    # En los incendios las horas se muestran con segundos
-    con_segundos = bool(tipo) and tipo.startswith('incendio')
+    # Todas las horas del reporte se muestran en formato militar HH:MM:SS
+    con_segundos = True
 
     # Vehículos afectados (lista dinámica)
     vehiculos_afectados = []

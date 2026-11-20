@@ -145,23 +145,22 @@
                     <span class="text-white text-sm font-medium">{{ reporte.receptor_aviso }}</span>
                 </div>
                 
-                {% set con_segundos = reporte.tipo_especifico and reporte.tipo_especifico.startswith('incendio') %}
-                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-4 gap-2">
+                                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-4 gap-2">
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Aviso:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_aviso.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_aviso.strftime('%H:%M:%S') }}</span>
                     </div>
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Salida:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_salida.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_salida.strftime('%H:%M:%S') }}</span>
                     </div>
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Llegada:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_llegada.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_llegada.strftime('%H:%M:%S') }}</span>
                     </div>
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Regreso:</span>
-                        <span class="text-white text-sm font-bold">{{ reporte.hora_regreso.strftime('%H:%M:%S' if con_segundos else '%H:%M') }}</span>
+                        <span class="text-white text-sm font-bold">{{ reporte.hora_regreso.strftime('%H:%M:%S') }}</span>
                     </div>
                 </div>
 
