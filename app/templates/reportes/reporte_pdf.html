@@ -267,6 +267,10 @@
         <td class="tcampos">Itinerario de Ruta</td>
         <td class="tvalor texto-largo" colspan="3">{{ dto.itinerario_ruta }}</td>
     </tr>
+    <tr>
+        <td class="tcampos">Cuadrante de Paz</td>
+        <td class="tvalor texto-largo" colspan="3">{{ dto.cuadrante_paz }}</td>
+    </tr>
 </table>
 
 <!-- ============ 2. DETALLE ESPECÍFICO DEL SERVICIO ============ -->
@@ -281,6 +285,64 @@
     </tr>
     {% endfor %}
 </table>
+
+{% if dto.tipo_reporte == 'falsa_alarma' and dto.descripcion_alarma %}
+<table class="tarjeta">
+    <tr>
+        <td class="titulo-seccion" colspan="2">Descripci&oacute;n de lo Ocurrido</td>
+    </tr>
+    <tr>
+        <td class="tvalor texto-largo" colspan="2">{{ dto.descripcion_alarma|safe }}</td>
+    </tr>
+</table>
+{% endif %}
+
+{% if dto.vehiculos_afectados %}
+<!-- ============ VEHÍCULOS AFECTADOS ============ -->
+<table class="tarjeta">
+    <tr>
+        <td class="titulo-seccion" colspan="9">Datos de los Veh&iacute;culos Afectados</td>
+    </tr>
+    <tr>
+        <th style="width: 11%;">Marca</th>
+        <th style="width: 11%;">Modelo</th>
+        <th style="width: 10%;">Color</th>
+        <th style="width: 9%;">Placa</th>
+        <th style="width: 9%;">A&ntilde;o</th>
+        <th style="width: 13%;">Propietario</th>
+        <th style="width: 11%;">C.I.</th>
+        <th style="width: 13%;">Conductor</th>
+        <th style="width: 13%;">Condici&oacute;n</th>
+    </tr>
+    {% for v in dto.vehiculos_afectados %}
+    <tr>
+        <td class="tvalor">{{ v.marca or '—' }}</td>
+        <td class="tvalor">{{ v.modelo or '—' }}</td>
+        <td class="tvalor">{{ v.color or '—' }}</td>
+        <td class="tvalor">{{ v.placa or '—' }}</td>
+        <td class="tvalor centro">{{ v.anio or '—' }}</td>
+        <td class="tvalor">{{ v.propietario or '—' }}</td>
+        <td class="tvalor">{{ v.cedula or '—' }}</td>
+        <td class="tvalor">{{ v.conductor or '—' }}</td>
+        <td class="tvalor">{{ v.condicion or '—' }}</td>
+    </tr>
+    {% if v.serial_motor or v.valor or v.perdidas or v.aseguradora or v.conductor_ci or v.valor_carga or v.perdida_carga or v.aseguradora_carga %}
+    <tr>
+        <td class="tvalor texto-largo" colspan="9" style="font-size: 7.5pt;">
+            {% if v.serial_motor %}Serial Motor: {{ v.serial_motor }} &nbsp;|&nbsp; {% endif %}
+            {% if v.valor %}Valor: {{ v.valor }} &nbsp;|&nbsp; {% endif %}
+            {% if v.perdidas %}P&eacute;rdidas: {{ v.perdidas }} &nbsp;|&nbsp; {% endif %}
+            {% if v.aseguradora %}Aseguradora: {{ v.aseguradora }} &nbsp;|&nbsp; {% endif %}
+            {% if v.conductor_ci %}C.I. Conductor: {{ v.conductor_ci }} &nbsp;|&nbsp; {% endif %}
+            {% if v.valor_carga %}Valor Carga: {{ v.valor_carga }} &nbsp;|&nbsp; {% endif %}
+            {% if v.perdida_carga %}P&eacute;rdida Carga: {{ v.perdida_carga }} &nbsp;|&nbsp; {% endif %}
+            {% if v.aseguradora_carga %}Aseguradora Carga: {{ v.aseguradora_carga }}{% endif %}
+        </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+</table>
+{% endif %}
 
 <!-- ============ 2B. DATOS DEL PACIENTE / LESIONADO ============ -->
 {% set es_aph = dto.tipo_reporte.startswith('aph_') %}

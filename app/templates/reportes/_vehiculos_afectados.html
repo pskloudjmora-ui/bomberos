@@ -1,0 +1,112 @@
+{# Datos de vehículos afectados (lista dinámica). #}
+<div class="border-t border-slate-800/40 pt-4 space-y-3">
+    <div class="flex items-center justify-between">
+        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Vehículo Afectado</span>
+        <button type="button" onclick="agregarVehiculoAfectado()"
+            class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Agregar vehículo</span>
+        </button>
+    </div>
+    <div id="contenedor-vehiculos-afectados" class="space-y-4"></div>
+</div>
+
+<template id="plantilla-vehiculo-afectado">
+    <div class="fila-vehiculo-afectado bg-slate-950/20 p-3 rounded-xl border border-slate-800/60 space-y-3">
+        <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Información del Vehículo</span>
+            <button type="button" onclick="eliminarVehiculoAfectado(this)" class="p-1 text-slate-500 hover:text-red-500 transition-colors">
+                <i data-lucide="trash" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Marca</label>
+                <input type="text" name="va_marca[]" placeholder="ej: Toyota"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo</label>
+                <input type="text" name="va_modelo[]" placeholder="ej: Hilux"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Color</label>
+                <input type="text" name="va_color[]" placeholder="Color"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
+                <input type="text" name="va_placa[]" placeholder="Placa"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Serial Motor</label>
+                <input type="text" name="va_serial_motor[]" placeholder="Serial"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Año</label>
+                <input type="text" name="va_anio[]" placeholder="ej: 2020"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor del Vehículo</label>
+                <input type="number" step="0.01" name="va_valor[]" placeholder="0.00"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Aprox. de Pérdidas</label>
+                <input type="number" step="0.01" name="va_perdidas[]" placeholder="0.00"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Firma Aseguradora</label>
+                <input type="text" name="va_aseguradora[]" placeholder="Aseguradora / póliza"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Condición</label>
+                <input type="text" name="va_condicion[]" placeholder="ej: Pérdida total, parcial"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Propietario</label>
+                <input type="text" name="va_propietario[]" placeholder="Nombre completo"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. Propietario</label>
+                <input type="text" name="va_cedula[]" placeholder="V-12345678"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Conductor</label>
+                <input type="text" name="va_conductor[]" placeholder="Nombre completo"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. Conductor</label>
+                <input type="text" name="va_conductor_ci[]" placeholder="V-12345678"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor de la Carga</label>
+                <input type="number" step="0.01" name="va_valor_carga[]" placeholder="0.00"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Pérdida Aprox. de Carga</label>
+                <input type="number" step="0.01" name="va_perdida_carga[]" placeholder="0.00"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div class="sm:col-span-3">
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Firma Aseguradora de la Carga</label>
+                <input type="text" name="va_aseguradora_carga[]" placeholder="Aseguradora / póliza"
+                    class="block w-full rounded-lg border-slate-800 bg-slate-950/60 p-2 text-xs text-slate-300 focus:border-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+        </div>
+    </div>
+</template>

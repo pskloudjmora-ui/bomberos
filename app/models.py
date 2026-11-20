@@ -1,4 +1,6 @@
 from datetime import datetime
+import json
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -90,6 +92,9 @@ class Reporte(db.Model):
 
     # Itinerario / ruta seguida por la unidad hasta el sitio del evento
     itinerario_ruta = db.Column(db.Text, nullable=True)
+
+    # Cuadrante de Paz al que pertenece la zona del servicio
+    cuadrante_paz = db.Column(db.String(100), nullable=True)
     
     # Auditoría y Estados
     creador_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
@@ -756,6 +761,16 @@ class ReporteIncendio(Reporte):
     # Tipo de incendio (para vegetación/forestal: Vegetación o Forestal)
     tipo_incendio = db.Column(db.String(100), nullable=True)
 
+    # Subtipo de incendio apoyado (selector dinámico del reporte de apoyo)
+    tipo_apoyo = db.Column(db.String(50), nullable=True)
+
+    # Despacho de unidades del incendio (horas con segundos)
+    salida_primera_maquina = db.Column(db.Time, nullable=True)
+    salida_segunda_maquina = db.Column(db.Time, nullable=True)
+    salida_ambulancia = db.Column(db.Time, nullable=True)
+    salida_unidad_adicional = db.Column(db.Time, nullable=True)
+    salida_unidad_adicional_nombre = db.Column(db.String(100), nullable=True)
+
     # Características del incendio
     clase_incendio = db.Column(db.String(20), nullable=True)  # Clase 1, 2 o 3
     intensidad = db.Column(db.String(20), nullable=True)  # 1era, 2da, 3era (otros subtipos)
@@ -803,6 +818,68 @@ class ReporteIncendio(Reporte):
     inmueble_propietario_cedula = db.Column(db.String(20), nullable=True)
     inmueble_propietario_telefono = db.Column(db.String(30), nullable=True)
 
+    # Información del Inmueble (estructura)
+    inmueble_descripcion = db.Column(db.String(50), nullable=True)  # Alquilada, Propiedad, A Cuido
+    inmueble_valor = db.Column(db.Numeric(14, 2), nullable=True)
+    inmueble_perdidas = db.Column(db.Numeric(14, 2), nullable=True)
+    inmueble_aseguradora = db.Column(db.String(150), nullable=True)
+
+    # Información del Mueble (estructura)
+    mueble_propietario = db.Column(db.String(150), nullable=True)
+    mueble_propietario_ci = db.Column(db.String(30), nullable=True)
+    mueble_valor = db.Column(db.Numeric(14, 2), nullable=True)
+    mueble_perdidas = db.Column(db.Numeric(14, 2), nullable=True)
+    mueble_aseguradora = db.Column(db.String(150), nullable=True)
+    mueble_condicion = db.Column(db.String(100), nullable=True)
+    lugar_a_cargo = db.Column(db.String(150), nullable=True)
+
+    # Información del Sistema Eléctrico Público (equipos eléctricos)
+    sistema_electrico_tipo = db.Column(db.String(100), nullable=True)
+    sistema_electrico_capacidad = db.Column(db.String(100), nullable=True)
+    sistema_electrico_uso = db.Column(db.String(150), nullable=True)
+    sistema_electrico_serial = db.Column(db.String(100), nullable=True)
+    sistema_electrico_propiedad = db.Column(db.String(150), nullable=True)
+    sistema_electrico_rif = db.Column(db.String(30), nullable=True)
+
+    # Información del Desperdicio (desechos sólidos)
+    desperdicio_materia = db.Column(db.String(150), nullable=True)
+    desperdicio_cantidad = db.Column(db.String(100), nullable=True)
+    desperdicio_recuperable = db.Column(db.String(5), nullable=True)  # Sí / No
+
+    # Datos del árbol (solo para subtipo arbol)
+    arbol_edad = db.Column(db.String(50), nullable=True)
+    arbol_longitud = db.Column(db.String(50), nullable=True)
+    arbol_circunferencia = db.Column(db.String(50), nullable=True)
+    arbol_especie = db.Column(db.String(150), nullable=True)
+
+    # Vehículos afectados (JSON serializado, admite varios registros)
+    vehiculos_afectados_json = db.Column(db.Text, nullable=True)
+
+    @property
+    def vehiculos_afectados(self):
+        """Lista de vehículos afectados, con respaldo en las columnas legacy."""
+        if self.vehiculos_afectados_json:
+            try:
+                datos = json.loads(self.vehiculos_afectados_json)
+                if isinstance(datos, list):
+                    return [d for d in datos if isinstance(d, dict)]
+            except (TypeError, ValueError):
+                pass
+        if any((self.vehiculo_marca, self.vehiculo_modelo, self.vehiculo_placa,
+                self.vehiculo_color, self.vehiculo_anio, self.vehiculo_tipo,
+                self.propietario_nombre, self.propietario_cedula)):
+            return [{
+                'marca': self.vehiculo_marca or '',
+                'modelo': self.vehiculo_modelo or '',
+                'color': self.vehiculo_color or '',
+                'placa': self.vehiculo_placa or '',
+                'anio': self.vehiculo_anio or '',
+                'tipo': self.vehiculo_tipo or '',
+                'propietario': self.propietario_nombre or '',
+                'cedula': self.propietario_cedula or '',
+            }]
+        return []
+
     __mapper_args__ = {
         'polymorphic_identity': 'incendio',
     }
@@ -822,6 +899,9 @@ class ReporteFalsaAlarma(Reporte):
 
     # Tipo de falsa alarma: incendio_estructura o incendio_vehiculo
     tipo_alarma = db.Column(db.String(50), nullable=False)
+
+    # Descripción amplia de lo ocurrido
+    descripcion = db.Column(db.Text, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'falsa_alarma',

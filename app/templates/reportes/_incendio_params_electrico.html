@@ -1,0 +1,92 @@
+{# Parámetros técnicos: Incendio de Equipos Eléctricos #}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
+        <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Extintor CO2, manguera"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
+        <input type="time" step="1" name="hora_control"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
+        <input type="time" step="1" name="hora_extincion_total"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
+        <input type="number" name="porcentaje_perdida_humo" placeholder="0-100"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
+        <input type="number" name="porcentaje_perdida_total" placeholder="0-100"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+</div>
+<div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
+        <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+</div>
+<div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
+        <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
+        <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+    </div>
+</div>
+<div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
+        <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+    </div>
+</div>
+
+<div class="border-t border-slate-800/40 pt-4 space-y-2">
+    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Información del Sistema Eléctrico Público</span>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo</label>
+            <input type="text" name="sistema_electrico_tipo" placeholder="ej: Transformador, tablero"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Capacidad</label>
+            <input type="text" name="sistema_electrico_capacidad" placeholder="ej: 15 kVA"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Uso</label>
+            <input type="text" name="sistema_electrico_uso" placeholder="ej: Residencial, comercial"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Serial</label>
+            <input type="text" name="sistema_electrico_serial" placeholder="Serial del equipo"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Propiedad de</label>
+            <input type="text" name="sistema_electrico_propiedad" placeholder="Empresa / propietario"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">RIF</label>
+            <input type="text" name="sistema_electrico_rif" placeholder="J-123456789"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+    </div>
+</div>

@@ -312,142 +312,207 @@ SECCIONES_ESPECIFICAS = {
         ('Rechazo - Nombre', 'rechazo_nombre', 'plain'),
         ('Rechazo - Cédula', 'rechazo_cedula', 'plain'),
     ],
-    # --- INCENDIO (todos los subtipos comparten los mismos campos base) ---
+    # --- INCENDIO (campos segun subtipo; los vacios se omiten en el DTO) ---
     'incendio_estructura': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
+        ('Clase de Incendio', 'clase_incendio', 'clase'),
         ('Tipo de Estructura', 'tipo_estructura', 'plain'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
         ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
-        ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Fuego', 'porcentaje_perdida_fuego', 'plain'),
-        ('% Pérdida Humo', 'porcentaje_perdida_humo', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Salida Primera Maquina', 'salida_primera_maquina', 'hora'),
+        ('Salida Segunda Maquina', 'salida_segunda_maquina', 'hora'),
+        ('Salida Ambulancia', 'salida_ambulancia', 'hora'),
+        ('Salida Unidad Adicional', 'salida_unidad_adicional', 'hora'),
+        ('Nombre Unidad Adicional', 'salida_unidad_adicional_nombre', 'plain'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Fuego', 'porcentaje_perdida_fuego', 'plain'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Hubo Propagación', 'hubo_propagacion', 'bool'),
-        ('Propagación - Dónde', 'propagacion_donde', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Técnicas de Extinción', 'tecnicas_extincion', 'plain'),
-        ('Poseía Equipos', 'poseia_equipos', 'bool'),
-        ('Fueron Usados', 'fue_usado', 'bool'),
-        ('Usados Por', 'por_quien_uso', 'plain'),
-        ('C.I. Usado Por', 'por_quien_ci', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
-        ('Propietario Inmueble', 'inmueble_propietario_nombre', 'plain'),
-        ('C.I. Propietario', 'inmueble_propietario_cedula', 'plain'),
-        ('Teléfono Propietario', 'inmueble_propietario_telefono', 'plain'),
+        ('Hubo Propagacion', 'hubo_propagacion', 'bool'),
+        ('Propagacion - Donde', 'propagacion_donde', 'plain', 'propagacion'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Poseia Equipos', 'poseia_equipos', 'bool'),
+        ('Fueron Usados', 'fue_usado', 'bool', 'equipos_poseia'),
+        ('Usados Por', 'por_quien_uso', 'plain', 'equipos_usados'),
+        ('C.I. Usado Por', 'por_quien_ci', 'plain', 'equipos_usados'),
+        ('Tipo de Equipo Usado', 'tipo_equipo_contra_incendio', 'plain', 'equipos_usados'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Inmueble - Descripcion', 'inmueble_descripcion', 'plain'),
+        ('Inmueble - Propietario', 'inmueble_propietario_nombre', 'plain'),
+        ('Inmueble - C.I. / RIF', 'inmueble_propietario_cedula', 'plain'),
+        ('Inmueble - Telefono', 'inmueble_propietario_telefono', 'plain'),
+        ('Inmueble - Valor', 'inmueble_valor', 'money'),
+        ('Inmueble - Perdidas', 'inmueble_perdidas', 'money'),
+        ('Inmueble - Aseguradora', 'inmueble_aseguradora', 'plain'),
+        ('Mueble - Propietario', 'mueble_propietario', 'plain'),
+        ('Mueble - C.I. / RIF', 'mueble_propietario_ci', 'plain'),
+        ('Mueble - Valor', 'mueble_valor', 'money'),
+        ('Mueble - Perdidas', 'mueble_perdidas', 'money'),
+        ('Mueble - Aseguradora', 'mueble_aseguradora', 'plain'),
+        ('Mueble - Condicion', 'mueble_condicion', 'plain'),
+        ('Lugar a cargo de', 'lugar_a_cargo', 'plain'),
     ],
     'incendio_apoyo': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
-        ('Tipo de Incendio', 'tipo_incendio', 'alarma'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
+        ('Tipo de Incendio Apoyado', 'tipo_apoyo', 'apoyo'),
+        ('Clase de Incendio', 'clase_incendio', 'clase'),
+        ('Tipo de Estructura', 'tipo_estructura', 'plain'),
+        ('Tipo de Incendio', 'tipo_incendio', 'plain'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
         ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
-        ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Salida Primera Maquina', 'salida_primera_maquina', 'hora'),
+        ('Salida Segunda Maquina', 'salida_segunda_maquina', 'hora'),
+        ('Salida Ambulancia', 'salida_ambulancia', 'hora'),
+        ('Salida Unidad Adicional', 'salida_unidad_adicional', 'hora'),
+        ('Nombre Unidad Adicional', 'salida_unidad_adicional_nombre', 'plain'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Fuego', 'porcentaje_perdida_fuego', 'plain'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Técnicas de Extinción', 'tecnicas_extincion', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Hubo Propagacion', 'hubo_propagacion', 'bool'),
+        ('Propagacion - Donde', 'propagacion_donde', 'plain', 'propagacion'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Poseia Equipos', 'poseia_equipos', 'bool'),
+        ('Fueron Usados', 'fue_usado', 'bool', 'equipos_poseia'),
+        ('Usados Por', 'por_quien_uso', 'plain', 'equipos_usados'),
+        ('C.I. Usado Por', 'por_quien_ci', 'plain', 'equipos_usados'),
+        ('Tipo de Equipo Usado', 'tipo_equipo_contra_incendio', 'plain', 'equipos_usados'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Inmueble - Descripcion', 'inmueble_descripcion', 'plain'),
+        ('Inmueble - Propietario', 'inmueble_propietario_nombre', 'plain'),
+        ('Inmueble - C.I. / RIF', 'inmueble_propietario_cedula', 'plain'),
+        ('Inmueble - Telefono', 'inmueble_propietario_telefono', 'plain'),
+        ('Inmueble - Valor', 'inmueble_valor', 'money'),
+        ('Inmueble - Perdidas', 'inmueble_perdidas', 'money'),
+        ('Inmueble - Aseguradora', 'inmueble_aseguradora', 'plain'),
+        ('Mueble - Propietario', 'mueble_propietario', 'plain'),
+        ('Mueble - C.I. / RIF', 'mueble_propietario_ci', 'plain'),
+        ('Mueble - Valor', 'mueble_valor', 'money'),
+        ('Mueble - Perdidas', 'mueble_perdidas', 'money'),
+        ('Mueble - Aseguradora', 'mueble_aseguradora', 'plain'),
+        ('Mueble - Condicion', 'mueble_condicion', 'plain'),
+        ('Lugar a cargo de', 'lugar_a_cargo', 'plain'),
+        ('Sistema Electrico - Tipo', 'sistema_electrico_tipo', 'plain'),
+        ('Sistema Electrico - Capacidad', 'sistema_electrico_capacidad', 'plain'),
+        ('Sistema Electrico - Uso', 'sistema_electrico_uso', 'plain'),
+        ('Sistema Electrico - Serial', 'sistema_electrico_serial', 'plain'),
+        ('Sistema Electrico - Propiedad', 'sistema_electrico_propiedad', 'plain'),
+        ('Sistema Electrico - RIF', 'sistema_electrico_rif', 'plain'),
+        ('Desperdicio - Materia Prima', 'desperdicio_materia', 'plain'),
+        ('Desperdicio - Cantidad', 'desperdicio_cantidad', 'plain'),
+        ('Desperdicio - Recuperable', 'desperdicio_recuperable', 'plain'),
+        ('Arbol - Edad', 'arbol_edad', 'plain'),
+        ('Arbol - Longitud', 'arbol_longitud', 'plain'),
+        ('Arbol - Circunferencia', 'arbol_circunferencia', 'plain'),
+        ('Arbol - Especie', 'arbol_especie', 'plain'),
+        ('Tipo de Terreno', 'tipo_terreno', 'plain'),
+        ('Tipo de Vegetacion', 'tipo_vegetacion', 'plain'),
+        ('Extension Terreno', 'extension_terreno', 'plain'),
+        ('Extension Afectada', 'extension_terreno_afectada', 'plain'),
+        ('Coordenadas', 'coordenadas', 'plain'),
     ],
     'incendio_electrico': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
-        ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
-        ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
         ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Técnicas de Extinción', 'tecnicas_extincion', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Sistema Electrico - Tipo', 'sistema_electrico_tipo', 'plain'),
+        ('Sistema Electrico - Capacidad', 'sistema_electrico_capacidad', 'plain'),
+        ('Sistema Electrico - Uso', 'sistema_electrico_uso', 'plain'),
+        ('Sistema Electrico - Serial', 'sistema_electrico_serial', 'plain'),
+        ('Sistema Electrico - Propiedad', 'sistema_electrico_propiedad', 'plain'),
+        ('Sistema Electrico - RIF', 'sistema_electrico_rif', 'plain'),
     ],
     'incendio_vehiculo': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
+        ('Clase de Incendio', 'clase_incendio', 'clase'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
         ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
-        ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Salida Primera Maquina', 'salida_primera_maquina', 'hora'),
+        ('Salida Segunda Maquina', 'salida_segunda_maquina', 'hora'),
+        ('Salida Ambulancia', 'salida_ambulancia', 'hora'),
+        ('Salida Unidad Adicional', 'salida_unidad_adicional', 'hora'),
+        ('Nombre Unidad Adicional', 'salida_unidad_adicional_nombre', 'plain'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Fuego', 'porcentaje_perdida_fuego', 'plain'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Técnicas de Extinción', 'tecnicas_extincion', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
-        ('Marca Vehículo', 'vehiculo_marca', 'plain'),
-        ('Modelo Vehículo', 'vehiculo_modelo', 'plain'),
-        ('Placa Vehículo', 'vehiculo_placa', 'plain'),
-        ('Color Vehículo', 'vehiculo_color', 'plain'),
-        ('Año Vehículo', 'vehiculo_anio', 'plain'),
-        ('Tipo Vehículo', 'vehiculo_tipo', 'plain'),
-        ('Propietario', 'propietario_nombre', 'plain'),
-        ('C.I. Propietario', 'propietario_cedula', 'plain'),
-        ('Teléfono Propietario', 'propietario_telefono', 'plain'),
+        ('Hubo Propagacion', 'hubo_propagacion', 'bool'),
+        ('Propagacion - Donde', 'propagacion_donde', 'plain', 'propagacion'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Poseia Equipos', 'poseia_equipos', 'bool'),
+        ('Fueron Usados', 'fue_usado', 'bool', 'equipos_poseia'),
+        ('Usados Por', 'por_quien_uso', 'plain', 'equipos_usados'),
+        ('C.I. Usado Por', 'por_quien_ci', 'plain', 'equipos_usados'),
+        ('Tipo de Equipo Usado', 'tipo_equipo_contra_incendio', 'plain', 'equipos_usados'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
     ],
     'incendio_desechos': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
-        ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
-        ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
         ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Salida Primera Maquina', 'salida_primera_maquina', 'hora'),
+        ('Salida Segunda Maquina', 'salida_segunda_maquina', 'hora'),
+        ('Salida Unidad Adicional', 'salida_unidad_adicional', 'hora'),
+        ('Nombre Unidad Adicional', 'salida_unidad_adicional_nombre', 'plain'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Desperdicio - Materia Prima', 'desperdicio_materia', 'plain'),
+        ('Desperdicio - Cantidad', 'desperdicio_cantidad', 'plain'),
+        ('Desperdicio - Recuperable', 'desperdicio_recuperable', 'plain'),
     ],
     'incendio_vegetacion': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
         ('Tipo de Incendio', 'tipo_incendio', 'plain'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
-        ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
-        ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
         ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Salida Primera Maquina', 'salida_primera_maquina', 'hora'),
+        ('Salida Segunda Maquina', 'salida_segunda_maquina', 'hora'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
         ('Tipo de Terreno', 'tipo_terreno', 'plain'),
-        ('Tipo de Vegetación', 'tipo_vegetacion', 'plain'),
-        ('Extensión Terreno', 'extension_terreno', 'plain'),
-        ('Extensión Afectada', 'extension_terreno_afectada', 'plain'),
+        ('Tipo de Vegetacion', 'tipo_vegetacion', 'plain'),
+        ('Extension Terreno', 'extension_terreno', 'plain'),
+        ('Extension Afectada', 'extension_terreno_afectada', 'plain'),
         ('Coordenadas', 'coordenadas', 'plain'),
     ],
     'incendio_arbol': [
-        ('Subtipo', 'subtipo_incendio', 'plain'),
-        ('Clase de Incendio', 'clase_incendio', 'plain'),
-        ('Intensidad', 'intensidad', 'plain'),
-        ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
-        ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
+        ('Salida Primera Maquina', 'salida_primera_maquina', 'hora'),
+        ('Arbol - Edad', 'arbol_edad', 'plain'),
+        ('Arbol - Longitud', 'arbol_longitud', 'plain'),
+        ('Arbol - Circunferencia', 'arbol_circunferencia', 'plain'),
+        ('Arbol - Especie', 'arbol_especie', 'plain'),
         ('Equipo Contra Incendio', 'tipo_equipo_contra_incendio', 'plain'),
-        ('Hora de Control', 'hora_control', 'plain'),
-        ('Hora Extinción Total', 'hora_extincion_total', 'plain'),
-        ('% Pérdida Total', 'porcentaje_perdida_total', 'plain'),
+        ('Hora de Control', 'hora_control', 'hora'),
+        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
+        ('% Perdida Humo', 'porcentaje_perdida_humo', 'plain'),
+        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
         ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Métodos de Extinción', 'metodos_extincion', 'plain'),
-        ('Evaluación Preliminar', 'evaluacion_preliminar', 'plain'),
-        ('Tipo de Terreno', 'tipo_terreno', 'plain'),
-        ('Tipo de Vegetación', 'tipo_vegetacion', 'plain'),
-        ('Extensión Terreno', 'extension_terreno', 'plain'),
-        ('Extensión Afectada', 'extension_terreno_afectada', 'plain'),
-        ('Coordenadas', 'coordenadas', 'plain'),
+        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
+        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
     ],
-    # --- RESCATE COLISIÓN / VOLCAMIENTO ---
+
+# --- RESCATE COLISIÓN / VOLCAMIENTO ---
     'rescate_colision_con_lesionado': [
         ('Subtipo', 'subtipo_rescate', 'plain'),
         ('Vehículos Involucrados', 'vehiculos_involucrados_json', 'plain'),
@@ -588,6 +653,24 @@ def _formatear_valor(valor, tipo):
         return '—'
     if tipo == 'bool':
         return 'SÍ' if valor else 'NO'
+    if tipo == 'clase':
+        return {'1': 'Primera clase', '2': 'Segunda clase', '3': 'Tercera clase'}.get(str(valor), str(valor))
+    if tipo == 'hora':
+        return _formatear_hora(valor, con_segundos=True)
+    if tipo == 'money':
+        try:
+            return f'{float(valor):,.2f}'
+        except (TypeError, ValueError):
+            return str(valor)
+    if tipo == 'apoyo':
+        return {
+            'estructura': 'Incendio de Estructura',
+            'vehiculo': 'Incendio de Vehículo',
+            'electrico': 'Incendio de Equipo Eléctrico',
+            'desechos': 'Incendio de Desechos Sólidos',
+            'vegetacion': 'Incendio de Vegetación / Forestal',
+            'arbol': 'Incendio de Árbol',
+        }.get(str(valor), str(valor))
     if tipo == 'alarma':
         return {
             'incendio_estructura': 'Incendio de Estructura',
@@ -703,12 +786,47 @@ def serializar_reporte(reporte):
     """
     tipo = reporte.tipo_especifico
 
+    def _es_incendio(t):
+        return bool(t) and t.startswith('incendio')
+
     especifico = []
-    for etiqueta, attr, tipo_dato in SECCIONES_ESPECIFICAS.get(tipo, []):
-        especifico.append({
-            'etiqueta': etiqueta,
-            'valor': _formatear_valor(getattr(reporte, attr, None), tipo_dato),
-        })
+    if _es_incendio(tipo):
+        # Los campos condicionales/vacíos no se incluyen para no dejar
+        # espacios en blanco en el PDF.
+        tipo_sec = tipo
+        if tipo == 'incendio_apoyo':
+            tipo_sec = 'incendio_' + (reporte.tipo_apoyo or 'estructura')
+        if tipo == 'incendio_apoyo':
+            especifico.append({
+                'etiqueta': 'Tipo de Incendio Apoyado',
+                'valor': _formatear_valor(reporte.tipo_apoyo, 'apoyo'),
+            })
+        for fila in SECCIONES_ESPECIFICAS.get(tipo_sec, []):
+            etiqueta, attr, tipo_dato = fila[0], fila[1], fila[2]
+            cond = fila[3] if len(fila) > 3 else None
+            if cond == 'propagacion' and not reporte.hubo_propagacion:
+                continue
+            if cond == 'equipos_poseia' and not reporte.poseia_equipos:
+                continue
+            if cond == 'equipos_usados' and not (reporte.poseia_equipos and reporte.fue_usado):
+                continue
+            if attr == 'tipo_apoyo':
+                continue
+            valor = getattr(reporte, attr, None)
+            if attr in ('hubo_propagacion', 'poseia_equipos') and not valor:
+                continue
+            if valor is None or valor == '':
+                continue
+            especifico.append({
+                'etiqueta': etiqueta,
+                'valor': _formatear_valor(valor, tipo_dato),
+            })
+    else:
+        for etiqueta, attr, tipo_dato in SECCIONES_ESPECIFICAS.get(tipo, []):
+            especifico.append({
+                'etiqueta': etiqueta,
+                'valor': _formatear_valor(getattr(reporte, attr, None), tipo_dato),
+            })
 
     vehiculos = []
     for va in reporte.vehiculos_actuantes:
@@ -745,8 +863,32 @@ def serializar_reporte(reporte):
 
     fecha_emision = reporte.fecha_creacion or datetime.now()
 
-    # En los incendios de estructura y vehículo las horas se muestran con segundos
-    con_segundos = tipo in ('incendio_estructura', 'incendio_vehiculo')
+    # En los incendios las horas se muestran con segundos
+    con_segundos = bool(tipo) and tipo.startswith('incendio')
+
+    # Vehículos afectados (lista dinámica)
+    vehiculos_afectados = []
+    if _es_incendio(tipo):
+        for v in (getattr(reporte, 'vehiculos_afectados', None) or []):
+            fila = {}
+            for clave in ('marca', 'modelo', 'color', 'placa', 'serial_motor', 'anio',
+                          'tipo', 'condicion', 'valor', 'perdidas', 'aseguradora',
+                          'propietario', 'cedula', 'conductor', 'conductor_ci',
+                          'valor_carga', 'perdida_carga', 'aseguradora_carga'):
+                valor = v.get(clave)
+                fila[clave] = str(valor).strip() if valor not in (None, '') else ''
+            if any(fila.values()):
+                vehiculos_afectados.append(fila)
+
+    # Título acorde al subtipo cuando el reporte es de apoyo
+    tipo_titulo = tipo
+    if tipo == 'incendio_apoyo':
+        tipo_titulo = 'incendio_' + (reporte.tipo_apoyo or 'estructura')
+    nombre_servicio = NOMBRE_SERVICIO.get(tipo, (tipo or '').upper())
+    titulo_seccion_2 = TITULO_SECCION_2.get(tipo, '2. DETALLE DEL SERVICIO')
+    if tipo == 'incendio_apoyo':
+        nombre_servicio = 'APOYO POR INCENDIOS - ' + NOMBRE_SERVICIO.get(tipo_titulo, '')
+        titulo_seccion_2 = '2. APOYO POR INCENDIOS - ' + TITULO_SECCION_2.get(tipo_titulo, '').replace('2. DETALLE DEL ', '')
 
     # Personas afectadas / lesionados (APH y rescates)
     personas_afectadas = [{
@@ -763,8 +905,8 @@ def serializar_reporte(reporte):
         'reporte_id': reporte.id,
         'tipo_reporte': tipo,
         'nro_control': reporte.nro_control,
-        'nombre_servicio': NOMBRE_SERVICIO.get(tipo, tipo.upper()),
-        'titulo_seccion_2': TITULO_SECCION_2.get(tipo, '2. DETALLE DEL SERVICIO'),
+        'nombre_servicio': nombre_servicio,
+        'titulo_seccion_2': titulo_seccion_2,
         'fecha_incidente': _formatear_fecha(reporte.fecha),
         'fecha_emision': fecha_emision.strftime('%d/%m/%Y %H:%M'),
         'clase_aviso': reporte.clase_aviso or '—',
@@ -777,6 +919,7 @@ def serializar_reporte(reporte):
             {'etiqueta': 'Hora de Regreso', 'valor': _formatear_hora(reporte.hora_regreso, con_segundos)},
         ],
         'itinerario_ruta': reporte.itinerario_ruta or '—',
+        'cuadrante_paz': reporte.cuadrante_paz or '—',
         'solicitante_nombre': reporte.solicitante_nombre or '—',
         'solicitante_cedula': reporte.solicitante_cedula or '—',
         'solicitante_telefono': reporte.solicitante_telefono or '—',
@@ -784,6 +927,8 @@ def serializar_reporte(reporte):
         'punto_referencia': reporte.punto_referencia or '—',
         'especifico': especifico,
         'vehiculos': vehiculos,
+        'vehiculos_afectados': vehiculos_afectados,
+        'descripcion_alarma': _nl2br_html(getattr(reporte, 'descripcion', None)) if getattr(reporte, 'descripcion', None) else '',
         'material_bomberil': material,
         'total_efectivos': len(personal),
         'jefe_comision': _formatear_personal(jefe),

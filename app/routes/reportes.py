@@ -154,7 +154,7 @@ REPORT_FIELDS_MAP = {
         'vehiculo_afecto', 'hoja_seguridad', 'extintor', 'equipo_derrame'
     ],
     'falsa_alarma': [
-        'tipo_alarma'
+        'tipo_alarma', 'descripcion'
     ],
     'pre_hospitalario': [
         'paciente_nombre', 'paciente_edad', 'paciente_genero', 'paciente_cedula',
@@ -224,74 +224,90 @@ REPORT_FIELDS_MAP = {
     ],
     'incendio_estructura': [
         'subtipo_incendio', 'clase_incendio', 'tipo_estructura', 'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'hora_control', 'hora_extincion_total',
         'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
         'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
         'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci', 'tipo_equipo_contra_incendio',
         'evaluacion_preliminar',
-        'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono'
+        'salida_primera_maquina', 'salida_segunda_maquina', 'salida_ambulancia',
+        'salida_unidad_adicional', 'salida_unidad_adicional_nombre',
+        'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono',
+        'inmueble_descripcion', 'inmueble_valor', 'inmueble_perdidas', 'inmueble_aseguradora',
+        'mueble_propietario', 'mueble_propietario_ci', 'mueble_valor', 'mueble_perdidas',
+        'mueble_aseguradora', 'mueble_condicion', 'lugar_a_cargo'
     ],
     'incendio_apoyo': [
-        'subtipo_incendio', 'tipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'subtipo_incendio', 'tipo_apoyo', 'tipo_incendio',
+        'clase_incendio', 'tipo_estructura', 'lugar_desarrollo', 'presunto_punto_origen',
+        'hora_control', 'hora_extincion_total',
         'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
         'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
         'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
-        'evaluacion_preliminar'
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci', 'tipo_equipo_contra_incendio',
+        'evaluacion_preliminar',
+        'salida_primera_maquina', 'salida_segunda_maquina', 'salida_ambulancia',
+        'salida_unidad_adicional', 'salida_unidad_adicional_nombre',
+        'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono',
+        'inmueble_descripcion', 'inmueble_valor', 'inmueble_perdidas', 'inmueble_aseguradora',
+        'mueble_propietario', 'mueble_propietario_ci', 'mueble_valor', 'mueble_perdidas',
+        'mueble_aseguradora', 'mueble_condicion', 'lugar_a_cargo',
+        'sistema_electrico_tipo', 'sistema_electrico_capacidad', 'sistema_electrico_uso',
+        'sistema_electrico_serial', 'sistema_electrico_propiedad', 'sistema_electrico_rif',
+        'desperdicio_materia', 'desperdicio_cantidad', 'desperdicio_recuperable',
+        'arbol_edad', 'arbol_longitud', 'arbol_circunferencia', 'arbol_especie',
+        'tipo_terreno', 'tipo_vegetacion', 'extension_terreno', 'extension_terreno_afectada', 'coordenadas',
+        'vehiculo_marca', 'vehiculo_modelo', 'vehiculo_placa', 'vehiculo_color',
+        'vehiculo_anio', 'vehiculo_tipo',
+        'propietario_nombre', 'propietario_cedula', 'propietario_edad', 'propietario_telefono'
     ],
     'incendio_electrico': [
-        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
-        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
-        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
-        'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
-        'evaluacion_preliminar'
+        'subtipo_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'metodos_extincion', 'tecnicas_extincion',
+        'tipo_equipo_contra_incendio', 'evaluacion_preliminar',
+        'sistema_electrico_tipo', 'sistema_electrico_capacidad', 'sistema_electrico_uso',
+        'sistema_electrico_serial', 'sistema_electrico_propiedad', 'sistema_electrico_rif'
     ],
     'incendio_vehiculo': [
-        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
+        'subtipo_incendio', 'clase_incendio', 'lugar_desarrollo', 'presunto_punto_origen',
+        'hora_control', 'hora_extincion_total',
         'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
         'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
         'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
+        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci', 'tipo_equipo_contra_incendio',
         'evaluacion_preliminar',
+        'salida_primera_maquina', 'salida_segunda_maquina', 'salida_ambulancia',
+        'salida_unidad_adicional', 'salida_unidad_adicional_nombre',
+        # Columnas legacy del vehículo afectado (respaldo del JSON)
         'vehiculo_marca', 'vehiculo_modelo', 'vehiculo_placa', 'vehiculo_color',
         'vehiculo_anio', 'vehiculo_tipo',
         'propietario_nombre', 'propietario_cedula', 'propietario_edad', 'propietario_telefono'
     ],
     'incendio_desechos': [
-        'subtipo_incendio', 'clase_incendio', 'intensidad', 'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
-        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
-        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
-        'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
-        'evaluacion_preliminar'
+        'subtipo_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'metodos_extincion', 'tecnicas_extincion',
+        'tipo_equipo_contra_incendio', 'evaluacion_preliminar',
+        'salida_primera_maquina', 'salida_segunda_maquina',
+        'salida_unidad_adicional', 'salida_unidad_adicional_nombre',
+        'desperdicio_materia', 'desperdicio_cantidad', 'desperdicio_recuperable'
     ],
     'incendio_vegetacion': [
-        'subtipo_incendio', 'tipo_incendio', 'clase_incendio', 'intensidad',
-        'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
-        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
-        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
-        'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
-        'evaluacion_preliminar',
+        'subtipo_incendio', 'tipo_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'metodos_extincion', 'tecnicas_extincion',
+        'tipo_equipo_contra_incendio', 'evaluacion_preliminar',
+        'salida_primera_maquina', 'salida_segunda_maquina',
         'tipo_terreno', 'tipo_vegetacion', 'extension_terreno', 'extension_terreno_afectada', 'coordenadas'
     ],
     'incendio_arbol': [
-        'subtipo_incendio', 'clase_incendio', 'intensidad',
-        'lugar_desarrollo', 'presunto_punto_origen',
-        'tipo_equipo_contra_incendio', 'hora_control', 'hora_extincion_total',
-        'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
-        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
-        'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
-        'evaluacion_preliminar',
-        'tipo_terreno', 'tipo_vegetacion', 'extension_terreno', 'extension_terreno_afectada', 'coordenadas'
+        'subtipo_incendio', 'hora_control', 'hora_extincion_total',
+        'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+        'litros_agua_utilizados', 'metodos_extincion', 'tecnicas_extincion',
+        'tipo_equipo_contra_incendio', 'evaluacion_preliminar',
+        'salida_primera_maquina',
+        'arbol_edad', 'arbol_longitud', 'arbol_circunferencia', 'arbol_especie'
     ],
     'rescate_colision_con_lesionado': [
         'subtipo_rescate', 'vehiculos_involucrados_json',
@@ -381,11 +397,14 @@ CAMPOS_DECIMALES = {
     'regla_9_miembro_superior_d', 'regla_9_miembro_superior_i',
     'regla_9_miembro_inferior_d', 'regla_9_miembro_inferior_i',
     'porcentaje_perdida_fuego', 'porcentaje_perdida_humo', 'porcentaje_perdida_total',
+    'inmueble_valor', 'inmueble_perdidas', 'mueble_valor', 'mueble_perdidas',
 }
 
 # Campos de tipo hora (columnas db.Time) que no forman parte de la cabecera
 CAMPOS_HORA = {
     'hora_control', 'hora_extincion_total',
+    'salida_primera_maquina', 'salida_segunda_maquina', 'salida_ambulancia',
+    'salida_unidad_adicional',
 }
 
 
@@ -420,9 +439,9 @@ def parse_field_value(field_name, raw_val):
             raise ValueError(f'El campo "{etiqueta}" debe ser un número.')
     if field_name in CAMPOS_HORA:
         try:
-            return datetime.strptime(str(raw_val).strip(), '%H:%M').time()
+            return _parsear_hora(str(raw_val).strip())
         except (TypeError, ValueError):
-            raise ValueError(f'El campo "{etiqueta}" debe tener formato de hora HH:MM.')
+            raise ValueError(f'El campo "{etiqueta}" debe tener formato de hora HH:MM o HH:MM:SS.')
     return raw_val
 
 
@@ -508,6 +527,7 @@ def _leer_cabecera(form):
         errores.append('La dirección del evento es obligatoria.')
 
     itinerario_ruta = (form.get('itinerario_ruta') or '').strip() or None
+    cuadrante_paz = (form.get('cuadrante_paz') or '').strip() or None
 
     return {
         'fecha': fecha,
@@ -515,6 +535,7 @@ def _leer_cabecera(form):
         'receptor_aviso': receptor_aviso,
         'direccion': direccion,
         'itinerario_ruta': itinerario_ruta,
+        'cuadrante_paz': cuadrante_paz,
         **horas,
     }, errores
 
@@ -573,6 +594,18 @@ def crear_reporte(tipo_reporte):
             if 'propagacion_donde' in specific_kwargs and not specific_kwargs.get('hubo_propagacion'):
                 specific_kwargs['propagacion_donde'] = None
 
+            # Cascada de equipos: lo dependiente solo se guarda si el checkbox
+            # padre está marcado (evita datos huérfanos y campos en el PDF).
+            if 'poseia_equipos' in specific_kwargs and not specific_kwargs.get('poseia_equipos'):
+                specific_kwargs['fue_usado'] = False
+                specific_kwargs['por_quien_uso'] = None
+                specific_kwargs['por_quien_ci'] = None
+                specific_kwargs['tipo_equipo_contra_incendio'] = None
+            if 'fue_usado' in specific_kwargs and not specific_kwargs.get('fue_usado'):
+                specific_kwargs['por_quien_uso'] = None
+                specific_kwargs['por_quien_ci'] = None
+                specific_kwargs['tipo_equipo_contra_incendio'] = None
+
             # 4. DEFINIR SUBTIPOS Y DATOS ADICIONALES SEGÚN EL TIPO
             extra_kwargs = {}
             # Subtipo para incendios
@@ -584,6 +617,38 @@ def crear_reporte(tipo_reporte):
                     'incendio_arbol': 'arbol',
                 }
                 extra_kwargs['subtipo_incendio'] = subtipos_map.get(tipo_reporte, tipo_reporte.replace('incendio_', ''))
+
+                # Vehículos afectados (lista dinámica, aplica a vehículo y apoyo)
+                claves_va = [
+                    'marca', 'modelo', 'color', 'placa', 'serial_motor', 'anio',
+                    'valor', 'perdidas', 'aseguradora', 'propietario', 'cedula',
+                    'conductor', 'conductor_ci', 'valor_carga', 'perdida_carga',
+                    'aseguradora_carga', 'condicion',
+                ]
+                columnas_va = {clave: request.form.getlist(f'va_{clave}[]') for clave in claves_va}
+                vehiculos_afectados = []
+                for i in range(max((len(v) for v in columnas_va.values()), default=0)):
+                    registro = {}
+                    for clave in claves_va:
+                        valores = columnas_va[clave]
+                        registro[clave] = (valores[i] if i < len(valores) else '').strip()
+                    if any(registro.values()):
+                        vehiculos_afectados.append(registro)
+                if vehiculos_afectados:
+                    extra_kwargs['vehiculos_afectados_json'] = json.dumps(
+                        vehiculos_afectados, ensure_ascii=False
+                    )
+                    # Respaldo en las columnas legacy (primer vehículo)
+                    primero = vehiculos_afectados[0]
+                    extra_kwargs.update({
+                        'vehiculo_marca': primero.get('marca') or None,
+                        'vehiculo_modelo': primero.get('modelo') or None,
+                        'vehiculo_placa': primero.get('placa') or None,
+                        'vehiculo_color': primero.get('color') or None,
+                        'vehiculo_anio': primero.get('anio') or None,
+                        'propietario_nombre': primero.get('propietario') or None,
+                        'propietario_cedula': primero.get('cedula') or None,
+                    })
             # Subtipo para rescate colisión/volcamiento
             if tipo_reporte.startswith('rescate_colision_') or tipo_reporte.startswith('rescate_volcamiento_'):
                 subtipos_map = {

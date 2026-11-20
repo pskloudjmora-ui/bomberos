@@ -1,0 +1,34 @@
+{# Apoyo por incendios: selector dinámico + parámetros del subtipo elegido #}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Incendio *</label>
+        <select name="tipo_apoyo" id="selector-tipo-apoyo" required onchange="cambiarTipoApoyo(this)"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            <option value="estructura">Incendio de Estructura</option>
+            <option value="vehiculo">Incendio de Vehículo</option>
+            <option value="electrico">Incendio de Equipos Eléctricos</option>
+            <option value="desechos">Incendio de Desechos Sólidos</option>
+            <option value="vegetacion">Incendio de Vegetación / Forestal</option>
+            <option value="arbol">Incendio de Árbol</option>
+        </select>
+    </div>
+</div>
+
+<fieldset data-grupo-apoyo="estructura" class="border-0 p-0 m-0 min-w-0 space-y-4">
+    {% include 'reportes/_incendio_params_estructura.html' %}
+</fieldset>
+<fieldset data-grupo-apoyo="vehiculo" disabled class="hidden border-0 p-0 m-0 min-w-0 space-y-4">
+    {% include 'reportes/_incendio_params_vehiculo.html' %}
+</fieldset>
+<fieldset data-grupo-apoyo="electrico" disabled class="hidden border-0 p-0 m-0 min-w-0 space-y-4">
+    {% include 'reportes/_incendio_params_electrico.html' %}
+</fieldset>
+<fieldset data-grupo-apoyo="desechos" disabled class="hidden border-0 p-0 m-0 min-w-0 space-y-4">
+    {% include 'reportes/_incendio_params_desechos.html' %}
+</fieldset>
+<fieldset data-grupo-apoyo="vegetacion" disabled class="hidden border-0 p-0 m-0 min-w-0 space-y-4">
+    {% include 'reportes/_incendio_params_vegetacion.html' %}
+</fieldset>
+<fieldset data-grupo-apoyo="arbol" disabled class="hidden border-0 p-0 m-0 min-w-0 space-y-4">
+    {% include 'reportes/_incendio_params_arbol.html' %}
+</fieldset>

@@ -145,7 +145,7 @@
                     <span class="text-white text-sm font-medium">{{ reporte.receptor_aviso }}</span>
                 </div>
                 
-                {% set con_segundos = reporte.tipo_especifico in ('incendio_estructura', 'incendio_vehiculo') %}
+                {% set con_segundos = reporte.tipo_especifico and reporte.tipo_especifico.startswith('incendio') %}
                 <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-4 gap-2">
                     <div>
                         <span class="block font-semibold text-slate-500">Hora Aviso:</span>
@@ -202,6 +202,12 @@
                 <div class="border-t border-slate-800/40 pt-2 col-span-3">
                     <span class="block font-semibold text-slate-500">Itinerario de Ruta:</span>
                     <span class="text-white text-sm font-medium block">{{ reporte.itinerario_ruta }}</span>
+                </div>
+                {% endif %}
+                {% if reporte.cuadrante_paz %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Cuadrante de Paz:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.cuadrante_paz }}</span>
                 </div>
                 {% endif %}
             </div>
@@ -652,9 +658,15 @@
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                 <div>
-                    <span class="block font-semibold text-slate-500">Tipo de Falsa Alarma:</span>
-                    <span class="text-white text-sm font-medium">{{ {'incendio_estructura': 'Incendio de Estructura', 'incendio_vehiculo': 'Incendio de Vehículo'}.get(reporte.tipo_alarma, reporte.tipo_alarma) }}</span>
+                    <span class="block font-semibold text-slate-500">Tipo de Incidente Reportado:</span>
+                    <span class="text-white text-sm font-medium">{{ {'incendio_estructura': 'Estructura', 'incendio_vehiculo': 'Vehículo'}.get(reporte.tipo_alarma, reporte.tipo_alarma) }}</span>
                 </div>
+                {% if reporte.descripcion %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Descripción de lo Ocurrido:</span>
+                    <span class="text-white text-sm font-medium block whitespace-pre-line">{{ reporte.descripcion }}</span>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -873,293 +885,8 @@
             {{ paciente.tabla_paciente(reporte) }}
         </div>
         {% endif %}
-        {% if reporte.tipo_especifico == 'incendio_estructura'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="flame" class="w-4 h-4 text-orange-500"></i>
-                <span>2. Incendio de Estructura</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Tipo de Estructura:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_estructura or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Propietario Inmueble:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_propietario_nombre or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Cédula:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_propietario_cedula or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Teléfono:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_propietario_telefono or '--' }}</span></div>
-                </div>
-            </div>
-        </div>
-        {% elif reporte.tipo_especifico == 'incendio_apoyo'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
-                <span>2. Apoyo por Incendios</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Tipo de Incendio:</span><span class="text-white text-sm font-medium">{{ {'incendio_estructura': 'Incendio de Estructura', 'incendio_vehiculo': 'Incendio de Vehículo'}.get(reporte.tipo_incendio, reporte.tipo_incendio or '--') }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-            </div>
-        </div>
-        {% elif reporte.tipo_especifico == 'incendio_electrico'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
-                <span>2. Incendio Equipo Eléctrico</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-            </div>
-        </div>
-        {% elif reporte.tipo_especifico == 'incendio_vehiculo'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="car" class="w-4 h-4 text-red-400"></i>
-                <span>2. Incendio de Vehículo</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Marca Vehículo:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_marca or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Modelo:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_modelo or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Placa:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_placa or '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Color:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_color or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Año:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_anio or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Tipo:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_tipo or '--' }}</span></div>
-                    <div></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Propietario:</span><span class="text-white text-sm font-medium">{{ reporte.propietario_nombre or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Cédula:</span><span class="text-white text-sm font-medium">{{ reporte.propietario_cedula or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Teléfono:</span><span class="text-white text-sm font-medium">{{ reporte.propietario_telefono or '--' }}</span></div>
-                </div>
-            </div>
-        </div>
-        {% elif reporte.tipo_especifico == 'incendio_desechos'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="trash-2" class="w-4 h-4 text-emerald-400"></i>
-                <span>2. Incendio Desechos Sólidos</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-            </div>
-        </div>
-        {% elif reporte.tipo_especifico == 'incendio_vegetacion'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="trees" class="w-4 h-4 text-green-500"></i>
-                <span>2. Incendio Vegetación/Forestal</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Tipo Incendio:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_incendio or '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Tipo Terreno:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_terreno or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Tipo Vegetación:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_vegetacion or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Extensión Terreno:</span><span class="text-white text-sm font-medium">{{ reporte.extension_terreno or '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Extensión Afectada:</span><span class="text-white text-sm font-medium">{{ reporte.extension_terreno_afectada or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Coordenadas:</span><span class="text-white text-sm font-medium">{{ reporte.coordenadas or '--' }}</span></div>
-                </div>
-            </div>
-        </div>
-        {% elif reporte.tipo_especifico == 'incendio_arbol'  %}
-        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
-            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
-                <i data-lucide="tree-pine" class="w-4 h-4 text-lime-500"></i>
-                <span>2. Incendio de Árbol</span>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div><span class="block font-semibold text-slate-500">Subtipo:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_incendio|upper }}</span></div>
-                
-                <div><span class="block font-semibold text-slate-500">Tipo Incendio:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_incendio or '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Clase de Incendio:</span><span class="text-white text-sm font-medium">{{ ('Clase ' + reporte.clase_incendio) if reporte.clase_incendio else '--' }}</span></div>
-                <div><span class="block font-semibold text-slate-500">Intensidad:</span><span class="text-white text-sm font-medium">{{ reporte.intensidad or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Equipo Contra Incendio:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_equipo_contra_incendio or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M') if reporte.hora_control else '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M') if reporte.hora_extincion_total else '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Pérdidas Estimadas:</span>
-                    <span class="text-white text-sm font-medium">Fuego: {{ reporte.porcentaje_perdida_fuego or 0 }}% | Humo: {{ reporte.porcentaje_perdida_humo or 0 }}% | Total: <strong class="text-fire-400">{{ reporte.porcentaje_perdida_total or 0 }}%</strong></span>
-                </div>
-                <div><span class="block font-semibold text-slate-500">Litros de Agua:</span><span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_agua_utilizados or 0 }} Lts.</span></div>
-                <div class="col-span-2"><span class="block font-semibold text-slate-500">Propagación:</span><span class="text-white text-sm font-medium">{{ 'Sí - ' + (reporte.propagacion_donde or '') if reporte.hubo_propagacion else 'No' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion or '--' }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Poseía Equipos:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.poseia_equipos else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Fueron Usados:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.fue_usado else 'No' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Por Quién:</span><span class="text-white text-sm font-medium">{{ reporte.por_quien_uso or '--' }} ({{ reporte.por_quien_ci or '--' }})</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Evaluación Preliminar:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar or '--' }}</span></div>
-                
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Tipo Terreno:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_terreno or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Tipo Vegetación:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_vegetacion or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Extensión Terreno:</span><span class="text-white text-sm font-medium">{{ reporte.extension_terreno or '--' }}</span></div>
-                </div>
-                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-                    <div><span class="block font-semibold text-slate-500">Extensión Afectada:</span><span class="text-white text-sm font-medium">{{ reporte.extension_terreno_afectada or '--' }}</span></div>
-                    <div><span class="block font-semibold text-slate-500">Coordenadas:</span><span class="text-white text-sm font-medium">{{ reporte.coordenadas or '--' }}</span></div>
-                </div>
-            </div>
-        </div>
+        {% if reporte.tipo_especifico and reporte.tipo_especifico.startswith('incendio') %}
+            {% include 'reportes/_detalle_incendio.html' %}
         {% endif %}
         {% if reporte.tipo_especifico == 'rescate_colision_con_lesionado'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">

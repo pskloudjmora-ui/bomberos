@@ -134,6 +134,8 @@ def dashboard_admin():
         except (TypeError, ValueError):
             flash('El vehículo seleccionado no es válido.', 'warning')
 
+    cuadrante_filtro = request.args.get('cuadrante', 'Todos')
+
     # La columna `tipo_reporte` guarda la identidad polimórfica genérica
     # ('incendio', 'rescate_especializado', ...), así que el filtro por tipo
     # específico (p. ej. 'incendio_estructura' o 'rescate_caida') se aplica en
@@ -145,6 +147,26 @@ def dashboard_admin():
     if tipo_reporte_filtro and tipo_reporte_filtro != 'Todos':
         reportes_filtrados = [
             r for r in reportes_filtrados if r.tipo_especifico == tipo_reporte_filtro
+        ]
+
+    # 2. ESTADÍSTICAS AGRUPADAS POR CUADRANTE DE PAZ
+    # Se calculan antes de aplicar el filtro de cuadrante para poder comparar
+    # todos los cuadrantes del rango seleccionado.
+    conteo_cuadrantes = Counter(
+        (r.cuadrante_paz or '').strip() or 'Sin cuadrante' for r in reportes_filtrados
+    )
+    estadisticas_cuadrantes = [
+        {'cuadrante': nombre, 'total': total}
+        for nombre, total in conteo_cuadrantes.most_common()
+    ]
+    cuadrantes_disponibles = sorted(
+        {nombre for nombre in conteo_cuadrantes if nombre != 'Sin cuadrante'}
+    )
+
+    if cuadrante_filtro and cuadrante_filtro != 'Todos':
+        reportes_filtrados = [
+            r for r in reportes_filtrados
+            if ((r.cuadrante_paz or '').strip() or 'Sin cuadrante') == cuadrante_filtro
         ]
 
     # 2. KPIs CALCULADOS SOBRE EL MISMO CONJUNTO FILTRADO
@@ -214,10 +236,13 @@ def dashboard_admin():
         fechas_grafico=fechas_grafico,
         cantidades_grafico=cantidades_grafico,
         vehiculos=vehiculos,
+        estadisticas_cuadrantes=estadisticas_cuadrantes,
+        cuadrantes_disponibles=cuadrantes_disponibles,
         filtro_inicio=fecha_inicio.strftime('%Y-%m-%d'),
         filtro_fin=fecha_fin.strftime('%Y-%m-%d'),
         filtro_tipo=tipo_reporte_filtro or 'Todos',
-        filtro_vehiculo=vehiculo_filtro or 'Todos'
+        filtro_vehiculo=vehiculo_filtro or 'Todos',
+        filtro_cuadrante=cuadrante_filtro or 'Todos'
     )
 
 

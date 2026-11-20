@@ -103,9 +103,8 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                         <option value="Radio Transmisor">Radio Transmisor</option>
                         <option value="Telefonico">Telefónico</option>
-                        {% if tipo_reporte != 'incendio_vehiculo' %}
                         <option value="Verbal">Verbal</option>
-                        {% endif %}
+                        <option value="Ocasional">Ocasional</option>
                     </select>
                 </div>
                 <div>
@@ -124,100 +123,40 @@
                 </div>
             </div>
 
-            {% if tipo_reporte == 'incendio_vehiculo' %}
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Vehículo Afectado</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Marca</label>
-                    <input type="text" name="vehiculo_marca" placeholder="ej: Toyota" 
+            <!-- Itinerario y Cuadrante de Paz -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Itinerario de Ruta</label>
+                    <textarea name="itinerario_ruta" rows="2" placeholder="Describa el recorrido realizado por las unidades hasta el sitio del evento"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cuadrante de Paz</label>
+                    <input type="text" name="cuadrante_paz" placeholder="ej: Cuadrante 3 - Zona Norte"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo</label>
-                    <input type="text" name="vehiculo_modelo" placeholder="ej: Hilux" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Placa</label>
-                    <input type="text" name="vehiculo_placa" placeholder="Placa del vehículo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Color</label>
-                    <input type="text" name="vehiculo_color" placeholder="Color" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Año</label>
-                    <input type="text" name="vehiculo_anio" placeholder="ej: 2020" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Vehículo</label>
-                    <input type="text" name="vehiculo_tipo" placeholder="ej: Camioneta, Automóvil" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
-            <div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Propietario</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Propietario</label>
-                    <input type="text" name="propietario_nombre" placeholder="Nombre completo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="propietario_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Edad</label>
-                    <input type="number" name="propietario_edad" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono</label>
-                    <input type="text" name="propietario_telefono" placeholder="0412-1234567" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Itinerario de ruta seguido por las unidades -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-1">Itinerario de Ruta</label>
-                <textarea name="itinerario_ruta" rows="2" placeholder="Describa el recorrido realizado por las unidades hasta el sitio del evento"
-                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
             </div>
 
             <!-- Tiempos de actuación -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Aviso *</label>
-                    <input type="time" name="hora_aviso" required {% if tipo_reporte in ('incendio_estructura', 'incendio_vehiculo') %}step="1"{% endif %}
+                    <input type="time" name="hora_aviso" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Salida *</label>
-                    <input type="time" name="hora_salida" required {% if tipo_reporte in ('incendio_estructura', 'incendio_vehiculo') %}step="1"{% endif %}
+                    <input type="time" name="hora_salida" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Llegada *</label>
-                    <input type="time" name="hora_llegada" required
+                    <input type="time" name="hora_llegada" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Regreso *</label>
-                    <input type="time" name="hora_regreso" required
+                    <input type="time" name="hora_regreso" required {% if tipo_reporte.startswith('incendio_') %}step="1"{% endif %}
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
             </div>
@@ -1219,940 +1158,56 @@
             {% elif tipo_reporte == 'falsa_alarma' %}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Falsa Alarma *</label>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Incidente Reportado *</label>
                     <select name="tipo_alarma" required
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="incendio_estructura">Incendio de Estructura</option>
-                        <option value="incendio_vehiculo">Incendio de Vehículo</option>
+                        <option value="incendio_estructura">Estructura</option>
+                        <option value="incendio_vehiculo">Vehículo</option>
                     </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Descripción de lo Ocurrido</label>
+                    <textarea name="descripcion" rows="5" placeholder="Describa la falsa alarma, verificaciones realizadas y observaciones..."
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
                 </div>
             </div>
 
             {# 2.12 INCENDIO DE ESTRUCTURA #}
-
             {% elif tipo_reporte == 'incendio_estructura' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="estructura">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Estructura</label>
-                    <select name="tipo_estructura"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="Industrial">Industrial</option>
-                        <option value="Recreacional">Recreacional</option>
-                        <option value="Comercial">Comercial</option>
-                        <option value="Residencial">Residencial</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos del Propietario del Inmueble</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Propietario</label>
-                    <input type="text" name="inmueble_propietario_nombre" placeholder="Nombre completo" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cédula</label>
-                    <input type="text" name="inmueble_propietario_cedula" placeholder="V-12345678" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono</label>
-                    <input type="text" name="inmueble_propietario_telefono" placeholder="0412-1234567" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="estructura">
+            {% include 'reportes/_incendio_params_estructura.html' %}
 
             {# 2.13 INCENDIO APOYO #}
-
             {% elif tipo_reporte == 'incendio_apoyo' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="apoyo">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Incendio *</label>
-                    <select name="tipo_incendio" required
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                        <option value="incendio_estructura">Incendio de Estructura</option>
-                        <option value="incendio_vehiculo">Incendio de Vehículo</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="apoyo">
+            {% include 'reportes/_incendio_params_apoyo.html' %}
 
             {# 2.14 INCENDIO EQUIPO ELÉCTRICO #}
-
             {% elif tipo_reporte == 'incendio_electrico' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="electrico">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="electrico">
+            {% include 'reportes/_incendio_params_electrico.html' %}
 
             {# 2.15 INCENDIO DE VEHÍCULO #}
-
             {% elif tipo_reporte == 'incendio_vehiculo' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="vehiculo">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="vehiculo">
+            {% include 'reportes/_incendio_params_vehiculo.html' %}
 
             {# 2.16 INCENDIO DESECHOS SÓLIDOS #}
-
             {% elif tipo_reporte == 'incendio_desechos' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="desechos">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="desechos">
+            {% include 'reportes/_incendio_params_desechos.html' %}
 
             {# 2.17 INCENDIO VEGETACIÓN/FORESTAL #}
-
             {% elif tipo_reporte == 'incendio_vegetacion' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="vegetacion">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Características del Terreno</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Terreno</label>
-                    <input type="text" name="tipo_terreno" placeholder="ej: Montañoso, Plano" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Vegetación</label>
-                    <input type="text" name="tipo_vegetacion" placeholder="ej: Matorral, Bosque seco" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Extensión del Terreno</label>
-                    <input type="text" name="extension_terreno" placeholder="ej: 2 hectáreas" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Extensión Afectada</label>
-                    <input type="text" name="extension_terreno_afectada" placeholder="ej: 0.5 hectáreas" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Coordenadas GPS</label>
-                    <input type="text" name="coordenadas" placeholder="ej: 10.4806° N, 66.9036° W" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="vegetacion">
+            {% include 'reportes/_incendio_params_vegetacion.html' %}
 
             {# 2.18 INCENDIO DE ÁRBOL #}
-
             {% elif tipo_reporte == 'incendio_arbol' %}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="subtipo_incendio" value="arbol">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Clase de Incendio</label>
-                    <select name="clase_incendio"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">Clase 1</option>
-                        <option value="2">Clase 2</option>
-                        <option value="3">Clase 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Intensidad</label>
-                    <select name="intensidad"
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                                                <option value="1">1era</option>
-                        <option value="2">2da</option>
-                        <option value="3">3ra</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
-                    <input type="text" name="lugar_desarrollo" required placeholder="Dirección/zona del incendio" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
-                    <input type="text" name="presunto_punto_origen" placeholder="Origen probable del fuego" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Equipo Contra Incendio Usado</label>
-                    <input type="text" name="tipo_equipo_contra_incendio" placeholder="ej: Manguera 1.5", Espuma AFFF" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
-                    <input type="time" name="hora_control" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
-                    <input type="time" name="hora_extincion_total" placeholder="" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Fuego</label>
-                    <input type="number" name="porcentaje_perdida_fuego" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida por Humo</label>
-                    <input type="number" name="porcentaje_perdida_humo" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
-                    <input type="number" name="porcentaje_perdida_total" placeholder="0-100" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
-                    <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Hubo Propagación</span>
-                </label>
-                <div data-campo-propagacion class="hidden sm:col-span-2">
-                    <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?" class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
-                    <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
-                    <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="poseia_equipos" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">El inmueble poseía equipos</span>
-                </label>
-                <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" name="fue_usado" class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
-                    <span class="ml-1.5">Fueron utilizados</span>
-                </label>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">¿Por quién fue usado?</label>
-                    <input type="text" name="por_quien_uso" placeholder="Nombre" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div><input type="text" name="por_quien_ci" placeholder="C.I." class="mt-2 block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-            </div>
-            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
-                    <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
-                </div>
-            </div>
-<div class="border-t border-slate-800/40 pt-4 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Características del Terreno</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Terreno</label>
-                    <input type="text" name="tipo_terreno" placeholder="ej: Montañoso, Plano" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Vegetación</label>
-                    <input type="text" name="tipo_vegetacion" placeholder="ej: Matorral, Bosque seco" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Extensión del Terreno</label>
-                    <input type="text" name="extension_terreno" placeholder="ej: 2 hectáreas" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Extensión Afectada</label>
-                    <input type="text" name="extension_terreno_afectada" placeholder="ej: 0.5 hectáreas" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                    <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Coordenadas GPS</label>
-                    <input type="text" name="coordenadas" placeholder="ej: 10.4806° N, 66.9036° W" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-                </div>
-            </div>
+            <input type="hidden" name="subtipo_incendio" value="arbol">
+            {% include 'reportes/_incendio_params_arbol.html' %}
 
             {# 2.19 RESCATE COLISIÓN CON LESIONADO #}
 
@@ -2892,7 +1947,92 @@
         agregarOrganismo();
         // Precargar una fila de lesionado en el reporte de caída en altura
         agregarPersonaAfectada();
+        // Vehículos afectados y cascada de equipos contra incendios
+        agregarVehiculoAfectado();
+        inicializarCascadaEquipos();
     });
+
+    // ============ VEHÍCULOS AFECTADOS (lista dinámica) ============
+    function agregarVehiculoAfectado() {
+        const contenedor = document.getElementById('contenedor-vehiculos-afectados');
+        const plantilla = document.getElementById('plantilla-vehiculo-afectado');
+        if (!contenedor || !plantilla) return;
+        contenedor.appendChild(plantilla.content.cloneNode(true));
+        lucide.createIcons();
+    }
+
+    function eliminarVehiculoAfectado(boton) {
+        const fila = boton.closest('.fila-vehiculo-afectado');
+        if (fila) fila.remove();
+    }
+
+    // ============ APOYO POR INCENDIOS (subtipo dinámico) ============
+    function limpiarGrupoApoyo(grupo) {
+        grupo.querySelectorAll('input, select, textarea').forEach(function (campo) {
+            if (campo.type === 'checkbox' || campo.type === 'radio') {
+                campo.checked = false;
+            } else {
+                campo.value = '';
+            }
+        });
+        grupo.querySelectorAll('[data-campo-propagacion]').forEach(function (campo) {
+            campo.classList.add('hidden');
+            const input = campo.querySelector('input[name="propagacion_donde"]');
+            if (input) {
+                input.disabled = true;
+                input.required = false;
+            }
+        });
+    }
+
+    function cambiarTipoApoyo(select) {
+        const tipo = select.value;
+        document.querySelectorAll('[data-grupo-apoyo]').forEach(function (grupo) {
+            const activo = grupo.dataset.grupoApoyo === tipo;
+            grupo.classList.toggle('hidden', !activo);
+            grupo.disabled = !activo;
+            if (!activo) limpiarGrupoApoyo(grupo);
+        });
+        inicializarCascadaEquipos();
+    }
+
+    // ============ EQUIPOS CONTRA INCENDIOS (cascada) ============
+    function aplicarEstadoEquipos(bloque) {
+        const chkPoseia = bloque.querySelector('[data-check-equipos]');
+        const grupoUsados = bloque.querySelector('[data-grupo-usados]');
+        const chkUsados = bloque.querySelector('[data-check-usados]');
+        const grupoDetalle = bloque.querySelector('[data-grupo-detalle-usados]');
+        if (!chkPoseia || !grupoUsados) return;
+
+        const poseia = chkPoseia.checked;
+        grupoUsados.classList.toggle('hidden', !poseia);
+        if (chkUsados) {
+            chkUsados.disabled = !poseia;
+            if (!poseia) chkUsados.checked = false;
+        }
+
+        const usados = poseia && chkUsados && chkUsados.checked;
+        if (grupoDetalle) {
+            grupoDetalle.classList.toggle('hidden', !usados);
+            grupoDetalle.querySelectorAll('input').forEach(function (campo) {
+                campo.disabled = !usados;
+                if (!usados) campo.value = '';
+            });
+        }
+    }
+
+    function inicializarCascadaEquipos() {
+        document.querySelectorAll('[data-bloque-equipos]').forEach(function (bloque) {
+            if (bloque.dataset.cascadaLista !== '1') {
+                bloque.dataset.cascadaLista = '1';
+                const chkPoseia = bloque.querySelector('[data-check-equipos]');
+                const chkUsados = bloque.querySelector('[data-check-usados]');
+                if (chkPoseia) chkPoseia.addEventListener('change', function () { aplicarEstadoEquipos(bloque); });
+                if (chkUsados) chkUsados.addEventListener('change', function () { aplicarEstadoEquipos(bloque); });
+            }
+            aplicarEstadoEquipos(bloque);
+        });
+    }
 
     // Personas afectadas / lesionados (para APH y Rescates)
     function agregarPersonaAfectada() {
