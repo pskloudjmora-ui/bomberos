@@ -1,0 +1,187 @@
+{# Parámetros técnicos: Control de Peligro por Árbol Caído.
+   El check de cabecera define el objeto afectado (inmueble/estructura o
+   vehículo) y habilita el grupo de parámetros correspondiente. #}
+{# ===== GRUPO: CAÍDA SOBRE INMUEBLE / ESTRUCTURA ===== #}
+<div data-grupo-arbol="estructura" class="hidden space-y-0">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Estructura</label>
+            <select name="tipo_estructura"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                <option value="Residencial">Residencial</option>
+                <option value="Comercial">Comercial</option>
+                <option value="Industrial">Industrial</option>
+                <option value="Recreacional">Recreacional</option>
+                <option value="Institucional">Institucional</option>
+                <option value="Educativa">Educativa</option>
+                <option value="Salud">Salud</option>
+                <option value="Otra">Otra</option>
+            </select>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Presunto Punto de Origen</label>
+            <input type="text" name="presunto_punto_origen" placeholder="Zona donde cayó el árbol"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/40 pt-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">% Pérdida Total</label>
+            <input type="number" name="porcentaje_perdida_total" placeholder="0-100"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+        <label class="inline-flex items-center text-xs text-slate-300 cursor-pointer">
+            <input type="checkbox" name="hubo_propagacion" onchange="alternarPropagacion(this)"
+                class="rounded bg-slate-900 border-slate-800 text-fire-600 focus:ring-fire-500 h-4 w-4">
+            <span class="ml-1.5">Hubo Propagación</span>
+        </label>
+        <div data-campo-propagacion class="hidden">
+            <input type="text" name="propagacion_donde" disabled placeholder="¿A dónde se propagó?"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+    </div>
+    {% with equipos_etiqueta='El inmueble poseía equipos' %}{% include 'reportes/_incendio_equipos.html' %}{% endwith %}
+
+    <div class="border-t border-slate-800/40 pt-4 space-y-2">
+        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Información del Inmueble</span>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Descripción</label>
+                <select name="inmueble_descripcion"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <option value="">Seleccione</option>
+                    <option value="Alquilada">Alquilada</option>
+                    <option value="Propiedad">Propiedad</option>
+                    <option value="A Cuido">A Cuido</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Propietario</label>
+                <input type="text" name="inmueble_propietario_nombre" placeholder="Nombre completo"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. o RIF</label>
+                <input type="text" name="inmueble_propietario_cedula" placeholder="V-12345678 / J-123456789"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono</label>
+                <input type="text" name="inmueble_propietario_telefono" placeholder="0412-1234567"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Aprox. del Inmueble</label>
+                <input type="number" step="0.01" name="inmueble_valor" placeholder="0.00"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Aprox. de Pérdidas</label>
+                <input type="number" step="0.01" name="inmueble_perdidas" placeholder="0.00"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div class="sm:col-span-3">
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Firma Aseguradora</label>
+                <input type="text" name="inmueble_aseguradora" placeholder="Aseguradora / póliza"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+        </div>
+    </div>
+
+    <div class="border-t border-slate-800/40 pt-4 space-y-2">
+        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Información del Mueble</span>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Propietario</label>
+                <input type="text" name="mueble_propietario" placeholder="Nombre completo"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">C.I. o RIF</label>
+                <input type="text" name="mueble_propietario_ci" placeholder="V-12345678 / J-123456789"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Aprox. del Mueble</label>
+                <input type="number" step="0.01" name="mueble_valor" placeholder="0.00"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Valor Aprox. de Pérdidas</label>
+                <input type="number" step="0.01" name="mueble_perdidas" placeholder="0.00"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Firma Aseguradora</label>
+                <input type="text" name="mueble_aseguradora" placeholder="Aseguradora / póliza"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Condición</label>
+                <input type="text" name="mueble_condicion" placeholder="ej: Pérdida total, parcial"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+            <div class="sm:col-span-3">
+                <label class="block text-xs font-semibold text-slate-400 mb-1">El lugar quedó a cargo de</label>
+                <input type="text" name="lugar_a_cargo" placeholder="Nombre y apellido"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===== GRUPO: CAÍDA SOBRE VEHÍCULO ===== #}
+<div data-grupo-arbol="vehiculo" class="hidden space-y-0">
+    <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Técnicas de Extinción</label>
+            <textarea name="tecnicas_extincion" rows="2" placeholder="Describa las técnicas empleadas..."
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+        </div>
+    </div>
+    {% include 'reportes/_vehiculos_afectados.html' %}
+</div>
+
+{# ===== CAMPOS COMPARTIDOS (ambos objetos) ===== #}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Lugar de Desarrollo</label>
+        <input type="text" name="lugar_desarrollo" placeholder="Dirección/zona donde cayó el árbol"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Control</label>
+            <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="hora_control"
+                class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Hora de Extinción Total</label>
+            <input type="text" inputmode="numeric" placeholder="HH:MM:SS" maxlength="8" autocomplete="off" name="hora_extincion_total"
+                class="campo-hora block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+    </div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados</label>
+        <input type="number" name="litros_agua_utilizados" placeholder="ej: 5000"
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+    </div>
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Métodos de Extinción</label>
+        <textarea name="metodos_extincion" rows="2" placeholder="Describa los métodos empleados..."
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+    </div>
+</div>
+<div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+    <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1">Evaluación Preliminar del Daño</label>
+        <textarea name="evaluacion_preliminar" rows="2" placeholder="Describa el daño observado..."
+            class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 custom-scrollbar"></textarea>
+    </div>
+</div>

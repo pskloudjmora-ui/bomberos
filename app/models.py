@@ -246,6 +246,7 @@ class ReporteMatpelGLP(Reporte):
     hoja_seguridad = db.Column(db.Boolean, default=False)
     extintor = db.Column(db.Boolean, default=False)
     equipo_derrame = db.Column(db.Boolean, default=False)
+    vehiculos_involucrados_json = db.Column(db.Text, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'matpel_glp',
@@ -272,6 +273,12 @@ class ReporteMatpelCombustible(Reporte):
     vehiculo_placa = db.Column(db.String(20), nullable=True)  # Placa del vehículo
     vehiculo_color = db.Column(db.String(30), nullable=True)  # Color del vehículo
     vehiculo_afecto = db.Column(db.Boolean, default=False)  # Si el vehículo afectó/causó el derrame
+    riesgo_producto = db.Column(db.String(150), nullable=True)
+    tipo_estructura = db.Column(db.String(100), nullable=True)
+    propietario_nombre = db.Column(db.String(150), nullable=True)
+    propietario_rif_ci = db.Column(db.String(30), nullable=True)
+    propietario_telefono = db.Column(db.String(30), nullable=True)
+    empresa_distribuidora = db.Column(db.String(150), nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'matpel_combustible',
@@ -297,6 +304,12 @@ class ReporteMatpelQuimico(Reporte):
     vehiculo_placa = db.Column(db.String(20), nullable=True)
     vehiculo_color = db.Column(db.String(30), nullable=True)
     vehiculo_afecto = db.Column(db.Boolean, default=False)
+    origen_derrame = db.Column(db.String(20), nullable=True)  # vehiculo / estructura
+    tipo_estructura = db.Column(db.String(100), nullable=True)
+    propietario_nombre = db.Column(db.String(150), nullable=True)
+    propietario_rif_ci = db.Column(db.String(30), nullable=True)
+    propietario_telefono = db.Column(db.String(30), nullable=True)
+    empresa_distribuidora = db.Column(db.String(150), nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'matpel_quimico',
@@ -336,6 +349,7 @@ class ReporteMatpelOtros(Reporte):
     hoja_seguridad = db.Column(db.Boolean, default=False)
     extintor = db.Column(db.Boolean, default=False)
     equipo_derrame = db.Column(db.Boolean, default=False)
+    vehiculos_involucrados_json = db.Column(db.Text, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'matpel_otros',
@@ -365,6 +379,7 @@ class ReportePreHospitalario(Reporte):
     signos_vitales_tension = db.Column(db.String(20), nullable=True)  # TA
     signos_vitales_pulso = db.Column(db.Integer, nullable=True)  # ppm
     signos_vitales_fr = db.Column(db.Integer, nullable=True)  # rpm
+    signos_vitales_temperatura = db.Column(db.String(10), nullable=True)  # °C
     
     # Logística y Tratamiento
     centro_traslado = db.Column(db.String(150), nullable=True)  # Ej: Hospital Central, IVSS, etc.
@@ -619,6 +634,9 @@ class ReporteAPHNoTraslado(Reporte):
     rechazo_cedula = db.Column(db.String(20), nullable=True)
     rechazo_firma = db.Column(db.Boolean, default=False)
 
+    # Constancia firmada por el paciente (atención sin traslado)
+    paciente_firma = db.Column(db.Boolean, default=False)
+
     __mapper_args__ = {
         'polymorphic_identity': 'aph_no_traslado',
     }
@@ -756,7 +774,10 @@ class ReporteIncendio(Reporte):
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
 
     # Subtipo de incendio
-    subtipo_incendio = db.Column(db.String(50), nullable=False)  # estructura, apoyo, electrico, vehiculo, desechos, vegetacion, arbol
+    subtipo_incendio = db.Column(db.String(50), nullable=False)  # estructura, apoyo, electrico, vehiculo, desechos, vegetacion, arbol, arbol_caido
+
+    # Objeto afectado por la caída del árbol (solo subtipo arbol_caido)
+    arbol_afecto = db.Column(db.String(30), nullable=True)  # estructura, vehiculo
 
     # Tipo de incendio (para vegetación/forestal: Vegetación o Forestal)
     tipo_incendio = db.Column(db.String(100), nullable=True)
@@ -929,6 +950,14 @@ class ReporteRescateColision(Reporte):
     vehiculo_cargo_cedula = db.Column(db.String(20), nullable=True)
     vehiculo_cargo_telefono = db.Column(db.String(30), nullable=True)
 
+    # Siniestro vial (colisión / volcamiento / choque / otro)
+    tipo_siniestro = db.Column(db.String(50), nullable=True)
+    salida_primera_maquina = db.Column(db.Time, nullable=True)
+    salida_segunda_maquina = db.Column(db.Time, nullable=True)
+    salida_ambulancia = db.Column(db.Time, nullable=True)
+    salida_unidad_adicional = db.Column(db.Time, nullable=True)
+    salida_unidad_adicional_nombre = db.Column(db.String(100), nullable=True)
+
     __mapper_args__ = {
         'polymorphic_identity': 'rescate_colision',
     }
@@ -973,8 +1002,105 @@ class ReporteRescateEspecializado(Reporte):
     despliegue_cantidad_bomberos = db.Column(db.Integer, nullable=True)
     despliegue_material_usado = db.Column(db.Text, nullable=True)
 
+    # Horarios de salida de unidades de auxilio
+    salida_ambulancia = db.Column(db.Time, nullable=True)
+    salida_primera_maquina = db.Column(db.Time, nullable=True)
+
+    # Motivos del rescate especializado
+    motivo_tapiada = db.Column(db.Text, nullable=True)
+    motivo_golpeada = db.Column(db.Text, nullable=True)
+    golpeada_por_vehiculo = db.Column(db.Boolean, default=False)
+    golpeada_vehiculo_marca = db.Column(db.String(50), nullable=True)
+    golpeada_vehiculo_modelo = db.Column(db.String(50), nullable=True)
+    golpeada_vehiculo_placa = db.Column(db.String(20), nullable=True)
+    golpeada_vehiculo_color = db.Column(db.String(30), nullable=True)
+    golpeada_conductor_nombre = db.Column(db.String(150), nullable=True)
+    golpeada_conductor_ci = db.Column(db.String(20), nullable=True)
+    golpeada_conductor_telefono = db.Column(db.String(30), nullable=True)
+
     __mapper_args__ = {
         'polymorphic_identity': 'rescate_especializado',
+    }
+
+
+# ========================================================
+# SUBCLASES: NUEVOS TIPOS DE REPORTE
+# ========================================================
+
+class ReporteAperturaPuerta(Reporte):
+    """
+    Recuperación de Llaves / Apertura de Puerta.
+    Registra los datos del propietario del inmueble afectado.
+    """
+    __tablename__ = 'reportes_apertura_puerta'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    propietario_nombre = db.Column(db.String(150), nullable=True)
+    propietario_cedula = db.Column(db.String(20), nullable=True)
+    propietario_telefono = db.Column(db.String(30), nullable=True)
+    inmueble_direccion = db.Column(db.String(255), nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'apertura_puerta',
+    }
+
+
+class ReporteServicioPiscinas(Reporte):
+    """
+    Recorrido por Piscinas y Balnearios.
+    Basado en el formato de abastecimiento de agua.
+    """
+    __tablename__ = 'reportes_servicio_piscinas'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    clasificacion_servicio = db.Column(db.String(100), nullable=True)
+    material_usado = db.Column(db.Text, nullable=True)
+    litros_distribuidos = db.Column(db.Integer, nullable=False, default=0)
+    beneficiarios_estimados = db.Column(db.Integer, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'servicio_piscinas',
+    }
+
+
+class ReporteServicioLluvias(Reporte):
+    """
+    Recorrido por Lluvias.
+    Basado en el formato de abastecimiento de agua, sin datos del solicitante.
+    """
+    __tablename__ = 'reportes_servicio_lluvias'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    clasificacion_servicio = db.Column(db.String(100), nullable=True)
+    material_usado = db.Column(db.Text, nullable=True)
+    litros_distribuidos = db.Column(db.Integer, nullable=False, default=0)
+    beneficiarios_estimados = db.Column(db.Integer, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'servicio_lluvias',
+    }
+
+
+class ReporteInspeccionInsectos(Reporte):
+    """
+    Inspección por Control y Reubicación de Insectos.
+    Basado en servicio de insectos, sin métodos utilizados.
+    """
+    __tablename__ = 'reportes_inspeccion_insectos'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    tipo_insecto = db.Column(db.String(150), nullable=True)
+    clasificacion_riesgo = db.Column(db.String(50), nullable=True)
+    condicion_actual = db.Column(db.Text, nullable=True)
+    materiales_utilizados = db.Column(db.String(255), nullable=True)
+    recomendaciones = db.Column(db.Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'inspeccion_insectos',
     }
 
 
@@ -983,3 +1109,25 @@ RANGOS_BOMBERILES = [
     'Primer Teniente', 'Sargento Segundo', 'Sargento Primero', 'Sargento Mayor', 'Cabo Segundo',
     'Cabo Primero', 'Distinguido', 'Bombero Raso'
 ]
+
+
+class ReporteBusquedaRescate(Reporte):
+    """
+    Operaciones de Búsqueda y Rescate (áreas escarpadas, cuerpos de agua, otros).
+    """
+    __tablename__ = 'reportes_busqueda_rescate'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    tipo_zona = db.Column(db.String(100), nullable=True)  # Area escarpada, Cuerpo de agua, Otro
+    material_usado = db.Column(db.Text, nullable=True)
+
+    salida_primera_maquina = db.Column(db.Time, nullable=True)
+    salida_segunda_maquina = db.Column(db.Time, nullable=True)
+    salida_ambulancia = db.Column(db.Time, nullable=True)
+    salida_unidad_adicional = db.Column(db.Time, nullable=True)
+    salida_unidad_adicional_nombre = db.Column(db.String(100), nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'busqueda_rescate',
+    }

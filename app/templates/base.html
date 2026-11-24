@@ -216,27 +216,27 @@
                                         <i data-lucide="tree-pine" class="w-4 h-4 text-lime-500"></i>
                                         <span>Incendio de Árbol</span>
                                     </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_arbol_caido') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="tree-deciduous" class="w-4 h-4 text-amber-600"></i>
+                                        <span>Árbol Caído (Inmueble/Vehículo)</span>
+                                    </a>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='falsa_alarma') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="bell-off" class="w-4 h-4 text-rose-400"></i>
                                         <span>Falsa Alarma</span>
                                     </a>
 
-                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">RESCATE COLISIÓN / VOLCAMIENTO</div>
-                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_colision_con_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">SINIESTRO VIAL</div>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='siniestro_vial_con_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="siren" class="w-4 h-4 text-red-500"></i>
-                                        <span>Colisión con Lesionado</span>
+                                        <span>Siniestro Vial con Lesionado</span>
                                     </a>
-                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_colision_sin_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='siniestro_vial_sin_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="siren" class="w-4 h-4 text-amber-500"></i>
-                                        <span>Colisión sin Lesionado</span>
+                                        <span>Siniestro Vial sin Lesionado</span>
                                     </a>
-                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_volcamiento_con_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
-                                        <i data-lucide="siren" class="w-4 h-4 text-orange-500"></i>
-                                        <span>Volcamiento con Lesionado</span>
-                                    </a>
-                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='rescate_volcamiento_sin_lesionado') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
-                                        <i data-lucide="siren" class="w-4 h-4 text-yellow-500"></i>
-                                        <span>Volcamiento sin Lesionado</span>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='busqueda_rescate') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="search" class="w-4 h-4 text-violet-500"></i>
+                                        <span>Búsqueda y Rescate</span>
                                     </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">RESCATE ESPECIALIZADO</div>
@@ -264,6 +264,10 @@
                                         <i data-lucide="user-x" class="w-4 h-4 text-slate-400"></i>
                                         <span>Rescate de Cadáver</span>
                                     </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='apertura_puerta') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="key" class="w-4 h-4 text-cyan-400"></i>
+                                        <span>Apertura de Puerta / Llaves</span>
+                                    </a>
 
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/60 mt-2 mb-1">SERVICIOS ESPECIALES</div>
                                     <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_agua') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
@@ -282,9 +286,20 @@
                                         <i data-lucide="chevrons-down" class="w-4 h-4 text-sky-400"></i>
                                         <span>Achicamiento (Inundación)</span>
                                     </a>
-                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_baldeo') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                                         <i data-lucide="waves" class="w-4 h-4 text-blue-400"></i>
                                         <span>Baldeo de Vía</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_piscinas') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="life-buoy" class="w-4 h-4 text-cyan-400"></i>
+                                        <span>Piscinas y Balnearios</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_lluvias') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="cloud-rain" class="w-4 h-4 text-sky-400"></i>
+                                        <span>Recorrido por Lluvias</span>
+                                    </a>
+                                    <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='inspeccion_insectos') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                                        <i data-lucide="search" class="w-4 h-4 text-violet-400"></i>
+                                        <span>Inspección de Insectos</span>
                                     </a>
                                 </div>
                             </div>

@@ -1,0 +1,138 @@
+{# Detalle del reporte "Control de Peligro por Árbol Caído".
+   Los campos se muestran solo si tienen valor: el formulario habilita el
+   grupo de parámetros según el objeto afectado (inmueble/vehículo). #}
+{% set es_vehiculo = reporte.arbol_afecto == 'vehiculo' %}
+
+<div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+    <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+        <i data-lucide="tree-pine" class="w-4 h-4 text-orange-500"></i>
+        <span>2. Control de Peligro por Árbol Caído</span>
+    </div>
+    <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+
+        <div>
+            <span class="block font-semibold text-slate-500">Objeto Afectado:</span>
+            <span class="text-white text-sm font-medium">{% if es_vehiculo %}Vehículo{% elif reporte.arbol_afecto %}Inmueble / Estructura{% else %}--{% endif %}</span>
+        </div>
+        {% if not es_vehiculo and reporte.tipo_estructura %}
+        <div><span class="block font-semibold text-slate-500">Tipo de Estructura:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_estructura }}</span></div>
+        {% endif %}
+
+        {% if reporte.lugar_desarrollo %}
+        <div class="sm:col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo }}</span></div>
+        {% endif %}
+        {% if not es_vehiculo and reporte.presunto_punto_origen %}
+        <div class="sm:col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen }}</span></div>
+        {% endif %}
+
+        {% if reporte.hora_control or reporte.hora_extincion_total %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
+            {% if reporte.hora_control %}<div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M:%S') }}</span></div>{% endif %}
+            {% if reporte.hora_extincion_total %}<div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M:%S') }}</span></div>{% endif %}
+        </div>
+        {% endif %}
+
+        {% if not es_vehiculo and reporte.porcentaje_perdida_total is not none %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2">
+            <span class="block font-semibold text-slate-500">Pérdida Estimada Total:</span>
+            <span class="text-white text-sm font-medium"><strong class="text-fire-400">{{ reporte.porcentaje_perdida_total }}%</strong></span>
+        </div>
+        {% endif %}
+
+        {% if reporte.litros_agua_utilizados %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2">
+            <span class="block font-semibold text-slate-500">Litros de Agua Utilizados:</span>
+            <span class="text-white text-sm font-medium">{{ reporte.litros_agua_utilizados }} Lts.</span>
+        </div>
+        {% endif %}
+
+        {% if not es_vehiculo and reporte.hubo_propagacion %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2">
+            <span class="block font-semibold text-slate-500">Hubo Propagación:</span>
+            <span class="text-white text-sm font-medium">Sí{% if reporte.propagacion_donde %} — {{ reporte.propagacion_donde }}{% endif %}</span>
+        </div>
+        {% endif %}
+
+        {% if reporte.metodos_extincion %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion }}</span></div>
+        {% endif %}
+        {% if reporte.tecnicas_extincion %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion }}</span></div>
+        {% endif %}
+
+        {% if not es_vehiculo and reporte.poseia_equipos %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2 space-y-1">
+            <span class="block font-semibold text-slate-500">Equipos Contra Incendio:</span>
+            <span class="text-white text-sm font-medium">El inmueble poseía equipos: Sí{% if reporte.fue_usado %} | Fueron utilizados{% if reporte.por_quien_uso %} por {{ reporte.por_quien_uso }}{% if reporte.por_quien_ci %} ({{ reporte.por_quien_ci }}){% endif %}{% endif %}{% if reporte.tipo_equipo_contra_incendio %} | {{ reporte.tipo_equipo_contra_incendio }}{% endif %}{% endif %}</span>
+        </div>
+        {% endif %}
+
+        {% if reporte.evaluacion_preliminar %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Evaluación Preliminar del Daño:</span><span class="text-white text-sm font-medium block">{{ reporte.evaluacion_preliminar }}</span></div>
+        {% endif %}
+    </div>
+
+    {% if not es_vehiculo and (reporte.inmueble_descripcion or reporte.inmueble_propietario_nombre or reporte.inmueble_valor or reporte.inmueble_perdidas or reporte.inmueble_aseguradora) %}
+    <div class="border-t border-slate-800/80 p-4 space-y-1">
+        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Información del Inmueble</span>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {% if reporte.inmueble_descripcion %}<div><span class="block font-semibold text-slate-500">Descripción:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_descripcion }}</span></div>{% endif %}
+            {% if reporte.inmueble_propietario_nombre %}<div><span class="block font-semibold text-slate-500">Propietario:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_propietario_nombre }}</span></div>{% endif %}
+            {% if reporte.inmueble_propietario_cedula %}<div><span class="block font-semibold text-slate-500">C.I. / RIF:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_propietario_cedula }}</span></div>{% endif %}
+            {% if reporte.inmueble_propietario_telefono %}<div><span class="block font-semibold text-slate-500">Teléfono:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_propietario_telefono }}</span></div>{% endif %}
+            {% if reporte.inmueble_valor is not none %}<div><span class="block font-semibold text-slate-500">Valor:</span><span class="text-white text-sm font-medium">{{ '{:,.2f}'.format(reporte.inmueble_valor) }}</span></div>{% endif %}
+            {% if reporte.inmueble_perdidas is not none %}<div><span class="block font-semibold text-slate-500">Pérdidas:</span><span class="text-white text-sm font-medium">{{ '{:,.2f}'.format(reporte.inmueble_perdidas) }}</span></div>{% endif %}
+            {% if reporte.inmueble_aseguradora %}<div class="sm:col-span-2"><span class="block font-semibold text-slate-500">Aseguradora:</span><span class="text-white text-sm font-medium">{{ reporte.inmueble_aseguradora }}</span></div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not es_vehiculo and (reporte.mueble_propietario or reporte.mueble_valor or reporte.mueble_perdidas or reporte.mueble_condicion or reporte.lugar_a_cargo) %}
+    <div class="border-t border-slate-800/80 p-4 space-y-1">
+        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Información del Mueble</span>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {% if reporte.mueble_propietario %}<div><span class="block font-semibold text-slate-500">Propietario:</span><span class="text-white text-sm font-medium">{{ reporte.mueble_propietario }}</span></div>{% endif %}
+            {% if reporte.mueble_propietario_ci %}<div><span class="block font-semibold text-slate-500">C.I. / RIF:</span><span class="text-white text-sm font-medium">{{ reporte.mueble_propietario_ci }}</span></div>{% endif %}
+            {% if reporte.mueble_valor is not none %}<div><span class="block font-semibold text-slate-500">Valor:</span><span class="text-white text-sm font-medium">{{ '{:,.2f}'.format(reporte.mueble_valor) }}</span></div>{% endif %}
+            {% if reporte.mueble_perdidas is not none %}<div><span class="block font-semibold text-slate-500">Pérdidas:</span><span class="text-white text-sm font-medium">{{ '{:,.2f}'.format(reporte.mueble_perdidas) }}</span></div>{% endif %}
+            {% if reporte.mueble_aseguradora %}<div><span class="block font-semibold text-slate-500">Aseguradora:</span><span class="text-white text-sm font-medium">{{ reporte.mueble_aseguradora }}</span></div>{% endif %}
+            {% if reporte.mueble_condicion %}<div><span class="block font-semibold text-slate-500">Condición:</span><span class="text-white text-sm font-medium">{{ reporte.mueble_condicion }}</span></div>{% endif %}
+            {% if reporte.lugar_a_cargo %}<div class="sm:col-span-2"><span class="block font-semibold text-slate-500">Lugar a cargo de:</span><span class="text-white text-sm font-medium">{{ reporte.lugar_a_cargo }}</span></div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if reporte.vehiculos_afectados %}
+    <div class="border-t border-slate-800/80 p-4 space-y-3">
+        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Datos de los Vehículos Afectados</span>
+        {% for v in reporte.vehiculos_afectados %}
+        <div class="bg-slate-950/30 border border-slate-800/60 rounded-xl p-3 text-xs space-y-2">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {% if v.marca %}<div><span class="block font-semibold text-slate-500">Marca:</span><span class="text-white text-sm font-medium">{{ v.marca }}</span></div>{% endif %}
+                {% if v.modelo %}<div><span class="block font-semibold text-slate-500">Modelo:</span><span class="text-white text-sm font-medium">{{ v.modelo }}</span></div>{% endif %}
+                {% if v.color %}<div><span class="block font-semibold text-slate-500">Color:</span><span class="text-white text-sm font-medium">{{ v.color }}</span></div>{% endif %}
+                {% if v.placa %}<div><span class="block font-semibold text-slate-500">Placa:</span><span class="text-white text-sm font-medium">{{ v.placa }}</span></div>{% endif %}
+                {% if v.serial_motor %}<div><span class="block font-semibold text-slate-500">Serial Motor:</span><span class="text-white text-sm font-medium">{{ v.serial_motor }}</span></div>{% endif %}
+                {% if v.anio %}<div><span class="block font-semibold text-slate-500">Año:</span><span class="text-white text-sm font-medium">{{ v.anio }}</span></div>{% endif %}
+                {% if v.tipo %}<div><span class="block font-semibold text-slate-500">Tipo:</span><span class="text-white text-sm font-medium">{{ v.tipo }}</span></div>{% endif %}
+                {% if v.condicion %}<div><span class="block font-semibold text-slate-500">Condición:</span><span class="text-white text-sm font-medium">{{ v.condicion }}</span></div>{% endif %}
+                {% if v.valor %}<div><span class="block font-semibold text-slate-500">Valor Vehículo:</span><span class="text-white text-sm font-medium">{{ v.valor }}</span></div>{% endif %}
+                {% if v.perdidas %}<div><span class="block font-semibold text-slate-500">Pérdidas:</span><span class="text-white text-sm font-medium">{{ v.perdidas }}</span></div>{% endif %}
+                {% if v.aseguradora %}<div class="sm:col-span-2"><span class="block font-semibold text-slate-500">Aseguradora:</span><span class="text-white text-sm font-medium">{{ v.aseguradora }}</span></div>{% endif %}
+            </div>
+            {% if v.propietario or v.cedula or v.conductor or v.conductor_ci or v.valor_carga or v.perdida_carga or v.aseguradora_carga %}
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 border-t border-slate-800/40 pt-2">
+                {% if v.propietario %}<div><span class="block font-semibold text-slate-500">Propietario:</span><span class="text-white text-sm font-medium">{{ v.propietario }}</span></div>{% endif %}
+                {% if v.cedula %}<div><span class="block font-semibold text-slate-500">C.I. Propietario:</span><span class="text-white text-sm font-medium">{{ v.cedula }}</span></div>{% endif %}
+                {% if v.conductor %}<div><span class="block font-semibold text-slate-500">Conductor:</span><span class="text-white text-sm font-medium">{{ v.conductor }}</span></div>{% endif %}
+                {% if v.conductor_ci %}<div><span class="block font-semibold text-slate-500">C.I. Conductor:</span><span class="text-white text-sm font-medium">{{ v.conductor_ci }}</span></div>{% endif %}
+                {% if v.valor_carga %}<div><span class="block font-semibold text-slate-500">Valor Carga:</span><span class="text-white text-sm font-medium">{{ v.valor_carga }}</span></div>{% endif %}
+                {% if v.perdida_carga %}<div><span class="block font-semibold text-slate-500">Pérdida Carga:</span><span class="text-white text-sm font-medium">{{ v.perdida_carga }}</span></div>{% endif %}
+                {% if v.aseguradora_carga %}<div><span class="block font-semibold text-slate-500">Aseguradora Carga:</span><span class="text-white text-sm font-medium">{{ v.aseguradora_carga }}</span></div>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

@@ -29,6 +29,10 @@ ETIQUETAS_TIPO = {
     'servicio_animal': 'Serv. Especial - Animal',
     'servicio_achicamiento': 'Serv. Especial - Achicamiento',
     'servicio_baldeo': 'Serv. Especial - Baldeo',
+    'servicio_piscinas': 'Serv. Especial - Piscinas',
+    'servicio_lluvias': 'Serv. Especial - Lluvias',
+    'inspeccion_insectos': 'Inspección - Insectos',
+    'apertura_puerta': 'Apertura de Puerta',
     # Incendios
     'incendio_estructura': 'Incendio - Estructura',
     'incendio_apoyo': 'Incendio - Apoyo',
@@ -37,6 +41,7 @@ ETIQUETAS_TIPO = {
     'incendio_desechos': 'Incendio - Desechos',
     'incendio_vegetacion': 'Incendio - Vegetación',
     'incendio_arbol': 'Incendio - Árbol',
+    'incendio_arbol_caido': 'Árbol Caído',
     # Rescates
     'rescate_colision_con_lesionado': 'Rescate - Colisión c/ Lesionado',
     'rescate_colision_sin_lesionado': 'Rescate - Colisión s/ Lesionado',
@@ -48,6 +53,9 @@ ETIQUETAS_TIPO = {
     'rescate_golpeada': 'Rescate - Golpeada',
     'rescate_caida': 'Rescate - Caída en Altura',
     'rescate_cadaver': 'Rescate de Cadáver',
+    'siniestro_vial_con_lesionado': 'Siniestro Vial c/ Lesionado',
+    'siniestro_vial_sin_lesionado': 'Siniestro Vial s/ Lesionado',
+    'busqueda_rescate': 'Búsqueda y Rescate',
 }
 
 # Clases Tailwind del badge (fondo, borde y texto)
@@ -55,8 +63,12 @@ COLORES_TIPO = {
     'matpel': 'bg-red-500/10 border-red-500/20 text-red-400',
     'aph': 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
     'servicio': 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+    'inspeccion': 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+    'apertura': 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
     'incendio': 'bg-orange-500/10 border-orange-500/20 text-orange-400',
     'rescate': 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+    'siniestro': 'bg-red-500/10 border-red-500/20 text-red-400',
+    'busqueda': 'bg-violet-500/10 border-violet-500/20 text-violet-400',
 }
 
 COLOR_POR_DEFECTO = 'bg-slate-800 border-slate-700 text-slate-300'

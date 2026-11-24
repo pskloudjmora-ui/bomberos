@@ -1,0 +1,151 @@
+Derrame de combustible 
+1. En los parámetros técnicos hay una sección que dice “El vehículo ocasionó el derrame”, eso NO 
+debería estar allí. 
+2. En la sección de los parámetros técnicos hay una sección que dice “vehículos involucrados”, allí 
+debería haber cuadros de texto con el mismo formato de incendios, ejemplo: 
+Se puede colocar similar al formato de vehículo que 
+tiene debajo en la sección de “Características del 
+vehículo…” 
+ 
+3. Colocar botón de “Agregar unidad” en la sección de vehículos para poder agregar más de uno, 
+ya que puede ser más de uno involucrado. 
+4. Debe haber casilla para colocar los datos del propietario y/o conductor del vehículo involucrado, 
+siendo los datos: Nombre y apellido, cédula, teléfono, edad 
+5. En caso de NO ser un vehículo involucrado, si no que sea por los otros tipos restantes de 
+almacenamiento salgan varios recuadros (como el reporte de GLP) donde pueda colocar el tipo de 
+estructura, datos del responsable o propietario, nombre de empresa (si aplica) etc. 
+6. En los parámetros técnicos falta colocar el riesgo del producto. 
+ 
+Control de GLP 
+ 
+1. Como detalle, en la sección de vehículos, debe llevar los mismos datos de este formato: 
+ 
+Derrames químicos 
+1. En el área de parámetros técnicos hace falta agregar un botón o lista donde seleccionemos si el 
+derrame fue en un vehículo o en una estructura, para ellos los datos puede ser parecidos a los del 
+formato de derrame de combustible 
+ 
+2. No se diría “Tipo de combustible” si no “Nombre de la sustancia” 
+ 
+Gas natural 
+1. Mismas observaciones que el reporte de GLP. 
+ 
+PLACA: 
+DEDEDECEFE 
+MODELO: 
+TOYOTA 
+
+Todos los reportes de traslados 
+1.  En los parámetros técnicos falta una casilla correspondiente a la temperatura, la misma iría 
+colocada justo al lado de frecuencia respiratoria. 
+Nota: En TODOS los reportes de traslado hace falta agregar la escala de Glasgow, MENOS en el 
+reporte de traslado NO realizado. 
+Nota 2: En TODOS los reportes de traslado hace falta agregar una casilla para que el doctor que 
+recibe el paciente firme, mientras que en el reporte de traslado NO realizado se debe agregar una 
+casilla para que el paciente firme como constancia. 
+ 
+APH SIN traslado 
+1. En los parámetros técnicos falta una casilla correspondiente a la temperatura, la misma iría 
+colocada justo al lado de frecuencia respiratoria. 
+2. Hace hace falta agregar la escala de Glasgow. 
+ 
+Incendio de equipos eléctricos 
+1. En los parámetros técnicos, eliminar la pérdida por humo y pérdida total. 
+ 
+Incendio de desechos sólidos 
+1. Agregar pérdida por fuego, en los parámetros técnicos. 
+ 
+Incendio de vegetación 
+1. En los parámetros técnicos, eliminar la pérdida por humo y pérdida total. 
+ 
+Incendio de árbol 
+1. En los parámetros técnicos, eliminar la pérdida por humo y pérdida total. 
+ 
+Acerca de Volcamiento, colisiones o choques CON lesionados 
+TODO volcamiento, colisión o choque con lesionado debe estar en UN SOLO reporte denominado 
+“Siniestro Vial con lesionado”. Ese reporte debe tener un botón, listado o checklist donde 
+manualmente se seleccione si es colisión, volcamiento o choque, además de agregarle una casilla 
+de “otros” por si acaso.  Se deben colocar las características de los vehículos que manejamos en el 
+reporte de incendio de vehículo, con la diferencia de que NO se coloca valor de la carga. 
+Y, debe tener cuadros de texto para los datos del conductor y/o propietario del vehículo. Debe 
+tener un botón de “Agregar unidad” en la sección de vehículos para poder agregar más de uno, ya 
+que puede ser más de uno involucrado. 
+Debe tener caja de texto para colocar los datos de los lesionados y la lesión que presenta.  
+En información de cabecera se puede agregar la opción de mencionar más de una unidad, siendo 
+estas: Primera Máquina, Segunda Máquina, Ambulancia y saber si se puede colocar otra unidad en 
+caso de (Ejemplo: Salida de una moto institucional) 
+Ejemplo de las máquinas: 
+  
+Acerca de Volcamiento, colisiones o choques SIN lesionados 
+TODO volcamiento, colisión o choque con lesionado debe estar en UN SOLO reporte denominado 
+“Siniestro Vial con lesionado”. Ese reporte debe tener un botón, listado o checklist donde 
+manualmente se seleccione si es colisión, volcamiento o choque, además de agregarle una casilla 
+de “otros” por si acaso.  Se deben colocar las características de los vehículos que manejamos en el 
+reporte de incendio de vehículo, con la diferencia de que NO se coloca valor de la carga. 
+Y, debe tener cuadros de texto para los datos del conductor y/o propietario del vehículo. Debe 
+tener un botón de “Agregar unidad” en la sección de vehículos para poder agregar más de uno, ya 
+que puede ser más de uno involucrado. 
+En información de cabecera se puede agregar la opción de mencionar más de una unidad, siendo 
+estas: Primera Máquina, Segunda Máquina, Ambulancia y saber si se puede colocar otra unidad en 
+caso de (Ejemplo: Salida de una moto institucional) 
+Ejemplo de las máquinas: 
+ 
+Rescate en ascensor y en inmueble 
+1. En parámetros técnicos solo debe dejar la parte de “Material utilizado” 
+2. Agregar espacio para colocar los datos de las personas rescatadas: Nombre y apellido, cédula, 
+edad y si tenía alguna lesión. 
+3. Agregar la hora de salida de la ambulancia 
+ 
+Rescate de persona tapiada 
+1. En parámetros técnicos solo debe dejar la parte de “Material utilizado” 
+2. Agregar espacio para colocar los datos de las personas rescatadas: Nombre y apellido, cédula, 
+edad y si tenía alguna lesión. 
+3. Agregar espacio para especificar POR qué fue tapiada la persona 
+4. Agregar la hora de salida de la ambulancia 
+SALIDA PRIMERA MÁQUINA: 
+22:50 
+SALIDA SEGUNDA MÁQUINA: 
+22:50 
+SALIDA AMBULANCIA: 
+22:50 
+SALIDA PRIMERA MÁQUINA: 
+22:50 
+SALIDA SEGUNDA MÁQUINA: 
+22:50 
+SALIDA AMBULANCIA: 
+22:50 
+Rescate de persona golpeada 
+1. En parámetros técnicos solo debe dejar la parte de “Material utilizado” 
+2. Agregar espacio para colocar los datos de las personas rescatadas: Nombre y apellido, cédula, 
+edad y si tenía alguna lesión. 
+3. Agregar espacio para especificar POR qué fue golpeada la persona 
+4. Agregar la hora de salida de la ambulancia 
+Nota: Si se agrega que la persona fue golpeada por un vehículo en movimiento, se debe desplegar 
+unas casillas con los datos del vehículo y el conductor 
+ 
+Rescate de persona caída de altura 
+1. Agregar la hora de salida de ambulancia y primera máquina 
+2. Agregar casilla de material usado 
+ 
+IMPORTANTE: Verificar el conteo de apartados, en algunos reportes salta del 2 al 6. 
+ 
+Rescate de cadáver: 
+1. Agregar casilla de material usado 
+ 
+Operaciones de búsqueda y rescate en… 
+1. Cómo tal NO tenemos un formato, sin embargo, este es sencillo. Para simplificar, llevaría los 
+mismos datos de cabecera que los demás, sale primera máquina, ambulancia y unidades 
+adicionales. En parámetros técnicos debe haber un espacio para especificar en QUÉ parte fue 
+realizada la búsqueda de rescate... allí se puede poner una lista que contenga: Áreas escarpadas o 
+Cuerpos de Agua, si se puede agregar otro espacio donde diga “otros” para nosotros especificar en 
+caso dé. 
+Debe haber apartado para los datos del ciudadano y si tiene alguna lesión, además de un apartado 
+para el material usado 
+ 
+Control y reubicación de insectos ponzoñosos 
+1. Al darle click en la opción “otros” el tipo de animal NO da cuadro de texto para escribir. 
+ 
+Control de animal domestico 
+1. Al darle click en la opción “otros” el tipo de animal NO da cuadro de texto para escribir 
+ 
+IMPORTANTE: ELIMINAR el reporte de baldeo de agua, ya no lo hacemos. 

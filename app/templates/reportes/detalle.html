@@ -263,30 +263,7 @@
                         <span class="block font-semibold text-slate-500">N° Certificado:</span>
                         <span class="text-white text-sm font-medium">{{ reporte.nro_certificado or '--' }}</span>
                     </div>
-                    <div>
-                        <span class="block font-semibold text-slate-500">Controles Técnicos en Sitio:</span>
-                        <span class="text-white text-sm font-medium">
-                            HDS: {% if reporte.hoja_seguridad %}Sí{% else %}No{% endif %} | 
-                            Extintor: {% if reporte.extintor %}Sí{% else %}No{% endif %} | 
-                            Equipo Derrame: {% if reporte.equipo_derrame %}Sí{% else %}No{% endif %}
-                        </span>
-                    </div>
-                </div>
-
-                {% if reporte.vehiculo_marca or reporte.vehiculo_placa %}
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Vehículo Transportador Involucrado:</span>
-                    <span class="text-white text-sm font-medium">
-                        Marca: {{ reporte.vehiculo_marca or '--' }} | 
-                        Modelo: {{ reporte.vehiculo_modelo or '--' }} | 
-                        Placa: {{ reporte.vehiculo_placa or '--' }} | 
-                        Color: {{ reporte.vehiculo_color or '--' }}
-                    </span>
-                </div>
-                {% endif %}
-                <div class="border-t border-slate-800/40 pt-2 col-span-3">
-                    <span class="block font-semibold text-slate-500">Vehículo Afectó el Inmueble:</span>
-                    <span class="text-white text-sm font-medium">{% if reporte.vehiculo_afecto %}Sí{% else %}No{% endif %}</span>
+                    <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Vehículos Involucrados:</span><span class="text-white text-sm font-medium block">{{ reporte.vehiculos_involucrados_json or 'No se registraron' }}</span></div>
                 </div>
             </div>
         </div>
@@ -322,8 +299,30 @@
                         <span class="text-white text-sm font-bold text-red-400">{{ reporte.cantidad_estimada_derrame or '0' }} Litros</span>
                     </div>
                     <div>
-                        <span class="block font-semibold text-slate-500">Vehículo Afectó:</span>
-                        <span class="text-white text-sm font-medium">{% if reporte.vehiculo_afecto %}Sí{% else %}No{% endif %}</span>
+                        <span class="block font-semibold text-slate-500">Riesgo del Producto:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.riesgo_producto or '--' }}</span>
+                    </div>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <span class="block font-semibold text-slate-500">Tipo de Estructura:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.tipo_estructura or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Propietario / Responsable:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.propietario_nombre or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">C.I. / RIF:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.propietario_rif_ci or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Teléfono:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.propietario_telefono or '--' }}</span>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-slate-500">Empresa Distribuidora:</span>
+                        <span class="text-white text-sm font-medium">{{ reporte.empresa_distribuidora or '--' }}</span>
                     </div>
                 </div>
                 
@@ -408,7 +407,15 @@
                     </span>
                 </div>
                 {% endif %}
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2 col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div><span class="block font-semibold text-slate-500">Origen del Derrame:</span><span class="text-white text-sm font-medium">{{ {'vehiculo':'Vehículo','estructura':'Estructura'}.get(reporte.origen_derrame, reporte.origen_derrame or '--') }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Tipo de Estructura:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_estructura or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Propietario / Responsable:</span><span class="text-white text-sm font-medium">{{ reporte.propietario_nombre or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">C.I. / RIF:</span><span class="text-white text-sm font-medium">{{ reporte.propietario_rif_ci or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Teléfono:</span><span class="text-white text-sm font-medium">{{ reporte.propietario_telefono or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Empresa:</span><span class="text-white text-sm font-medium">{{ reporte.empresa_distribuidora or '--' }}</span></div>
+                </div>
+</div>
         </div>
 
         {# 2.5 PRE-HOSPITALARIO #}
@@ -443,7 +450,8 @@
                     <span class="text-white text-sm font-medium block">
                         Tensión: {{ reporte.signos_vitales_tension or 'No evaluada' }} |
                         Pulso: {{ reporte.signos_vitales_pulso or '--' }} ppm |
-                        Resp: {{ reporte.signos_vitales_fr or '--' }} rpm
+                        Resp: {{ reporte.signos_vitales_fr or '--' }} rpm |
+                        Temp: {{ reporte.signos_vitales_temperatura or '--' }} °C
                     </span>
                 </div>
 
@@ -648,6 +656,124 @@
                 {% endif %}
             </div>
         </div>
+
+        {# RECORRIDO POR PISCINAS Y BALNEARIOS #}
+        {% elif reporte.tipo_especifico == 'servicio_piscinas' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="waves" class="w-4 h-4 text-blue-500"></i>
+                <span>2. Parámetros del Recorrido por Piscinas y Balnearios</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Instalación:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clasificacion_servicio }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Litros Distribuidos:</span>
+                    <span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_distribuidos }} Lts.</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Beneficiarios Estimados:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.beneficiarios_estimados or '--' }} Personas</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Material Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_usado }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# RECORRIDO POR LLUVIAS #}
+        {% elif reporte.tipo_especifico == 'servicio_lluvias' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="cloud-rain" class="w-4 h-4 text-blue-500"></i>
+                <span>2. Parámetros del Recorrido por Lluvias</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Recorrido:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clasificacion_servicio }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Litros Utilizados:</span>
+                    <span class="text-white text-sm font-bold text-blue-400">{{ reporte.litros_distribuidos }} Lts.</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Beneficiarios Estimados:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.beneficiarios_estimados or '--' }} Personas</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Material Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_usado }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# INSPECCIÓN - CONTROL Y REUBICACIÓN DE INSECTOS #}
+        {% elif reporte.tipo_especifico == 'inspeccion_insectos' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="bug" class="w-4 h-4 text-yellow-500"></i>
+                <span>2. Parámetros de la Inspección de Insectos</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Insecto:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_insecto }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Riesgo:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.clasificacion_riesgo }}</span>
+                </div>
+
+                <div class="border-t border-slate-800/40 pt-2 col-span-2">
+                    <span class="block font-semibold text-slate-500">Condición Actual y Ubicación:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.condicion_actual }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2">
+                    <span class="block font-semibold text-slate-500">Materiales Utilizados:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.materiales_utilizados }}</span>
+                </div>
+
+                {% if reporte.recomendaciones %}
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Recomendaciones:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.recomendaciones }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# RECUPERACIÓN DE LLAVES / APERTURA DE PUERTA #}
+        {% elif reporte.tipo_especifico == 'apertura_puerta' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="key" class="w-4 h-4 text-cyan-400"></i>
+                <span>2. Datos del Inmueble y Propietario</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Propietario - Nombre:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.propietario_nombre or '--' }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Propietario - C.I.:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.propietario_cedula or '--' }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Propietario - Teléfono:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.propietario_telefono or '--' }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2 sm:col-span-3">
+                    <span class="block font-semibold text-slate-500">Dirección del Inmueble:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.inmueble_direccion or '--' }}</span>
+                </div>
+            </div>
+        </div>
         {% endif %}
         {% if reporte.tipo_especifico == 'falsa_alarma' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
@@ -775,7 +901,8 @@
                     <div><span class="block font-semibold text-slate-500">Rechazo - Nombre:</span><span class="text-white text-sm font-medium">{{ reporte.rechazo_nombre or 'N/A' }}</span></div>
                     <div><span class="block font-semibold text-slate-500">Rechazo - Cédula:</span><span class="text-white text-sm font-medium">{{ reporte.rechazo_cedula or '--' }}</span></div>
                     <div><span class="block font-semibold text-slate-500">Rechazo - Firma:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.rechazo_firma else 'No' }}</span></div>
-                </div>
+                                <div><span class="block font-semibold text-slate-500">Firma del Paciente:</span><span class="text-white text-sm font-medium">{{ 'Sí' if reporte.paciente_firma else 'No' }}</span></div>
+</div>
             </div>
             {{ paciente.tabla_paciente(reporte) }}
         </div>
@@ -884,8 +1011,11 @@
             {{ paciente.tabla_paciente(reporte) }}
         </div>
         {% endif %}
-        {% if reporte.tipo_especifico and reporte.tipo_especifico.startswith('incendio') %}
+        {% if reporte.tipo_especifico and reporte.tipo_especifico.startswith('incendio') and reporte.tipo_especifico != 'incendio_arbol_caido' %}
             {% include 'reportes/_detalle_incendio.html' %}
+        {% endif %}
+        {% if reporte.tipo_especifico == 'incendio_arbol_caido' %}
+            {% include 'reportes/_detalle_arbol_caido.html' %}
         {% endif %}
         {% if reporte.tipo_especifico == 'rescate_colision_con_lesionado'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
@@ -956,6 +1086,48 @@
             </div>
         </div>
         {% endif %}
+        {% if reporte.tipo_especifico in ('siniestro_vial_con_lesionado', 'siniestro_vial_sin_lesionado') %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="siren" class="w-4 h-4 text-red-500"></i>
+                <span>2. {{ 'Siniestro Vial con Lesionado' if reporte.tipo_especifico == 'siniestro_vial_con_lesionado' else 'Siniestro Vial sin Lesionado' }}</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 gap-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div><span class="block font-semibold text-slate-500">Tipo de Siniestro:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_siniestro or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida 1ra Máquina:</span><span class="text-white text-sm font-medium">{{ reporte.salida_primera_maquina.strftime('%H:%M:%S') if reporte.salida_primera_maquina else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida 2da Máquina:</span><span class="text-white text-sm font-medium">{{ reporte.salida_segunda_maquina.strftime('%H:%M:%S') if reporte.salida_segunda_maquina else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Unidad Adicional:</span><span class="text-white text-sm font-medium">{{ reporte.salida_unidad_adicional_nombre or '--' }} {{ reporte.salida_unidad_adicional.strftime('(%H:%M:%S)') if reporte.salida_unidad_adicional else '' }}</span></div>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Vehículos Involucrados:</span><span class="text-white text-sm font-medium block">{{ reporte.vehiculos_involucrados_json or 'No se registraron' }}</span></div>
+                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Observaciones Custodio:</span><span class="text-white text-sm font-medium block">{{ reporte.observaciones_custodio or 'Ninguna' }}</span></div>
+                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div><span class="block font-semibold text-slate-500">Responsable Vehículo:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_cargo_nombre or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Cédula:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_cargo_cedula or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Teléfono:</span><span class="text-white text-sm font-medium">{{ reporte.vehiculo_cargo_telefono or '--' }}</span></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if reporte.tipo_especifico == 'busqueda_rescate' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="search" class="w-4 h-4 text-violet-500"></i>
+                <span>2. Operaciones de Búsqueda y Rescate</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 gap-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div><span class="block font-semibold text-slate-500">Tipo de Zona:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_zona or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida 1ra Máquina:</span><span class="text-white text-sm font-medium">{{ reporte.salida_primera_maquina.strftime('%H:%M:%S') if reporte.salida_primera_maquina else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida 2da Máquina:</span><span class="text-white text-sm font-medium">{{ reporte.salida_segunda_maquina.strftime('%H:%M:%S') if reporte.salida_segunda_maquina else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Unidad Adicional:</span><span class="text-white text-sm font-medium">{{ reporte.salida_unidad_adicional_nombre or '--' }} {{ reporte.salida_unidad_adicional.strftime('(%H:%M:%S)') if reporte.salida_unidad_adicional else '' }}</span></div>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.material_usado or 'No se registró' }}</span></div>
+            </div>
+        </div>
+        {% endif %}
         {% if reporte.tipo_especifico == 'rescate_ascensor'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
@@ -972,7 +1144,8 @@
                     <div><span class="block font-semibold text-slate-500">Cantidad Bomberos:</span><span class="text-white text-sm font-bold text-fire-400">{{ reporte.despliegue_cantidad_bomberos or '--' }}</span></div>
                 </div>
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+</div>
         </div>
         {% elif reporte.tipo_especifico == 'rescate_inmueble'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
@@ -990,7 +1163,8 @@
                     <div><span class="block font-semibold text-slate-500">Cantidad Bomberos:</span><span class="text-white text-sm font-bold text-fire-400">{{ reporte.despliegue_cantidad_bomberos or '--' }}</span></div>
                 </div>
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+</div>
         </div>
         {% elif reporte.tipo_especifico == 'rescate_tapiada'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
@@ -1008,7 +1182,9 @@
                     <div><span class="block font-semibold text-slate-500">Cantidad Bomberos:</span><span class="text-white text-sm font-bold text-fire-400">{{ reporte.despliegue_cantidad_bomberos or '--' }}</span></div>
                 </div>
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Motivo de la Tapiada:</span><span class="text-white text-sm font-medium block">{{ reporte.motivo_tapiada or 'No registrado' }}</span></div>
+                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+</div>
         </div>
         {% elif reporte.tipo_especifico == 'rescate_golpeada'  %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
@@ -1026,7 +1202,16 @@
                     <div><span class="block font-semibold text-slate-500">Cantidad Bomberos:</span><span class="text-white text-sm font-bold text-fire-400">{{ reporte.despliegue_cantidad_bomberos or '--' }}</span></div>
                 </div>
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or 'Ninguno' }}</span></div>
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Motivo de la Golpeada:</span><span class="text-white text-sm font-medium block">{{ reporte.motivo_golpeada or 'No registrado' }}</span></div>
+                {% if reporte.golpeada_por_vehiculo %}
+                <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div><span class="block font-semibold text-slate-500">Vehículo:</span><span class="text-white text-sm font-medium">{{ reporte.golpeada_vehiculo_marca or '' }} {{ reporte.golpeada_vehiculo_modelo or '' }} - {{ reporte.golpeada_vehiculo_placa or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Conductor:</span><span class="text-white text-sm font-medium">{{ reporte.golpeada_conductor_nombre or '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">C.I. Conductor:</span><span class="text-white text-sm font-medium">{{ reporte.golpeada_conductor_ci or '--' }}</span></div>
+                </div>
+                {% endif %}
+                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+</div>
         </div>
         {% elif reporte.tipo_especifico == 'rescate_caida' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
@@ -1070,7 +1255,12 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div><span class="block font-semibold text-slate-500">Salida 1ra Máquina:</span><span class="text-white text-sm font-medium">{{ reporte.salida_primera_maquina.strftime('%H:%M:%S') if reporte.salida_primera_maquina else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Salida Ambulancia:</span><span class="text-white text-sm font-medium">{{ reporte.salida_ambulancia.strftime('%H:%M:%S') if reporte.salida_ambulancia else '--' }}</span></div>
+                    <div><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or '--' }}</span></div>
+                </div>
+</div>
         </div>
 
         {% elif reporte.tipo_especifico == 'rescate_cadaver' %}
@@ -1086,7 +1276,8 @@
                 <div><span class="block font-semibold text-slate-500">Edad:</span><span class="text-white text-sm font-medium">{{ reporte.cadaver_edad if reporte.cadaver_edad is not none else '--' }}</span></div>
                 <div><span class="block font-semibold text-slate-500">Sexo:</span><span class="text-white text-sm font-medium">{{ reporte.cadaver_sexo or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 col-span-3"><span class="block font-semibold text-slate-500">Ubicación donde se encontró el Cadáver:</span><span class="text-white text-sm font-medium block">{{ reporte.cadaver_ubicacion or '--' }}</span></div>
-            </div>
+                            <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Material Utilizado:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_material_usado or '--' }}</span></div>
+</div>
         </div>
 
         {% endif %}
