@@ -1131,3 +1131,46 @@ class ReporteBusquedaRescate(Reporte):
     __mapper_args__ = {
         'polymorphic_identity': 'busqueda_rescate',
     }
+
+
+class ReporteTendidoElectrico(Reporte):
+    """Servicio de Tendido Eléctrico (líneas energizadas o no energizadas)."""
+    __tablename__ = 'reportes_servicio_tendido_electrico'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    tendido_energizado = db.Column(db.String(20), nullable=True)  # Energizado / No energizado
+    material_usado = db.Column(db.Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'servicio_tendido_electrico',
+    }
+
+
+class ReporteTalaArbol(Reporte):
+    """Reporte de Tala de Árbol."""
+    __tablename__ = 'reportes_tala_arbol'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    especie = db.Column(db.String(100), nullable=True)
+    tamano = db.Column(db.String(50), nullable=True)
+    edad = db.Column(db.String(50), nullable=True)
+    material_usado = db.Column(db.Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'tala_arbol',
+    }
+
+
+class ReporteGuardiaSeguridad(Reporte):
+    """Reporte de Guardia de Seguridad y Prevención."""
+    __tablename__ = 'reportes_guardia_seguridad'
+
+    id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
+
+    material_usado = db.Column(db.Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'guardia_seguridad',
+    }

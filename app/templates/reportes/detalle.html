@@ -774,6 +774,65 @@
                 </div>
             </div>
         </div>
+        {% elif reporte.tipo_especifico == 'servicio_tendido_electrico' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                <span>2. Parámetros del Servicio de Tendido Eléctrico</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Tendido:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tendido_energizado or '--' }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Material Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_usado or '--' }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# TALA DE ÁRBOL #}
+        {% elif reporte.tipo_especifico == 'tala_arbol' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="tree-deciduous" class="w-4 h-4 text-green-500"></i>
+                <span>2. Datos del Árbol</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Especie:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.especie or '--' }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Tamaño:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tamano or '--' }}</span>
+                </div>
+                <div>
+                    <span class="block font-semibold text-slate-500">Edad:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.edad or '--' }}</span>
+                </div>
+                <div class="border-t border-slate-800/40 pt-2 col-span-3">
+                    <span class="block font-semibold text-slate-500">Material Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_usado or '--' }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# GUARDIA DE SEGURIDAD Y PREVENCIÓN #}
+        {% elif reporte.tipo_especifico == 'guardia_seguridad' %}
+        <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
+            <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
+                <i data-lucide="shield" class="w-4 h-4 text-sky-500"></i>
+                <span>2. Actuación de la Guardia</span>
+            </div>
+            <div class="p-4 grid grid-cols-1 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Material Usado:</span>
+                    <span class="text-white text-sm font-medium block">{{ reporte.material_usado or '--' }}</span>
+                </div>
+            </div>
+        </div>
         {% endif %}
         {% if reporte.tipo_especifico == 'falsa_alarma' %}
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">

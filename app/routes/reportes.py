@@ -13,7 +13,8 @@ from app.models import (
     ReporteAPHTraslado, ReporteAPHNoTraslado, ReporteAPHInterhospitalario, ReporteAPHSinTraslado,
     ReporteIncendio, ReporteRescateColision, ReporteRescateEspecializado, ReportePersonaAfectada,
     ReporteFalsaAlarma, ReporteAperturaPuerta, ReporteServicioPiscinas, ReporteServicioLluvias,
-    ReporteInspeccionInsectos, ReporteBusquedaRescate
+    ReporteInspeccionInsectos, ReporteBusquedaRescate,
+    ReporteTendidoElectrico, ReporteTalaArbol, ReporteGuardiaSeguridad
 )
 from app.services.pdf_service import generar_pdf_reporte, renderizar_html_reporte
 
@@ -66,6 +67,9 @@ REPORT_MODEL_MAP = {
     'siniestro_vial_con_lesionado': ReporteRescateColision,
     'siniestro_vial_sin_lesionado': ReporteRescateColision,
     'busqueda_rescate': ReporteBusquedaRescate,
+    'servicio_tendido_electrico': ReporteTendidoElectrico,
+    'tala_arbol': ReporteTalaArbol,
+    'guardia_seguridad': ReporteGuardiaSeguridad,
 }
 
 # Prefijos correspondientes para la autogeneración del N° de Control
@@ -110,6 +114,9 @@ REPORT_PREFIX_MAP = {
     'siniestro_vial_con_lesionado': 'SINV_CL',
     'siniestro_vial_sin_lesionado': 'SINV_SL',
     'busqueda_rescate': 'BUSQ',
+    'servicio_tendido_electrico': 'TEND',
+    'tala_arbol': 'TALA',
+    'guardia_seguridad': 'GUARD',
 }
 
 # Títulos de cabecera legibles para la plantilla crear.html
@@ -154,6 +161,9 @@ REPORT_TITLE_MAP = {
     'siniestro_vial_con_lesionado': 'Siniestro Vial con Lesionado',
     'siniestro_vial_sin_lesionado': 'Siniestro Vial sin Lesionado',
     'busqueda_rescate': 'Operaciones de Búsqueda y Rescate',
+    'servicio_tendido_electrico': 'Servicio de Tendido Eléctrico',
+    'tala_arbol': 'Reporte Tala de Árbol',
+    'guardia_seguridad': 'Guardia de Seguridad y Prevención',
 }
 
 # Campos específicos que corresponden a cada clase de reporte
@@ -427,6 +437,15 @@ REPORT_FIELDS_MAP = {
     'inspeccion_insectos': [
         'tipo_insecto', 'clasificacion_riesgo', 'condicion_actual',
         'materiales_utilizados', 'recomendaciones'
+    ],
+    'servicio_tendido_electrico': [
+        'tendido_energizado', 'material_usado'
+    ],
+    'tala_arbol': [
+        'especie', 'tamano', 'edad', 'material_usado'
+    ],
+    'guardia_seguridad': [
+        'material_usado'
     ],
 }
 

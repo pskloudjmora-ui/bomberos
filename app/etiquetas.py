@@ -33,6 +33,9 @@ ETIQUETAS_TIPO = {
     'servicio_lluvias': 'Serv. Especial - Lluvias',
     'inspeccion_insectos': 'Inspección - Insectos',
     'apertura_puerta': 'Apertura de Puerta',
+    'servicio_tendido_electrico': 'Serv. Especial - Tendido Eléctrico',
+    'tala_arbol': 'Tala de Árbol',
+    'guardia_seguridad': 'Guardia de Seguridad',
     # Incendios
     'incendio_estructura': 'Incendio - Estructura',
     'incendio_apoyo': 'Incendio - Apoyo',
@@ -69,6 +72,9 @@ COLORES_TIPO = {
     'rescate': 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
     'siniestro': 'bg-red-500/10 border-red-500/20 text-red-400',
     'busqueda': 'bg-violet-500/10 border-violet-500/20 text-violet-400',
+    'servicio_tendido_electrico': 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    'tala_arbol': 'bg-green-500/15 text-green-400 border-green-500/30',
+    'guardia_seguridad': 'bg-sky-500/15 text-sky-400 border-sky-500/30',
 }
 
 COLOR_POR_DEFECTO = 'bg-slate-800 border-slate-700 text-slate-300'

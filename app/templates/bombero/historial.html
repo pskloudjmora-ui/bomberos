@@ -50,6 +50,10 @@
                     <i data-lucide="tree-deciduous" class="w-4 h-4 text-amber-600"></i>
                     <span>Árbol Caído (Inmueble/Vehículo)</span>
                 </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='tala_arbol') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="axe" class="w-4 h-4 text-lime-500"></i>
+                    <span>Tala de Árbol</span>
+                </a>
                 <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='falsa_alarma') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                     <i data-lucide="bell-off" class="w-4 h-4 text-rose-400"></i>
                     <span>Falsa Alarma por Incendio</span>
@@ -86,6 +90,14 @@
                 <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='inspeccion_insectos') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                     <i data-lucide="search" class="w-4 h-4 text-violet-400"></i>
                     <span>Inspección de Insectos</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='servicio_tendido_electrico') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                    <span>Servicio de Tendido Eléctrico</span>
+                </a>
+                <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='guardia_seguridad') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+                    <i data-lucide="shield" class="w-4 h-4 text-sky-500"></i>
+                    <span>Guardia de Seguridad y Prevención</span>
                 </a>
                 <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='apertura_puerta') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
                     <i data-lucide="key" class="w-4 h-4 text-cyan-400"></i>

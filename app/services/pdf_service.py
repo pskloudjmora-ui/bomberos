@@ -65,6 +65,9 @@ NOMBRE_SERVICIO = {
     'siniestro_vial_con_lesionado': 'SINIESTRO VIAL CON LESIONADO',
     'siniestro_vial_sin_lesionado': 'SINIESTRO VIAL SIN LESIONADO',
     'busqueda_rescate': 'OPERACIONES DE BÚSQUEDA Y RESCATE',
+    'servicio_tendido_electrico': 'SERVICIO DE TENDIDO ELÉCTRICO',
+    'tala_arbol': 'REPORTE TALA DE ÁRBOL',
+    'guardia_seguridad': 'GUARDIA DE SEGURIDAD Y PREVENCIÓN',
 }
 
 # Título de la sección 2 (detalle específico) según el tipo de reporte
@@ -109,6 +112,9 @@ TITULO_SECCION_2 = {
     'siniestro_vial_con_lesionado': '2. DETALLE DEL SINIESTRO VIAL CON LESIONADO',
     'siniestro_vial_sin_lesionado': '2. DETALLE DEL SINIESTRO VIAL SIN LESIONADO',
     'busqueda_rescate': '2. DETALLE DE LA BÚSQUEDA Y RESCATE',
+    'servicio_tendido_electrico': '2. PARÁMETROS DEL SERVICIO DE TENDIDO ELÉCTRICO',
+    'tala_arbol': '2. DATOS DEL ÁRBOL',
+    'guardia_seguridad': '2. ACTUACIÓN DE LA GUARDIA',
 }
 
 # Campos específicos por tipo de reporte: (Etiqueta del formulario, atributo del modelo, tipo de dato)
@@ -695,6 +701,17 @@ SECCIONES_ESPECIFICAS = {
         ('Nombre Unidad Adicional', 'salida_unidad_adicional_nombre', 'plain'),
         ('Material Utilizado', 'material_usado', 'plain'),
     ],
+    'servicio_tendido_electrico': [
+        ('Tipo de Tendido', 'tendido_energizado', 'plain'),
+    ],
+    'tala_arbol': [
+        ('Especie', 'especie', 'plain'),
+        ('Tamaño', 'tamano', 'plain'),
+        ('Edad', 'edad', 'plain'),
+    ],
+    'guardia_seguridad': [
+        ('Material Utilizado en Guardia', 'material_usado', 'plain'),
+    ],
 }
 
 # Campo del modelo que describe el material/equipos usados en la actuación, según el tipo
@@ -739,6 +756,9 @@ MATERIAL_ATTR = {
     'servicio_animal': None,
     'servicio_achicamiento': 'bombas_usadas',
     'servicio_baldeo': None,
+    'servicio_tendido_electrico': 'material_usado',
+    'tala_arbol': 'material_usado',
+    'guardia_seguridad': None,
 }
 
 
