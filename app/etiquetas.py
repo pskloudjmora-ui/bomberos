@@ -33,7 +33,7 @@ ETIQUETAS_TIPO = {
     'servicio_lluvias': 'Serv. Especial - Lluvias',
     'inspeccion_insectos': 'Inspección - Insectos',
     'apertura_puerta': 'Apertura de Puerta',
-    'servicio_tendido_electrico': 'Serv. Especial - Tendido Eléctrico',
+    'servicio_tendido_electrico': 'Inspección y Control de Riesgo por Tendido Eléctrico Caído',
     'tala_arbol': 'Tala de Árbol',
     'guardia_seguridad': 'Guardia de Seguridad',
     # Incendios

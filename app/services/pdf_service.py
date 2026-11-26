@@ -13,6 +13,7 @@ El logotipo se incrusta como Data URI (base64) directamente en el HTML para
 que la conversión a PDF nunca dependa de servidores/URLs externas.
 """
 import base64
+import re
 import io
 import os
 from datetime import datetime
@@ -22,6 +23,14 @@ RUTA_LOGO = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     'static', 'imagen', 'logo-bomberos.png'
 )
+
+# Carpeta de imágenes institucionales en la raíz del proyecto
+RUTA_IMAGENES = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    'imagen'
+)
+RUTA_LOGO_BOMBEROS = os.path.join(RUTA_IMAGENES, 'logo de los bomberos.jpg')
+RUTA_PIE_PAGINA = os.path.join(RUTA_IMAGENES, 'pie-de-pagina.jpg')
 
 # Títulos legibles de cada tipo de servicio (se usan en el encabezado del PDF)
 NOMBRE_SERVICIO = {
@@ -65,7 +74,7 @@ NOMBRE_SERVICIO = {
     'siniestro_vial_con_lesionado': 'SINIESTRO VIAL CON LESIONADO',
     'siniestro_vial_sin_lesionado': 'SINIESTRO VIAL SIN LESIONADO',
     'busqueda_rescate': 'OPERACIONES DE BÚSQUEDA Y RESCATE',
-    'servicio_tendido_electrico': 'SERVICIO DE TENDIDO ELÉCTRICO',
+    'servicio_tendido_electrico': 'INSPECCIÓN Y CONTROL DE RIESGO POR TENDIDO ELÉCTRICO CAÍDO',
     'tala_arbol': 'REPORTE TALA DE ÁRBOL',
     'guardia_seguridad': 'GUARDIA DE SEGURIDAD Y PREVENCIÓN',
 }
@@ -112,7 +121,7 @@ TITULO_SECCION_2 = {
     'siniestro_vial_con_lesionado': '2. DETALLE DEL SINIESTRO VIAL CON LESIONADO',
     'siniestro_vial_sin_lesionado': '2. DETALLE DEL SINIESTRO VIAL SIN LESIONADO',
     'busqueda_rescate': '2. DETALLE DE LA BÚSQUEDA Y RESCATE',
-    'servicio_tendido_electrico': '2. PARÁMETROS DEL SERVICIO DE TENDIDO ELÉCTRICO',
+    'servicio_tendido_electrico': '2. PARÁMETROS — INSPECCIÓN Y CONTROL DE RIESGO POR TENDIDO ELÉCTRICO CAÍDO',
     'tala_arbol': '2. DATOS DEL ÁRBOL',
     'guardia_seguridad': '2. ACTUACIÓN DE LA GUARDIA',
 }
@@ -839,6 +848,42 @@ def _nl2br_html(texto):
     return texto.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
 
 
+@lru_cache(maxsize=8)
+def _data_uri_imagen(ruta, max_ancho=None, max_alto=None):
+    """Devuelve una imagen del disco como Data URI, redimensionada con PIL."""
+    try:
+        with open(ruta, 'rb') as f:
+            data = f.read()
+        mime = 'image/png' if ruta.lower().endswith('.png') else 'image/jpeg'
+        try:
+            from PIL import Image
+            imagen = Image.open(io.BytesIO(data))
+            w, h = imagen.size
+            if max_ancho and w > max_ancho:
+                imagen = imagen.resize((max_ancho, int(h * max_ancho / w)), Image.LANCZOS)
+            elif max_alto and h > max_alto:
+                imagen = imagen.resize((int(w * max_alto / h), max_alto), Image.LANCZOS)
+            if imagen.mode not in ('RGB', 'RGBA'):
+                imagen = imagen.convert('RGBA' if 'A' in imagen.getbands() else 'RGB')
+            buffer = io.BytesIO()
+            formato = 'PNG' if mime == 'image/png' else 'JPEG'
+            if formato == 'JPEG' and imagen.mode == 'RGBA':
+                imagen = imagen.convert('RGB')
+            imagen.save(buffer, format=formato, optimize=True)
+            data = buffer.getvalue()
+        except Exception:
+            pass
+        return f'data:{mime};base64,' + base64.b64encode(data).decode('ascii')
+    except Exception:
+        return ''
+
+
+@lru_cache(maxsize=1)
+def obtener_pie_data_uri():
+    """Pie de página institucional (imagen) como Data URI pequeño."""
+    return _data_uri_imagen(RUTA_PIE_PAGINA, max_alto=100)
+
+
 @lru_cache(maxsize=1)
 def obtener_logo_data_uri():
     """
@@ -855,8 +900,13 @@ def obtener_logo_data_uri():
     final del PDF. Si el archivo no existe, se devuelve '' y la plantilla
     muestra un recuadro de respaldo.
     """
+    ruta_logo = RUTA_LOGO_BOMBEROS if os.path.exists(RUTA_LOGO_BOMBEROS) else RUTA_LOGO
     try:
-        with open(RUTA_LOGO, 'rb') as f:
+        return _data_uri_imagen(ruta_logo, max_ancho=220)
+    except Exception:
+        pass
+    try:
+        with open(ruta_logo, 'rb') as f:
             data = f.read()
         try:
             from PIL import Image
@@ -871,7 +921,8 @@ def obtener_logo_data_uri():
             data = buffer.getvalue()
         except Exception:
             pass
-        return 'data:image/png;base64,' + base64.b64encode(data).decode('ascii')
+        mime = 'image/png' if ruta_logo.lower().endswith('.png') else 'image/jpeg'
+        return f'data:{mime};base64,' + base64.b64encode(data).decode('ascii')
     except Exception:
         return ''
 
@@ -946,9 +997,12 @@ def serializar_reporte(reporte):
             })
     else:
         for etiqueta, attr, tipo_dato in SECCIONES_ESPECIFICAS.get(tipo, []):
+            valor = getattr(reporte, attr, None)
+            if valor is None or valor == '':
+                continue
             especifico.append({
                 'etiqueta': etiqueta,
-                'valor': _formatear_valor(getattr(reporte, attr, None), tipo_dato),
+                'valor': _formatear_valor(valor, tipo_dato),
             })
 
     vehiculos = []
@@ -1025,9 +1079,11 @@ def serializar_reporte(reporte):
 
     return {
         'logo': '',
+        'pie': '',
         'reporte_id': reporte.id,
         'tipo_reporte': tipo,
-        'nro_control': reporte.nro_control,
+        # En el documento físico solo se muestra el correlativo sin el año
+        'nro_control': re.sub(r'^\d{7}-\d{4}$', lambda m: m.group(0).split('-')[0], reporte.nro_control or ''),
         'nombre_servicio': nombre_servicio,
         'titulo_seccion_2': titulo_seccion_2,
         'fecha_incidente': _formatear_fecha(reporte.fecha),
@@ -1075,6 +1131,7 @@ def renderizar_html_reporte(reporte):
 
     dto = serializar_reporte(reporte)
     dto['logo'] = obtener_logo_data_uri()
+    dto['pie'] = obtener_pie_data_uri()
     return render_template('reportes/reporte_pdf.html', dto=dto)
 
 

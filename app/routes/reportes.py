@@ -14,7 +14,7 @@ from app.models import (
     ReporteIncendio, ReporteRescateColision, ReporteRescateEspecializado, ReportePersonaAfectada,
     ReporteFalsaAlarma, ReporteAperturaPuerta, ReporteServicioPiscinas, ReporteServicioLluvias,
     ReporteInspeccionInsectos, ReporteBusquedaRescate,
-    ReporteTendidoElectrico, ReporteTalaArbol, ReporteGuardiaSeguridad
+    ReporteTendidoElectrico, ReporteTalaArbol, ReporteGuardiaSeguridad, SecuenciaControl
 )
 from app.services.pdf_service import generar_pdf_reporte, renderizar_html_reporte
 
@@ -161,7 +161,7 @@ REPORT_TITLE_MAP = {
     'siniestro_vial_con_lesionado': 'Siniestro Vial con Lesionado',
     'siniestro_vial_sin_lesionado': 'Siniestro Vial sin Lesionado',
     'busqueda_rescate': 'Operaciones de Búsqueda y Rescate',
-    'servicio_tendido_electrico': 'Servicio de Tendido Eléctrico',
+    'servicio_tendido_electrico': 'Inspección y Control de Riesgo por Tendido Eléctrico Caído',
     'tala_arbol': 'Reporte Tala de Árbol',
     'guardia_seguridad': 'Guardia de Seguridad y Prevención',
 }
@@ -450,6 +450,91 @@ REPORT_FIELDS_MAP = {
 }
 
 
+def _datos_para_edicion(reporte):
+    """Serializa un reporte existente para pre-llenar el formulario de edición."""
+    from sqlalchemy import inspect as sa_inspect
+    campos = {}
+    for attr in sa_inspect(reporte).mapper.column_attrs:
+        try:
+            campos[attr.key] = getattr(reporte, attr.key)
+        except Exception:
+            continue
+    datos = json.loads(json.dumps(campos, default=str))
+
+    listas = {}
+
+    # Vehículos actuantes
+    vas = list(reporte.vehiculos_actuantes)
+    if vas:
+        listas['vehiculos_actuantes'] = [v.vehiculo_id for v in vas]
+        listas['conductores'] = [v.conductor_nombre or '' for v in vas]
+        listas['horas_salida_vehiculo'] = [str(v.hora_salida) if v.hora_salida else '' for v in vas]
+        listas['kms_salida'] = [v.km_salida for v in vas]
+        listas['kms_llegada'] = [v.km_llegada for v in vas]
+
+    # Personal actuante
+    comp_n, comp_c, comp_r = [], [], []
+    for p in reporte.personal_actuante:
+        rol = (p.rol_en_servicio or '').lower()
+        if 'jefe' in rol:
+            listas['jefe_comision_usuario_id'] = [p.cedula or '']
+        elif 'conductor' in rol:
+            listas['conductor_unidad_usuario_id'] = [p.cedula or '']
+        elif 'combatiente' in rol:
+            comp_n.append(p.nombre_completo or '')
+            comp_c.append(p.cedula or '')
+            comp_r.append(p.rango or '')
+    if comp_n:
+        listas['combatientes_usuario_id'] = list(comp_c)  # se matchea por C.I. en el <option>
+        listas['combatientes_nombres'] = comp_n
+        listas['combatientes_cis'] = comp_c
+        listas['combatientes_rangos'] = comp_r
+
+    # Otros organismos
+    orgs = list(reporte.otros_organismos)
+    if orgs:
+        listas['organismo_nombre'] = [o.nombre_organismo or '' for o in orgs]
+        listas['organismo_jefe'] = [o.jefe_unidad or '' for o in orgs]
+        listas['organismo_matricula'] = [o.matricula_unidad or '' for o in orgs]
+        listas['organismo_cantidad'] = [o.cantidad_unidades for o in orgs]
+
+    # Personas afectadas / lesionados
+    pas = list(reporte.personas_afectadas)
+    if pas:
+        listas['pa_nombre'] = [p.nombre_apellido or '' for p in pas]
+        listas['pa_cedula'] = [p.cedula_pasaporte or '' for p in pas]
+        listas['pa_edad'] = [p.edad for p in pas]
+        listas['pa_sexo'] = [p.sexo or '' for p in pas]
+        listas['pa_lesion'] = [p.lesion or '' for p in pas]
+        listas['pa_residencia'] = [p.residencia or '' for p in pas]
+
+    # Vehículos afectados (JSON en columna)
+    for col_json, prefijo in (('vehiculos_afectados_json', 'va_'), ('vehiculos_involucrados_json', 'veh_inv_'), ('vehiculos_involucrados', 'veh_inv_')):
+        bruto = getattr(reporte, col_json, None)
+        if not bruto:
+            continue
+        if col_json == 'vehiculos_involucrados':
+            try:
+                pre = json.loads(bruto)
+            except (TypeError, ValueError):
+                continue
+            if not (isinstance(pre, list) and pre and isinstance(pre[0], dict)):
+                continue
+        try:
+            items = json.loads(bruto)
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            for k, v in item.items():
+                listas.setdefault(prefijo + k, []).append(v)
+
+    return {'campos': datos, 'listas': listas}
+
+
 def _parsear_vehiculos_involucrados():
     """Lee las listas dinamicas veh_inv_*[] y devuelve la lista de dicts."""
     claves = ['marca', 'modelo', 'placa', 'color', 'anio', 'tipo', 'propietario', 'cedula', 'telefono', 'edad', 'conductor', 'conductor_ci', 'conductor_tel']
@@ -552,26 +637,19 @@ def parse_field_value(field_name, raw_val):
 
 def _siguiente_nro_control(prefix, tipo_reporte):
     """
-    Calcula el siguiente número de control tomando el mayor consecutivo
-    existente del tipo en el año. A diferencia de contar filas, esto no genera
-    duplicados cuando se elimina un reporte.
-
-    El prefijo es único por tipo de reporte, así que se filtra por él en lugar
-    de por ``tipo_reporte`` (que solo guarda la identidad polimórfica genérica).
+    Correlativo anual UNIFICADO para todos los tipos de reporte.
+    Formato: 0000001-2026, 0000002-2026 ... y se reinicia cada año
+    (0000001-2027 el 1 de enero). El contador vive en la tabla
+    ``secuencias_control`` para no depender de los formatos antiguos.
     """
     anio = datetime.now().year
-    base = f'{prefix}-{anio}-'
-    numeros = db.session.query(Reporte.nro_control).filter(
-        Reporte.nro_control.like(f'{base}%'),
-    ).all()
-
-    maximo = 0
-    for (nro_control,) in numeros:
-        try:
-            maximo = max(maximo, int(str(nro_control).rsplit('-', 1)[-1]))
-        except (TypeError, ValueError):
-            continue
-    return f'{base}{maximo + 1:04d}'
+    seq = db.session.get(SecuenciaControl, anio)
+    if seq is None:
+        seq = SecuenciaControl(anio=anio, ultimo=0)
+        db.session.add(seq)
+        db.session.flush()
+    seq.ultimo += 1
+    return f'{seq.ultimo:07d}-{anio}'
 
 
 _HORA_24H_RE = re.compile(r'^(\d{1,2}):(\d{2})(?::(\d{2}))?$')
@@ -694,7 +772,8 @@ def crear_reporte(tipo_reporte):
                 return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
 
             # 2. AUTOGENERAR N° DE CONTROL SECUENCIAL ÚNICO
-            nro_control = _siguiente_nro_control(prefix, tipo_reporte)
+            es_edicion = bool((request.form.get('reporte_id') or '').strip())
+            nro_control = None if es_edicion else _siguiente_nro_control(prefix, tipo_reporte)
 
             solicitante_nombre = (request.form.get('solicitante_nombre') or '').strip() or None
             solicitante_cedula = (request.form.get('solicitante_cedula') or '').strip() or None
@@ -828,22 +907,51 @@ def crear_reporte(tipo_reporte):
             # veces como argumento (los subtipos y datos calculados ganan).
             parametros = {**specific_kwargs, **extra_kwargs}
 
-            reporte_inst = model_class(
-                nro_control=nro_control,
-                **cabecera,
-                solicitante_nombre=solicitante_nombre,
-                solicitante_cedula=solicitante_cedula,
-                solicitante_telefono=solicitante_telefono,
-                receptor_cedula=receptor_cedula,
-                punto_referencia=punto_referencia,
-                creador_id=current_user.id,
-                estado='Enviado',
-                observaciones_generales=observaciones_generales,
-                **parametros
-            )
+            if es_edicion:
+                try:
+                    reporte_a_editar = db.session.get(Reporte, int(request.form.get('reporte_id')))
+                except (TypeError, ValueError):
+                    reporte_a_editar = None
+                if (not current_user.es_admin or not reporte_a_editar
+                        or reporte_a_editar.tipo_especifico != tipo_reporte):
+                    raise ValueError('No tiene permiso para editar este reporte o no corresponde al tipo indicado.')
+                datos_edicion = dict(cabecera)
+                datos_edicion.update({
+                    'solicitante_nombre': solicitante_nombre,
+                    'solicitante_cedula': solicitante_cedula,
+                    'solicitante_telefono': solicitante_telefono,
+                    'receptor_cedula': receptor_cedula,
+                    'punto_referencia': punto_referencia,
+                    'observaciones_generales': observaciones_generales,
+                })
+                datos_edicion.update(parametros)
+                for campo, valor in datos_edicion.items():
+                    if hasattr(reporte_a_editar, campo):
+                        setattr(reporte_a_editar, campo, valor)
+                reporte_a_editar.vehiculos_actuantes.clear()
+                reporte_a_editar.personal_actuante.clear()
+                reporte_a_editar.otros_organismos.clear()
+                reporte_a_editar.personas_afectadas.clear()
+                reporte_inst = reporte_a_editar
+                nro_control = reporte_inst.nro_control
+                db.session.flush()
+            else:
+                reporte_inst = model_class(
+                    nro_control=nro_control,
+                    **cabecera,
+                    solicitante_nombre=solicitante_nombre,
+                    solicitante_cedula=solicitante_cedula,
+                    solicitante_telefono=solicitante_telefono,
+                    receptor_cedula=receptor_cedula,
+                    punto_referencia=punto_referencia,
+                    creador_id=current_user.id,
+                    estado='Enviado',
+                    observaciones_generales=observaciones_generales,
+                    **parametros
+                )
 
-            db.session.add(reporte_inst)
-            db.session.flush()
+                db.session.add(reporte_inst)
+                db.session.flush()
 
             # 6. REGISTRAR PERSONAS AFECTADAS / LESIONADOS (APH y Rescates)
             if (tipo_reporte.startswith('aph_') or tipo_reporte.startswith('rescate_')
@@ -977,7 +1085,7 @@ def crear_reporte(tipo_reporte):
                     ))
 
             db.session.commit()
-            flash(f'Reporte {nro_control} creado y enviado con éxito.', 'success')
+            flash(f'Reporte {nro_control} ' + ('actualizado' if es_edicion else 'creado y enviado') + ' con éxito.', 'success')
             return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte_inst.id))
 
         except ValueError as error:
@@ -997,6 +1105,23 @@ def crear_reporte(tipo_reporte):
             flash('Ocurrió un error al guardar el reporte. Intente nuevamente o contacte al administrador.', 'danger')
             return redirect(url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte))
 
+    # Modo edición: ?editar=<id> pre-llena el formulario (solo admin)
+    reporte_edicion_json = None
+    editar_id = (request.args.get('editar') or '').strip()
+    if editar_id:
+        if not current_user.es_admin:
+            flash('Solo el administrador puede editar reportes.', 'danger')
+            return redirect(url_for('main.index'))
+        try:
+            rep_edicion = db.session.get(Reporte, int(editar_id))
+        except (TypeError, ValueError):
+            rep_edicion = None
+        if not rep_edicion or rep_edicion.tipo_especifico != tipo_reporte:
+            flash('No se encontró un reporte de este tipo para editar.', 'danger')
+            return redirect(url_for('reportes.detalle_reporte', reporte_id=editar_id) if rep_edicion else url_for('main.index'))
+        reporte_edicion_json = _datos_para_edicion(rep_edicion)
+        title = f'Editar - {title}'
+
     vehiculos = Vehiculo.query.filter_by(activo=True).all()
     bomberos = Usuario.query.filter_by(activo=True).order_by(Usuario.rango.asc(), Usuario.nombre.asc()).all()
     date_today = datetime.now().strftime('%Y-%m-%d')
@@ -1008,7 +1133,23 @@ def crear_reporte(tipo_reporte):
         bomberos=bomberos,
         date_today=date_today,
         incluye_secciones_operativas=incluye_secciones_operativas,
+        reporte_edicion_json=reporte_edicion_json,
     )
+
+
+@reportes_bp.route('/eliminar/<int:reporte_id>', methods=['POST'])
+@login_required
+def eliminar_reporte(reporte_id):
+    """Elimina un reporte (solo administrador)."""
+    if not current_user.es_admin:
+        flash('Solo el administrador puede eliminar reportes.', 'danger')
+        return redirect(url_for('main.index'))
+    reporte = Reporte.query.get_or_404(reporte_id)
+    nro = reporte.nro_control
+    db.session.delete(reporte)
+    db.session.commit()
+    flash(f'Reporte {nro} eliminado con éxito.', 'success')
+    return redirect(url_for('main.index'))
 
 
 @reportes_bp.route('/detalle/<int:reporte_id>')

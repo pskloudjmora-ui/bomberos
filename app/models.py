@@ -144,6 +144,14 @@ class Reporte(db.Model):
 # TABLAS INTERMEDIAS Y RELACIONES COMPLEJAS
 # ==========================================
 
+class SecuenciaControl(db.Model):
+    """Correlativo anual unificado para todos los tipos de reporte."""
+    __tablename__ = 'secuencias_control'
+
+    anio = db.Column(db.Integer, primary_key=True)
+    ultimo = db.Column(db.Integer, nullable=False, default=0)
+
+
 class ReporteVehiculoActuante(db.Model):
     """
     Detalle de los vehículos que actuaron en una incidencia.

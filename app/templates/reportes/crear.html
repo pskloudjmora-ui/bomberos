@@ -124,6 +124,7 @@
     <!-- Formulario Completo -->
     <form action="{{ url_for('reportes.crear_reporte', tipo_reporte=tipo_reporte) }}" method="POST" class="space-y-6">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if reporte_edicion_json %}<input type="hidden" name="reporte_id" value="{{ reporte_edicion_json.campos.id }}">{% endif %}
         
         <!-- SECCIÓN 1: DATOS GENERALES DE LA LLAMADA Y TIEMPOS -->
         <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
@@ -2661,4 +2662,101 @@
         </div>
     </div>
 </template>
+
+{% if reporte_edicion_json %}
+<script>
+window.__REPORTE_EDICION__ = {{ reporte_edicion_json | tojson }};
+document.addEventListener('DOMContentLoaded', function () {
+    var data = window.__REPORTE_EDICION__;
+    if (!data) return;
+    var campos = data.campos || {};
+    var listas = data.listas || {};
+
+    function setValor(el, val) {
+        if (val === null || val === undefined) val = '';
+        if (el.tagName === 'SELECT') {
+            var str = String(val);
+            for (var i = 0; i < el.options.length; i++) {
+                if (el.options[i].value === str) { el.selectedIndex = i; return; }
+            }
+            // Selects de bomberos: la opción muestra "(C.I.: XXXX)"
+            if (str) {
+                for (var j = 0; j < el.options.length; j++) {
+                    if (el.options[j].text.indexOf('(C.I.: ' + str + ')') !== -1) { el.selectedIndex = j; return; }
+                }
+                // Si no coincide, intentar la opción "Otro" y llenar su campo manual
+                for (var k = 0; k < el.options.length; k++) {
+                    if (el.options[k].value === 'Otro') {
+                        el.selectedIndex = k;
+                        var base = el.name.replace(/\[\]$/, '');
+                        var otro = document.querySelector('[name="' + base + '_otro"], [id="' + base + '_otro"]');
+                        if (otro) { otro.value = val; otro.style.display = 'block'; otro.disabled = false; }
+                        return;
+                    }
+                }
+            }
+            return;
+        }
+        if (el.type === 'checkbox' || el.type === 'radio') {
+            var grupo = el.type === 'radio' ? document.querySelectorAll('[name="' + el.name + '"]') : [el];
+            for (var m = 0; m < grupo.length; m++) {
+                if (String(grupo[m].value) === String(val)) { grupo[m].checked = true; return; }
+            }
+            return;
+        }
+        el.value = val;
+    }
+
+    // 1) Campos escalares de cabecera y parámetros técnicos
+    var excluir = {id:1, nro_control:1, estado:1, tipo_reporte:1, creador_id:1, fecha_creacion:1};
+    Object.keys(campos).forEach(function (name) {
+        if (excluir[name]) return;
+        var els = document.querySelectorAll('[name="' + name + '"]');
+        if (els.length) setValor(els[0], campos[name]);
+    });
+
+    // 2) Listas dinámicas: asegurar filas y llenar valores
+    var agregarPorSeccion = [
+        ['vehiculos_actuantes', agregarVehiculo],
+        ['combatientes_usuario_id', agregarCombatiente],
+        ['organismo_nombre', agregarOrganismo],
+        ['pa_nombre', agregarPersonaAfectada],
+        ['va_marca', agregarVehiculoAfectado],
+        ['veh_inv_marca', agregarVehiculoInvolucrado]
+    ];
+    var yaAgregadas = {};
+    agregarPorSeccion.forEach(function (par) {
+        var nombre = par[0], addFn = par[1];
+        var valores = listas[nombre];
+        if (!valores || !valores.length) return;
+        if (!yaAgregadas[nombre]) {
+            yaAgregadas[nombre] = true;
+            var actuales = document.querySelectorAll('[name="' + nombre + '[]"]').length;
+            for (var i = actuales; i < valores.length; i++) { try { addFn(); } catch (e) {} }
+        }
+    });
+    // Llenar cada lista
+    Object.keys(listas).forEach(function (nombre) {
+        var valores = listas[nombre];
+        if (!Array.isArray(valores)) {
+            // selects únicos (jefe de comisión / conductor)
+            var el = document.querySelector('[name="' + nombre + '"]');
+            if (el && valores) setValor(el, valores);
+            return;
+        }
+        var els = document.querySelectorAll('[name="' + nombre + '[]"]');
+        for (var i = 0; i < Math.min(els.length, valores.length); i++) {
+            setValor(els[i], valores[i]);
+        }
+    });
+
+    // 3) Resincronizar visibilidad/validación de grupos condicionales
+    try { if (typeof actualizarMatpelCombustible === 'function') actualizarMatpelCombustible(); } catch (e) {}
+    try { if (typeof actualizarMatpelQuimico === 'function') actualizarMatpelQuimico(); } catch (e) {}
+    try { if (typeof actualizarGruposArbol === 'function') actualizarGruposArbol(); } catch (e) {}
+    try { if (typeof calcularGlasgow === 'function') calcularGlasgow(); } catch (e) {}
+    try { if (typeof inicializarCascadaEquipos === 'function') inicializarCascadaEquipos(); } catch (e) {}
+});
+</script>
+{% endif %}
 {% endblock %}

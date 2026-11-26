@@ -149,6 +149,23 @@ def dashboard_admin():
             r for r in reportes_filtrados if r.tipo_especifico == tipo_reporte_filtro
         ]
 
+    # Filtro por tipo de animal (solo aplica cuando el tipo de reporte es
+    # 'servicio_animal'). Se calcula sobre el conjunto ya filtrado por tipo.
+    animal_filtro = request.args.get('animal', 'Todos')
+    animales_disponibles = []
+    conteo_animales = {}
+    if tipo_reporte_filtro == 'servicio_animal':
+        conteo_animales = Counter(
+            (getattr(r, 'tipo_animal', None) or 'Sin especificar')
+            for r in reportes_filtrados
+        )
+        animales_disponibles = sorted(conteo_animales)
+        if animal_filtro != 'Todos':
+            reportes_filtrados = [
+                r for r in reportes_filtrados
+                if (getattr(r, 'tipo_animal', None) or 'Sin especificar') == animal_filtro
+            ]
+
     # 2. ESTADÍSTICAS AGRUPADAS POR CUADRANTE DE PAZ
     # Se calculan antes de aplicar el filtro de cuadrante para poder comparar
     # todos los cuadrantes del rango seleccionado.
@@ -242,7 +259,10 @@ def dashboard_admin():
         filtro_fin=fecha_fin.strftime('%Y-%m-%d'),
         filtro_tipo=tipo_reporte_filtro or 'Todos',
         filtro_vehiculo=vehiculo_filtro or 'Todos',
-        filtro_cuadrante=cuadrante_filtro or 'Todos'
+        filtro_cuadrante=cuadrante_filtro or 'Todos',
+        filtro_animal=animal_filtro or 'Todos',
+        animales_disponibles=animales_disponibles,
+        conteo_animales=conteo_animales,
     )
 
 
