@@ -146,9 +146,6 @@ COLUMNAS_NUEVAS = {
     'reportes_matpel_otros': {
         'vehiculos_involucrados_json': 'TEXT',
     },
-    'reportes_aph_no_traslado': {
-        'paciente_firma': 'BOOLEAN',
-    },
     'reportes_pre_hospitalario': {
         'signos_vitales_temperatura': 'VARCHAR(10)',
     },
@@ -157,6 +154,7 @@ COLUMNAS_NUEVAS = {
         'recomendaciones': 'TEXT',
     },
     'reportes_aph_no_traslado': {
+        'paciente_firma': 'BOOLEAN',
         'causa_traslado': 'TEXT',
         'recomendaciones': 'TEXT',
     },
