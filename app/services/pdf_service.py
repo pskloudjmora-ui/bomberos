@@ -1049,20 +1049,22 @@ def serializar_reporte(reporte):
     ]
 
     # Campos de la sección 4 (2 columnas de 3 filas en el PDF)
+    jefe_fmt = _formatear_personal(jefe)
+    conductor_fmt = _formatear_personal(conductor)
     actuacion_campos = [
         {'etiqueta': 'Material y Equipos Utilizados', 'valor': material},
         {'etiqueta': 'Cantidad de Bomberos Actuantes',
          'valor': f'{len(personal)} efectivos en comisión'},
     ]
-    if jefe:
+    if jefe_fmt:
         actuacion_campos.append({
             'etiqueta': 'Jefe de Comisión',
-            'valor': f'{jefe.nombre}  —  C.I.: {jefe.cedula}',
+            'valor': f'{jefe_fmt["nombre"]}  —  C.I.: {jefe_fmt["cedula"]}',
         })
-    if conductor:
+    if conductor_fmt:
         actuacion_campos.append({
             'etiqueta': 'Conductor de Unidad',
-            'valor': f'{conductor.nombre}  —  C.I.: {conductor.cedula}',
+            'valor': f'{conductor_fmt["nombre"]}  —  C.I.: {conductor_fmt["cedula"]}',
         })
     if combatientes:
         lista_combatientes = '  •  '.join(

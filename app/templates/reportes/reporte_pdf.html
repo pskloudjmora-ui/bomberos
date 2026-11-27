@@ -51,6 +51,56 @@
         width: 33%;
         font-size: 7.4pt;
     }
+    /* Detalles técnicos: columnas de hasta 10 campos (orden columna-mayor) */
+    .tabla-detalles {
+        table-layout: fixed;
+    }
+    .tabla-detalles .tcampos {
+        font-size: 6.2pt;
+        padding: 1.5pt 2pt;
+    }
+    .tabla-detalles .tvalor {
+        font-size: 7.2pt;
+        padding: 1.5pt 2pt;
+    }
+    .tabla-detalles.cols-2 .tcampos { width: 15%; }
+    .tabla-detalles.cols-2 .tvalor { width: 35%; }
+    .tabla-detalles.cols-3 .tcampos {
+        width: 9%;
+        font-size: 5.8pt;
+        letter-spacing: 0;
+        padding: 1.3pt 1.6pt;
+    }
+    .tabla-detalles.cols-3 .tvalor {
+        width: 24.34%;
+        font-size: 6.6pt;
+        padding: 1.3pt 1.6pt;
+    }
+    .tabla-detalles.cols-4 .tcampos {
+        width: 6.8%;
+        font-size: 5.4pt;
+        letter-spacing: 0;
+        padding: 1.2pt 1.4pt;
+    }
+    .tabla-detalles.cols-4 .tvalor {
+        width: 18.2%;
+        font-size: 6.2pt;
+        padding: 1.2pt 1.4pt;
+    }
+    /* Cuadrícula de 2 campos por fila (4 celdas) */
+    .tabla-grid-2 {
+        table-layout: fixed;
+    }
+    .tabla-grid-2 .tcampos {
+        width: 14%;
+        font-size: 6pt;
+        padding: 1.5pt 2pt;
+    }
+    .tabla-grid-2 .tvalor {
+        width: 36%;
+        font-size: 7pt;
+        padding: 1.5pt 2pt;
+    }
     .titulo-seccion {
         background-color: #1f1f1f;
         color: #ffffff;
@@ -212,7 +262,7 @@
     <tr>
         <td style="width: 21%; text-align: center;">
             {% if dto.logo %}
-            <img src="{{ dto.logo }}" style="height: 13mm; width: auto;">
+            <img src="{{ dto.logo }}" style="height: 16mm; width: auto;">
             {% else %}
             <div class="logo-rec">LOGOTIPO<br>OFICIAL</div>
             {% endif %}
@@ -261,41 +311,30 @@
 </table>
 
 <!-- ============ 2. DETALLE ESPECÍFICO DEL SERVICIO ============ -->
-<table class="tarjeta{{ ' tabla-dos-col' if dto.especifico|length > 12 }}">
+{% set n_cols = ((dto.especifico|length / 10)|round(0, 'ceil'))|int %}
+{% if n_cols < 1 %}{% set n_cols = 1 %}{% endif %}
+{% if n_cols > 4 %}{% set n_cols = 4 %}{% endif %}
+{% set n_filas = ((dto.especifico|length / n_cols)|round(0, 'ceil'))|int %}
+<table class="tarjeta tabla-detalles cols-{{ n_cols }}">
     <tr>
-        <td class="titulo-seccion" colspan="{{ 4 if dto.especifico|length > 12 else 2 }}">{{ dto.titulo_seccion_2 }}</td>
+        <td class="titulo-seccion" colspan="{{ n_cols * 2 }}">{{ dto.titulo_seccion_2 }}</td>
     </tr>
-    {% if dto.especifico|length > 12 %}
-    {# Dos columnas de hasta 12 campos cada una #}
-    {% set n_filas = [12, dto.especifico|length - 12]|max %}
+    {# Columnas de hasta 10 campos, orden columna-mayor #}
     {% for i in range(n_filas) %}
     <tr>
-        {% if i < 12 %}
-        {% set c1 = dto.especifico[i] %}
-        <td class="tcampos">{{ c1.etiqueta }}</td>
-        <td class="tvalor texto-largo">{{ c1.valor }}</td>
-        {% else %}
-        <td class="tcampos"></td>
-        <td class="tvalor"></td>
-        {% endif %}
-        {% if dto.especifico[i + 12] is defined %}
-        {% set c2 = dto.especifico[i + 12] %}
-        <td class="tcampos">{{ c2.etiqueta }}</td>
-        <td class="tvalor texto-largo">{{ c2.valor }}</td>
-        {% else %}
-        <td class="tcampos"></td>
-        <td class="tvalor"></td>
-        {% endif %}
+        {% for g in range(n_cols) %}
+            {% set idx = g * n_filas + i %}
+            {% if idx < dto.especifico|length %}
+                {% set c = dto.especifico[idx] %}
+                <td class="tcampos">{{ c.etiqueta }}</td>
+                <td class="tvalor texto-largo">{{ c.valor }}</td>
+            {% else %}
+                <td class="tcampos"></td>
+                <td class="tvalor"></td>
+            {% endif %}
+        {% endfor %}
     </tr>
     {% endfor %}
-    {% else %}
-    {% for campo in dto.especifico %}
-    <tr>
-        <td class="tcampos">{{ campo.etiqueta }}</td>
-        <td class="tvalor texto-largo">{{ campo.valor }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
 </table>
 
 {% if dto.tipo_reporte == 'falsa_alarma' and dto.descripcion_alarma %}
@@ -419,36 +458,26 @@
 </table>
 
 <!-- ============ 4. ACTUACIÓN BOMBERIL ============ -->
-<table class="tarjeta no-cortar{{ ' tabla-dos-col' if dto.actuacion_campos|length > 3 }}">
+<table class="tarjeta no-cortar tabla-grid-2">
     <tr>
-        <td class="titulo-seccion" colspan="{{ 4 if dto.actuacion_campos|length > 3 else 3 }}">4. Actuaci&oacute;n Bomberil</td>
+        <td class="titulo-seccion" colspan="4">4. Actuaci&oacute;n Bomberil</td>
     </tr>
-    {% if dto.actuacion_campos|length > 3 %}
-    {# Dos columnas de hasta 3 campos cada una #}
-    {% set n_filas = [3, dto.actuacion_campos|length - 3]|max %}
-    {% for i in range(n_filas) %}
+    {# Cuadrícula: 2 campos por fila #}
+    {% for i in range(0, dto.actuacion_campos|length, 2) %}
     <tr>
-        {% set c1 = dto.actuacion_campos[i] %}
-        <td class="tcampos">{{ c1.etiqueta }}</td>
-        <td class="tvalor texto-largo">{{ c1.valor }}</td>
-        {% if dto.actuacion_campos[i + 3] is defined %}
-        {% set c2 = dto.actuacion_campos[i + 3] %}
-        <td class="tcampos">{{ c2.etiqueta }}</td>
-        <td class="tvalor texto-largo">{{ c2.valor }}</td>
-        {% else %}
-        <td class="tcampos"></td>
-        <td class="tvalor"></td>
-        {% endif %}
+        {% for j in range(2) %}
+            {% set idx = i + j %}
+            {% if idx < dto.actuacion_campos|length %}
+                {% set c = dto.actuacion_campos[idx] %}
+                <td class="tcampos">{{ c.etiqueta }}</td>
+                <td class="tvalor texto-largo">{{ c.valor }}</td>
+            {% else %}
+                <td class="tcampos"></td>
+                <td class="tvalor"></td>
+            {% endif %}
+        {% endfor %}
     </tr>
     {% endfor %}
-    {% else %}
-    {% for campo in dto.actuacion_campos %}
-    <tr>
-        <td class="tcampos">{{ campo.etiqueta }}</td>
-        <td class="tvalor texto-largo" colspan="2">{{ campo.valor }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
 </table>
 
 <!-- ============ 5. COOPERACIÓN DE OTROS ORGANISMOS ============ -->
