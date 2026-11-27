@@ -6,14 +6,14 @@
 <style>
     @page {
         size: letter;
-        margin: 0.85cm 0.9cm 0.85cm 0.9cm;
+        margin: 0.85cm 0.9cm 0.45cm 0.9cm;
     }
     body {
         font-family: Helvetica, Arial, sans-serif;
         font-size: 7.6pt;
         color: #111111;
         margin: 0;
-        padding: 0;
+        padding: 0 0 46pt 0;
         line-height: 1.2;
     }
     table {
@@ -80,6 +80,7 @@
     }
     .republ {
         font-size: 6.3pt;
+        font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 0.5pt;
         color: #333333;
@@ -139,19 +140,18 @@
         font-weight: bold;
         text-transform: uppercase;
     }
+    .pie-fijo {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
     .pie {
-        text-align: center;
-        font-size: 5.8pt;
-        color: #555555;
-        margin-top: 6pt;
-    }
-    .pie-imagen {
-        text-align: center;
-        margin-top: 2pt;
-    }
-    .pie-imagen img {
-        height: 30pt;
-        width: auto;
+        font-size: 7pt;
+        color: #333333;
+        line-height: 1.3;
+        text-transform: uppercase;
     }
     .texto-largo {
         font-size: 8pt;
@@ -220,9 +220,8 @@
         <td style="width: 56%; text-align: center;">
             <div class="republ">República Bolivariana de Venezuela</div>
             <div class="estado-municipio">Estado Carabobo &mdash; Municipio San Diego</div>
-            <div class="institucion">Alcaldía de San Diego</div>
             <div class="institucion">Cuerpo de Bomberos y Bomberas y<br>Administración de Emergencias de Carácter Civil</div>
-            <div class="republ" style="margin-top: 2pt;">Dirección de Operaciones y Control de Emergencias</div>
+            <div class="republ" style="margin-top: 2pt;">Unidad de Operaciones y Control de Emergencias</div>
         </td>
         <td style="width: 23%;">
             <table class="caja-control">
@@ -535,15 +534,15 @@
     </tr>
 </table>
 
-<div class="pie">
-    Documento generado por el Sistema de Reportes Operativos &mdash; Cuerpo de Bomberos y Bomberas y Administraci&oacute;n
-    de Emergencias de Car&aacute;cter Civil, Municipalidad de San Diego, Estado Carabobo.
+<!-- ============ PIE DE PÁGINA (fijo al fondo) ============ -->
+<div class="pie-fijo">
+    <div class="pie">
+        Urb. Valle Verde, Av. 69, 3ra Etapa del Parque Metropolitano de San Diego, Municipio San Diego, Estado Carabobo.<br>
+        Tel&eacute;fonos: 0241-8713002 / 0424-4583484 / 0424-4414191 &nbsp;&nbsp; P&aacute;gina Web: www.bomberossandiego.gob.ve<br>
+        Twitter: @bomberosandiego &nbsp;&nbsp; E-mail: bomberosdesandiego@gmail.com &nbsp;&nbsp; Instagram: @bomberosde_sandiego<br>
+        FMP
+    </div>
 </div>
 
-</body>
-
-{% if dto.pie %}
-<div class="pie-imagen"><img src="{{ dto.pie }}" alt="Pie de p&aacute;gina"></div>
-{% endif %}
 </body>
 </html>
