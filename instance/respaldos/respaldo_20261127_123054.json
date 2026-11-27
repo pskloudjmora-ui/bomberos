@@ -1,0 +1,100 @@
+{
+ "secuencias_control": [],
+ "usuarios": [
+  {
+   "id": 1,
+   "username": "admin",
+   "password_hash": "scrypt:32768:8:1$Oq4p8vckAmefeTA7$9fae21ce189bb39173b448b17a5cde9d39769a533a95f6cb2122a84504315d04f5770b654f117a53d2a4d6830f5807b96c89e728018b1db199cb7824b1c7cd53",
+   "nombre": "Jefe",
+   "apellido": "Administrador",
+   "cedula": "V-12345678",
+   "rango": "Coronel",
+   "rol": "administrador",
+   "activo": true,
+   "fecha_registro": "2026-06-23 14:04:02.955990"
+  },
+  {
+   "id": 2,
+   "username": "bombero",
+   "password_hash": "scrypt:32768:8:1$dgb9rt6mj7fnSk6H$8ed3d01b087250acae588f4bdbf8c2e1d44940da22eee6251d1456adba6b7e28f0e05e547d66e51427adfdd263ced6eaaa0508b5b9a900a1756fc4e17f924550",
+   "nombre": "Juan",
+   "apellido": "Pérez",
+   "cedula": "V-87654321",
+   "rango": "Cabo Primero",
+   "rol": "bombero",
+   "activo": true,
+   "fecha_registro": "2026-06-23 14:04:02.955990"
+  },
+  {
+   "id": 3,
+   "username": "soporte",
+   "password_hash": "scrypt:32768:8:1$3nRLYpmfN0wN3mNR$fb00306bcc78f2566ef41d8413f54be491a5b1021d16bf35a6689ab51a976166d6556d1f525ab763509d3bb82c43612849cdb2646f28dd1d52e3b6517c744c21",
+   "nombre": "soporte",
+   "apellido": "soporte",
+   "cedula": "20396747",
+   "rango": "General",
+   "rol": "soporte",
+   "activo": true,
+   "fecha_registro": "2026-11-27 12:17:33.331908"
+  }
+ ],
+ "vehiculos": [],
+ "logs_actividad": [
+  {
+   "id": 1,
+   "usuario_id": 1,
+   "username": "admin",
+   "accion": "inicio_sesion",
+   "detalle": "Acceso de Coronel Jefe Administrador",
+   "fecha": "2026-11-27 12:16:16.362643"
+  },
+  {
+   "id": 2,
+   "usuario_id": 1,
+   "username": "admin",
+   "accion": "inicio_sesion",
+   "detalle": "Acceso de Coronel Jefe Administrador",
+   "fecha": "2026-11-27 12:20:48.262697"
+  },
+  {
+   "id": 3,
+   "usuario_id": 3,
+   "username": "soporte",
+   "accion": "inicio_sesion",
+   "detalle": "Acceso de General soporte soporte",
+   "fecha": "2026-11-27 12:24:54.183132"
+  }
+ ],
+ "reportes": [],
+ "respaldos": [],
+ "reporte_otros_organismos": [],
+ "reporte_personal_actuante": [],
+ "reporte_personas_afectadas": [],
+ "reporte_vehiculos_actuantes": [],
+ "reportes_apertura_puerta": [],
+ "reportes_aph_interhospitalario": [],
+ "reportes_aph_no_traslado": [],
+ "reportes_aph_sin_traslado": [],
+ "reportes_aph_traslado": [],
+ "reportes_busqueda_rescate": [],
+ "reportes_falsa_alarma": [],
+ "reportes_guardia_seguridad": [],
+ "reportes_incendio": [],
+ "reportes_inspeccion_insectos": [],
+ "reportes_matpel_combustible": [],
+ "reportes_matpel_glp": [],
+ "reportes_matpel_otros": [],
+ "reportes_matpel_quimico": [],
+ "reportes_pre_hospitalario": [],
+ "reportes_rescate_colision": [],
+ "reportes_rescate_especializado": [],
+ "reportes_servicio_achicamiento": [],
+ "reportes_servicio_agua": [],
+ "reportes_servicio_animal": [],
+ "reportes_servicio_baldeo": [],
+ "reportes_servicio_insectos": [],
+ "reportes_servicio_lluvias": [],
+ "reportes_servicio_piscinas": [],
+ "reportes_servicio_tendido_electrico": [],
+ "reportes_tala_arbol": []
+}

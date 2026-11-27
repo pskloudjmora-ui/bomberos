@@ -61,7 +61,7 @@ def _aplicar_filtros_usuarios(args):
     if rango:
         query = query.filter(Usuario.rango == rango)
 
-    if rol in ('administrador', 'bombero'):
+    if rol in ('administrador', 'bombero', 'soporte'):
         query = query.filter(Usuario.rol == rol)
 
     if estado in ('activo', 'inactivo'):
@@ -373,7 +373,7 @@ def editar_usuario(usuario_id):
             flash('Complete los campos obligatorios: ' + ', '.join(faltantes) + '.', 'danger')
             return redirect(url_for('main.editar_usuario', usuario_id=usuario.id))
 
-        if rol not in ('bombero', 'administrador'):
+        if rol not in ('bombero', 'administrador', 'soporte'):
             rol = 'bombero'
 
         if password and len(password) < 6:
@@ -488,6 +488,8 @@ def validar_reporte(reporte_id):
         flash('Acción no reconocida.', 'warning')
         return redirect(url_for('main.dashboard_admin'))
 
+    from app.services.actividad import registrar_log
+    registrar_log(f'reporte_{accion}', f'{reporte.tipo_especifico} - {reporte.nro_control}')
     db.session.commit()
     return redirect(url_for('main.dashboard_admin'))
 

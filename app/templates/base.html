@@ -166,6 +166,32 @@
 </details>
 {% endif %}
 
+{% if current_user.is_authenticated and current_user.rol == 'soporte' %}
+<details class="group">
+    <summary class="flex items-center justify-between px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 hover:text-white cursor-pointer select-none rounded-lg hover:bg-slate-800/60 transition-colors [&::-webkit-details-marker]:hidden">
+        <span>SOPORTE</span>
+        <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200 group-open:rotate-180"></i>
+    </summary>
+    <div class="mt-1 pb-2 space-y-0.5">
+        <a href="{{ url_for('soporte.panel') }}" class="flex items-center space-x-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+            <i data-lucide="life-buoy" class="w-4 h-4 text-cyan-400"></i><span>Panel de Soporte</span>
+        </a>
+        <a href="{{ url_for('soporte.limpiar') }}" class="flex items-center space-x-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+            <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i><span>Limpiar Data</span>
+        </a>
+        <a href="{{ url_for('soporte.respaldos') }}" class="flex items-center space-x-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+            <i data-lucide="database-backup" class="w-4 h-4 text-emerald-400"></i><span>Respaldos</span>
+        </a>
+        <a href="{{ url_for('soporte.conexion') }}" class="flex items-center space-x-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+            <i data-lucide="plug-zap" class="w-4 h-4 text-cyan-400"></i><span>Conexión a BD</span>
+        </a>
+        <a href="{{ url_for('soporte.logs') }}" class="flex items-center space-x-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors">
+            <i data-lucide="scroll-text" class="w-4 h-4 text-amber-400"></i><span>Logs del Sistema</span>
+        </a>
+    </div>
+</details>
+{% endif %}
+
 <details class="group">
     <summary class="flex items-center justify-between px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 hover:text-white cursor-pointer select-none rounded-lg hover:bg-slate-800/60 transition-colors [&::-webkit-details-marker]:hidden"><span>MATPEL</span><i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200 group-open:rotate-180"></i></summary>
     <div class="mt-1 pb-2 space-y-0.5">
@@ -248,14 +274,6 @@
 <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_arbol') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
     <i data-lucide="tree-pine" class="w-4 h-4 text-lime-500"></i>
     <span>Incendio de Árbol</span>
-</a>
-<a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_arbol_caido') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
-    <i data-lucide="tree-deciduous" class="w-4 h-4 text-amber-600"></i>
-    <span>Control y Eliminación de Peligro por Árbol Caído</span>
-</a>
-<a href="{{ url_for('reportes.crear_reporte', tipo_reporte='tala_arbol') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
-    <i data-lucide="axe" class="w-4 h-4 text-lime-500"></i>
-    <span>Despeje de Vía por Árbol Caído o Escombro</span>
 </a>
 <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='falsa_alarma') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
     <i data-lucide="bell-off" class="w-4 h-4 text-rose-400"></i>
@@ -361,6 +379,14 @@
 <a href="{{ url_for('reportes.crear_reporte', tipo_reporte='guardia_seguridad') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
     <i data-lucide="shield" class="w-4 h-4 text-sky-500"></i>
     <span>Guardia de Seguridad y Prevención</span>
+</a>
+<a href="{{ url_for('reportes.crear_reporte', tipo_reporte='incendio_arbol_caido') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+    <i data-lucide="tree-deciduous" class="w-4 h-4 text-amber-600"></i>
+    <span>Control y Eliminación de Peligro por Árbol Caído</span>
+</a>
+<a href="{{ url_for('reportes.crear_reporte', tipo_reporte='tala_arbol') }}" class="block px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors flex items-center space-x-2">
+    <i data-lucide="axe" class="w-4 h-4 text-lime-500"></i>
+    <span>Despeje de Vía por Árbol Caído o Escombro</span>
 </a>
     </div>
 </details>

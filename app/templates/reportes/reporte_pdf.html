@@ -79,7 +79,7 @@
         border: 0.8pt solid #000000;
     }
     .republ {
-        font-size: 6.3pt;
+        font-size: 7.8pt;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 0.5pt;
@@ -212,7 +212,7 @@
     <tr>
         <td style="width: 21%; text-align: center;">
             {% if dto.logo %}
-            <img src="{{ dto.logo }}" style="height: 11mm; width: auto;">
+            <img src="{{ dto.logo }}" style="height: 13mm; width: auto;">
             {% else %}
             <div class="logo-rec">LOGOTIPO<br>OFICIAL</div>
             {% endif %}
@@ -237,69 +237,40 @@
 <div class="barra-titulo">Reporte Operativo &mdash; {{ dto.nombre_servicio }}</div>
 
 <!-- ============ 1. INFORMACIÓN GENERAL DEL AVISO ============ -->
-<table class="tarjeta no-cortar">
+<table class="tarjeta no-cortar tabla-dos-col">
     <tr>
         <td class="titulo-seccion" colspan="4">1. Informaci&oacute;n General del Aviso, Tiempos y Ubicaci&oacute;n</td>
     </tr>
+    {# Dos columnas de hasta 7 campos cada una #}
+    {% set n_filas = [7, dto.aviso_campos|length - 7]|max %}
+    {% for i in range(n_filas) %}
     <tr>
-        <td class="tcampos">Fecha del Incidente</td>
-        <td class="tvalor">{{ dto.fecha_incidente }}</td>
-        <td class="tcampos">Clase de Aviso</td>
-        <td class="tvalor">{{ dto.clase_aviso }}</td>
+        {% set c1 = dto.aviso_campos[i] %}
+        <td class="tcampos">{{ c1.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ c1.valor }}</td>
+        {% if dto.aviso_campos[i + 7] is defined %}
+        {% set c2 = dto.aviso_campos[i + 7] %}
+        <td class="tcampos">{{ c2.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ c2.valor }}</td>
+        {% else %}
+        <td class="tcampos"></td>
+        <td class="tvalor"></td>
+        {% endif %}
     </tr>
-    <tr>
-        <td class="tcampos">{{ dto.horas[0].etiqueta }}</td>
-        <td class="tvalor">{{ dto.horas[0].valor }}</td>
-        <td class="tcampos">{{ dto.horas[1].etiqueta }}</td>
-        <td class="tvalor">{{ dto.horas[1].valor }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">{{ dto.horas[2].etiqueta }}</td>
-        <td class="tvalor">{{ dto.horas[2].valor }}</td>
-        <td class="tcampos">{{ dto.horas[3].etiqueta }}</td>
-        <td class="tvalor">{{ dto.horas[3].valor }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">Solicitante</td>
-        <td class="tvalor">{{ dto.solicitante_nombre }}</td>
-        <td class="tcampos">C&eacute;dula del Solicitante</td>
-        <td class="tvalor">{{ dto.solicitante_cedula }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">Tel&eacute;fono del Solicitante</td>
-        <td class="tvalor">{{ dto.solicitante_telefono }}</td>
-        <td class="tcampos">Receptor del Aviso</td>
-        <td class="tvalor">{{ dto.receptor_aviso }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">Direcci&oacute;n del Suceso</td>
-        <td class="tvalor" colspan="3">{{ dto.direccion }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">Punto de Referencia</td>
-        <td class="tvalor" colspan="3">{{ dto.punto_referencia }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">Itinerario de Ruta</td>
-        <td class="tvalor texto-largo" colspan="3">{{ dto.itinerario_ruta }}</td>
-    </tr>
-    <tr>
-        <td class="tcampos">Cuadrante de Paz</td>
-        <td class="tvalor texto-largo" colspan="3">{{ dto.cuadrante_paz }}</td>
-    </tr>
+    {% endfor %}
 </table>
 
 <!-- ============ 2. DETALLE ESPECÍFICO DEL SERVICIO ============ -->
-<table class="tarjeta{{ ' tabla-dos-col' if dto.especifico|length > 6 }}">
+<table class="tarjeta{{ ' tabla-dos-col' if dto.especifico|length > 12 }}">
     <tr>
-        <td class="titulo-seccion" colspan="{{ 4 if dto.especifico|length > 6 else 2 }}">{{ dto.titulo_seccion_2 }}</td>
+        <td class="titulo-seccion" colspan="{{ 4 if dto.especifico|length > 12 else 2 }}">{{ dto.titulo_seccion_2 }}</td>
     </tr>
-    {% if dto.especifico|length > 6 %}
-    {# Dos columnas: primeros 6 campos a la izquierda, el resto a la derecha #}
-    {% set n_filas = [6, dto.especifico|length - 6]|max %}
+    {% if dto.especifico|length > 12 %}
+    {# Dos columnas de hasta 12 campos cada una #}
+    {% set n_filas = [12, dto.especifico|length - 12]|max %}
     {% for i in range(n_filas) %}
     <tr>
-        {% if i < 6 %}
+        {% if i < 12 %}
         {% set c1 = dto.especifico[i] %}
         <td class="tcampos">{{ c1.etiqueta }}</td>
         <td class="tvalor texto-largo">{{ c1.valor }}</td>
@@ -307,8 +278,8 @@
         <td class="tcampos"></td>
         <td class="tvalor"></td>
         {% endif %}
-        {% if dto.especifico[i + 6] is defined %}
-        {% set c2 = dto.especifico[i + 6] %}
+        {% if dto.especifico[i + 12] is defined %}
+        {% set c2 = dto.especifico[i + 12] %}
         <td class="tcampos">{{ c2.etiqueta }}</td>
         <td class="tvalor texto-largo">{{ c2.valor }}</td>
         {% else %}
@@ -448,37 +419,35 @@
 </table>
 
 <!-- ============ 4. ACTUACIÓN BOMBERIL ============ -->
-<table class="tarjeta no-cortar">
+<table class="tarjeta no-cortar{{ ' tabla-dos-col' if dto.actuacion_campos|length > 3 }}">
     <tr>
-        <td class="titulo-seccion" colspan="3">4. Actuaci&oacute;n Bomberil</td>
+        <td class="titulo-seccion" colspan="{{ 4 if dto.actuacion_campos|length > 3 else 3 }}">4. Actuaci&oacute;n Bomberil</td>
     </tr>
+    {% if dto.actuacion_campos|length > 3 %}
+    {# Dos columnas de hasta 3 campos cada una #}
+    {% set n_filas = [3, dto.actuacion_campos|length - 3]|max %}
+    {% for i in range(n_filas) %}
     <tr>
-        <td class="tcampos">Material y Equipos Utilizados</td>
-        <td class="tvalor texto-largo" colspan="2">{{ dto.material_bomberil }}</td>
+        {% set c1 = dto.actuacion_campos[i] %}
+        <td class="tcampos">{{ c1.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ c1.valor }}</td>
+        {% if dto.actuacion_campos[i + 3] is defined %}
+        {% set c2 = dto.actuacion_campos[i + 3] %}
+        <td class="tcampos">{{ c2.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ c2.valor }}</td>
+        {% else %}
+        <td class="tcampos"></td>
+        <td class="tvalor"></td>
+        {% endif %}
     </tr>
+    {% endfor %}
+    {% else %}
+    {% for campo in dto.actuacion_campos %}
     <tr>
-        <td class="tcampos">Cantidad de Bomberos Actuantes</td>
-        <td class="tvalor" colspan="2">{{ dto.total_efectivos }} efectivos en comisi&oacute;n</td>
+        <td class="tcampos">{{ campo.etiqueta }}</td>
+        <td class="tvalor texto-largo" colspan="2">{{ campo.valor }}</td>
     </tr>
-    {% if dto.jefe_comision %}
-    <tr>
-        <td class="tcampos">Jefe de Comisi&oacute;n</td>
-        <td class="tvalor" colspan="2">{{ dto.jefe_comision.nombre }} &nbsp;&mdash;&nbsp; C.I.: {{ dto.jefe_comision.cedula }}</td>
-    </tr>
-    {% endif %}
-    {% if dto.conductor_unidad %}
-    <tr>
-        <td class="tcampos">Conductor de Unidad</td>
-        <td class="tvalor" colspan="2">{{ dto.conductor_unidad.nombre }} &nbsp;&mdash;&nbsp; C.I.: {{ dto.conductor_unidad.cedula }}</td>
-    </tr>
-    {% endif %}
-    {% if dto.combatientes %}
-    <tr>
-        <td class="tcampos">Combatientes</td>
-        <td class="tvalor texto-largo" colspan="2">
-            {% for c in dto.combatientes %}{{ loop.index }}. {{ c.nombre }} (C.I.: {{ c.cedula }}){% if not loop.last %} &nbsp;&bull;&nbsp; {% endif %}{% endfor %}
-        </td>
-    </tr>
+    {% endfor %}
     {% endif %}
 </table>
 
@@ -539,8 +508,7 @@
     <div class="pie">
         Urb. Valle Verde, Av. 69, 3ra Etapa del Parque Metropolitano de San Diego, Municipio San Diego, Estado Carabobo.<br>
         Tel&eacute;fonos: 0241-8713002 / 0424-4583484 / 0424-4414191 &nbsp;&nbsp; P&aacute;gina Web: www.bomberossandiego.gob.ve<br>
-        Twitter: @bomberosandiego &nbsp;&nbsp; E-mail: bomberosdesandiego@gmail.com &nbsp;&nbsp; Instagram: @bomberosde_sandiego<br>
-        FMP
+        Twitter: @bomberosandiego &nbsp;&nbsp; E-mail: bomberosdesandiego@gmail.com &nbsp;&nbsp; Instagram: @bomberosde_sandiego
     </div>
 </div>
 

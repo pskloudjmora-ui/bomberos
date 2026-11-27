@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Limpiar Data - Soporte{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-white flex items-center space-x-3">
+        <i data-lucide="trash-2" class="w-7 h-7 text-red-400"></i>
+        <span>Limpiar Data del Sistema</span>
+    </h1>
+    <p class="text-slate-400 text-sm mt-1">Elimine reportes según los filtros seleccionados. Esta acción no se puede deshacer.</p>
+</div>
+
+<!-- Filtros -->
+<div class="glass-panel p-6 rounded-2xl border border-slate-800 mb-6">
+    <form method="GET" action="{{ url_for('soporte.limpiar') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha Inicio</label>
+            <input type="date" name="fecha_inicio" value="{{ request.args.get('fecha_inicio','') }}"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha Fin</label>
+            <input type="date" name="fecha_fin" value="{{ request.args.get('fecha_fin','') }}"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Estado</label>
+            <select name="estado"
+                class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                <option value="Todos" {% if request.args.get('estado','Todos') == 'Todos' %}selected{% endif %}>Todos</option>
+                <option value="Pendiente" {% if request.args.get('estado') == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="Validado" {% if request.args.get('estado') == 'Validado' %}selected{% endif %}>Validado</option>
+                <option value="Rechazado" {% if request.args.get('estado') == 'Rechazado' %}selected{% endif %}>Rechazado</option>
+            </select>
+        </div>
+        <div class="flex items-end">
+            <button type="submit" class="w-full px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-bold transition-colors cursor-pointer">
+                Filtrar ({{ reportes|length }})
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Vista previa -->
+<div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Reportes que coinciden con el filtro</h2>
+        <span class="text-xs text-slate-400">Mostrando hasta 100</span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-900/60 text-slate-400 text-xs uppercase">
+                <tr>
+                    <th class="py-3 px-4 text-left">N° Control</th>
+                    <th class="py-3 px-4 text-left">Tipo</th>
+                    <th class="py-3 px-4 text-left">Fecha</th>
+                    <th class="py-3 px-4 text-left">Dirección</th>
+                    <th class="py-3 px-4 text-left">Estado</th>
+                    <th class="py-3 px-4 text-left">Creado por</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60">
+                {% for r in reportes %}
+                <tr class="hover:bg-slate-800/30">
+                    <td class="py-2.5 px-4 text-slate-300 font-mono text-xs">{{ r.nro_control }}</td>
+                    <td class="py-2.5 px-4 text-slate-300">{{ r.tipo_especifico }}</td>
+                    <td class="py-2.5 px-4 text-slate-400">{{ r.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td class="py-2.5 px-4 text-slate-400 max-w-xs truncate">{{ r.direccion }}</td>
+                    <td class="py-2.5 px-4">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold {% if r.estado == 'Validado' %}bg-emerald-500/10 text-emerald-400{% elif r.estado == 'Rechazado' %}bg-red-500/10 text-red-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{{ r.estado }}</span>
+                    </td>
+                    <td class="py-2.5 px-4 text-slate-400">{{ r.creador.nombre ~ ' ' ~ r.creador.apellido if r.creador else '--' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="py-8 text-center text-slate-500">No hay reportes que coincidan con el filtro.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Zona de peligro -->
+{% if reportes %}
+<div class="mt-6 glass-panel p-6 rounded-2xl border-2 border-red-500/40 bg-red-500/5">
+    <h3 class="text-red-400 font-bold flex items-center space-x-2 mb-2">
+        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        <span>Zona de Peligro</span>
+    </h3>
+    <p class="text-slate-300 text-sm mb-4">
+        Está a punto de eliminar <strong class="text-red-400">{{ reportes|length }}</strong> reporte(s) que coinciden con los filtros actuales
+        {% if request.args.get('fecha_inicio') or request.args.get('fecha_fin') or request.args.get('estado') not in (None,'Todos') %}(y posiblemente más que no se muestran){% endif %}.
+        Esta acción es <strong>irreversible</strong>.
+    </p>
+    <form method="POST" action="{{ url_for('soporte.limpiar') }}" class="flex flex-wrap items-center gap-3"
+          onsubmit="return confirm('¿CONFIRMA que desea eliminar los reportes filtrados? Esta acción NO se puede deshacer.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="fecha_inicio" value="{{ request.args.get('fecha_inicio','') }}">
+        <input type="hidden" name="fecha_fin" value="{{ request.args.get('fecha_fin','') }}">
+        <input type="hidden" name="estado" value="{{ request.args.get('estado','Todos') }}">
+        <label class="flex items-center space-x-2 text-sm text-slate-300">
+            <input type="checkbox" name="confirmar" value="SI" required class="rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500">
+            <span>Confirmo que deseo eliminar estos reportes</span>
+        </label>
+        <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-bold transition-colors cursor-pointer">
+            Eliminar Reportes Filtrados
+        </button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

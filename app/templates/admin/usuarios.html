@@ -47,6 +47,7 @@
                     <option value="">Todos los roles</option>
                     <option value="administrador" {% if filtros.rol == 'administrador' %}selected{% endif %}>Administrador</option>
                     <option value="bombero" {% if filtros.rol == 'bombero' %}selected{% endif %}>Bombero</option>
+                    <option value="soporte" {% if filtros.rol == 'soporte' %}selected{% endif %}>Soporte</option>
                 </select>
             </div>
             <div>
@@ -114,7 +115,11 @@
                         <td class="py-4 px-6">{{ usuario.cedula }}</td>
                         <td class="py-4 px-6 text-slate-400 font-semibold">{{ usuario.rango or 'Bombero' }}</td>
                         <td class="py-4 px-6">
-                            {% if usuario.rol == 'administrador' %}
+                            {% if usuario.rol == 'soporte' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                                    Soporte
+                                </span>
+                            {% elif usuario.rol == 'administrador' %}
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-fire-500/10 border border-fire-500/20 text-fire-400">
                                     Administrador
                                 </span>

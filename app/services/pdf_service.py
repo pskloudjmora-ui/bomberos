@@ -249,8 +249,6 @@ SECCIONES_ESPECIFICAS = {
     ],
     'servicio_piscinas': [
         ('Clasificación del Servicio', 'clasificacion_servicio', 'plain'),
-        ('Litros Suministrados (Lts.)', 'litros_distribuidos', 'plain'),
-        ('Beneficiarios Estimados', 'beneficiarios_estimados', 'plain'),
     ],
     'servicio_lluvias': [
         ('Clasificación del Servicio', 'clasificacion_servicio', 'plain'),
@@ -1028,6 +1026,50 @@ def serializar_reporte(reporte):
 
     # Todas las horas del reporte se muestran en formato militar HH:MM:SS
     con_segundos = True
+    horas = [
+        {'etiqueta': 'Hora de Aviso', 'valor': _formatear_hora(reporte.hora_aviso, con_segundos)},
+        {'etiqueta': 'Hora de Salida', 'valor': _formatear_hora(reporte.hora_salida, con_segundos)},
+        {'etiqueta': 'Hora de Llegada', 'valor': _formatear_hora(reporte.hora_llegada, con_segundos)},
+        {'etiqueta': 'Hora de Regreso', 'valor': _formatear_hora(reporte.hora_regreso, con_segundos)},
+    ]
+
+    # Campos de la sección 1 (se muestran en 2 columnas de 7 filas en el PDF)
+    aviso_campos = [
+        {'etiqueta': 'Fecha del Incidente', 'valor': _formatear_fecha(reporte.fecha)},
+        {'etiqueta': 'Clase de Aviso', 'valor': reporte.clase_aviso or '—'},
+    ] + [{'etiqueta': h['etiqueta'], 'valor': h['valor']} for h in horas] + [
+        {'etiqueta': 'Solicitante', 'valor': reporte.solicitante_nombre or '—'},
+        {'etiqueta': 'Cédula del Solicitante', 'valor': reporte.solicitante_cedula or '—'},
+        {'etiqueta': 'Teléfono del Solicitante', 'valor': reporte.solicitante_telefono or '—'},
+        {'etiqueta': 'Receptor del Aviso', 'valor': reporte.receptor_aviso or '—'},
+        {'etiqueta': 'Dirección del Suceso', 'valor': reporte.direccion or '—'},
+        {'etiqueta': 'Punto de Referencia', 'valor': reporte.punto_referencia or '—'},
+        {'etiqueta': 'Itinerario de Ruta', 'valor': reporte.itinerario_ruta or '—'},
+        {'etiqueta': 'Cuadrante de Paz', 'valor': reporte.cuadrante_paz or '—'},
+    ]
+
+    # Campos de la sección 4 (2 columnas de 3 filas en el PDF)
+    actuacion_campos = [
+        {'etiqueta': 'Material y Equipos Utilizados', 'valor': material},
+        {'etiqueta': 'Cantidad de Bomberos Actuantes',
+         'valor': f'{len(personal)} efectivos en comisión'},
+    ]
+    if jefe:
+        actuacion_campos.append({
+            'etiqueta': 'Jefe de Comisión',
+            'valor': f'{jefe.nombre}  —  C.I.: {jefe.cedula}',
+        })
+    if conductor:
+        actuacion_campos.append({
+            'etiqueta': 'Conductor de Unidad',
+            'valor': f'{conductor.nombre}  —  C.I.: {conductor.cedula}',
+        })
+    if combatientes:
+        lista_combatientes = '  •  '.join(
+            f'{i}. {c["nombre"]} (C.I.: {c["cedula"]})'
+            for i, c in enumerate(combatientes, 1)
+        )
+        actuacion_campos.append({'etiqueta': 'Combatientes', 'valor': lista_combatientes})
 
     # Vehículos afectados (lista dinámica)
     vehiculos_afectados = []
@@ -1077,12 +1119,8 @@ def serializar_reporte(reporte):
         'clase_aviso': reporte.clase_aviso or '—',
         'receptor_aviso': reporte.receptor_aviso or '—',
         'receptor_cedula': reporte.receptor_cedula or '—',
-        'horas': [
-            {'etiqueta': 'Hora de Aviso', 'valor': _formatear_hora(reporte.hora_aviso, con_segundos)},
-            {'etiqueta': 'Hora de Salida', 'valor': _formatear_hora(reporte.hora_salida, con_segundos)},
-            {'etiqueta': 'Hora de Llegada', 'valor': _formatear_hora(reporte.hora_llegada, con_segundos)},
-            {'etiqueta': 'Hora de Regreso', 'valor': _formatear_hora(reporte.hora_regreso, con_segundos)},
-        ],
+        'horas': horas,
+        'aviso_campos': aviso_campos,
         'itinerario_ruta': reporte.itinerario_ruta or '—',
         'cuadrante_paz': reporte.cuadrante_paz or '—',
         'solicitante_nombre': reporte.solicitante_nombre or '—',
@@ -1095,6 +1133,7 @@ def serializar_reporte(reporte):
         'vehiculos_afectados': vehiculos_afectados,
         'descripcion_alarma': _nl2br_html(getattr(reporte, 'descripcion', None)) if getattr(reporte, 'descripcion', None) else '',
         'material_bomberil': material,
+        'actuacion_campos': actuacion_campos,
         'total_efectivos': len(personal),
         'jefe_comision': _formatear_personal(jefe),
         'conductor_unidad': _formatear_personal(conductor),

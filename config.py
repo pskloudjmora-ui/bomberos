@@ -35,10 +35,15 @@ class Config:
     if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
 
-    # Render exige conexiones SSL con PostgreSQL: forzarlo si la URL no lo define
+    # Render exige conexiones SSL con PostgreSQL remoto: forzarlo si la URL no
+    # lo define. No aplica a PostgreSQL local (localhost/127.0.0.1/::1), que
+    # normalmente no soporta SSL.
     if DATABASE_URL and DATABASE_URL.startswith('postgresql://') and 'sslmode' not in DATABASE_URL:
-        separador = '&' if '?' in DATABASE_URL else '?'
-        DATABASE_URL = f'{DATABASE_URL}{separador}sslmode=require'
+        from urllib.parse import urlparse
+        host = (urlparse(DATABASE_URL).hostname or '').lower()
+        if host not in ('localhost', '127.0.0.1', '::1'):
+            separador = '&' if '?' in DATABASE_URL else '?'
+            DATABASE_URL = f'{DATABASE_URL}{separador}sslmode=require'
 
     if DATABASE_URL:
         SQLALCHEMY_DATABASE_URI = DATABASE_URL

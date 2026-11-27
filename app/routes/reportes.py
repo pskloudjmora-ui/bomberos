@@ -424,7 +424,7 @@ REPORT_FIELDS_MAP = {
         'propietario_nombre', 'propietario_cedula', 'propietario_edad', 'propietario_telefono'
     ],
     'servicio_piscinas': [
-        'clasificacion_servicio', 'material_usado', 'litros_distribuidos', 'beneficiarios_estimados'
+        'clasificacion_servicio', 'material_usado'
     ],
     'servicio_lluvias': [
         'clasificacion_servicio', 'material_usado', 'litros_distribuidos', 'beneficiarios_estimados'
@@ -1079,6 +1079,11 @@ def crear_reporte(tipo_reporte):
                         cantidad_unidades=_a_entero(organismos_cantidades[i]) if i < len(organismos_cantidades) else 1,
                     ))
 
+            from app.services.actividad import registrar_log
+            registrar_log(
+                'editar_reporte' if es_edicion else 'crear_reporte',
+                f'{tipo_reporte} - {nro_control}'
+            )
             db.session.commit()
             flash(f'Reporte {nro_control} ' + ('actualizado' if es_edicion else 'creado y enviado') + ' con éxito.', 'success')
             return redirect(url_for('reportes.detalle_reporte', reporte_id=reporte_inst.id))
@@ -1141,6 +1146,8 @@ def eliminar_reporte(reporte_id):
         return redirect(url_for('main.index'))
     reporte = Reporte.query.get_or_404(reporte_id)
     nro = reporte.nro_control
+    from app.services.actividad import registrar_log
+    registrar_log('eliminar_reporte', f'{reporte.tipo_especifico} - {nro}')
     db.session.delete(reporte)
     db.session.commit()
     flash(f'Reporte {nro} eliminado con éxito.', 'success')

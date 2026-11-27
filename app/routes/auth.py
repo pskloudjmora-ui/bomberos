@@ -8,7 +8,7 @@ from app.permisos import solo_administrador
 
 auth_bp = Blueprint('auth', __name__)
 
-ROLES_VALIDOS = ('bombero', 'administrador')
+ROLES_VALIDOS = ('bombero', 'administrador', 'soporte')
 
 
 def _destino_seguro(destino):
@@ -36,6 +36,9 @@ def login():
         usuario = Usuario.query.filter_by(username=username).first()
 
         if not usuario or not usuario.check_password(password):
+            from app.services.actividad import registrar_log
+            registrar_log('inicio_fallo', f'Intento con usuario "{username}"')
+            db.session.commit()
             flash('Usuario o contraseña incorrectos. Por favor intente de nuevo.', 'danger')
             return redirect(url_for('auth.login'))
 
@@ -44,6 +47,9 @@ def login():
             return redirect(url_for('auth.login'))
 
         login_user(usuario, remember=remember)
+        from app.services.actividad import registrar_log
+        registrar_log('inicio_sesion', f'Acceso de {usuario.rango or ""} {usuario.nombre} {usuario.apellido}'.strip())
+        db.session.commit()
         next_page = _destino_seguro(request.args.get('next'))
         return redirect(next_page) if next_page else redirect(url_for('main.index'))
 
@@ -87,7 +93,7 @@ def registrar_usuario():
             flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
             return redirect(url_for('auth.registrar_usuario'))
 
-        if rol not in ROLES_VALIDOS:
+        if rol not in ('bombero', 'administrador'):
             rol = 'bombero'
 
         # Validación de unicidad

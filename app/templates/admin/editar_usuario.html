@@ -74,6 +74,7 @@
                         class="block w-full mt-1.5 rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                         <option value="bombero" {% if usuario.rol == 'bombero' %}selected{% endif %}>Bombero (Solo creación de reportes e historial)</option>
                         <option value="administrador" {% if usuario.rol == 'administrador' %}selected{% endif %}>Administrador (Métricas, validación y gestión total)</option>
+                        <option value="soporte" {% if usuario.rol == 'soporte' %}selected{% endif %}>Soporte (Administración total + herramientas de soporte)</option>
                     </select>
                 </div>
 

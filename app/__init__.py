@@ -30,6 +30,7 @@ COLUMNAS_NUEVAS = {
     'reportes': {
         'itinerario_ruta': 'TEXT',
         'cuadrante_paz': 'VARCHAR(100)',
+        'receptor_cedula': 'VARCHAR(20)',
     },
     'reporte_vehiculos_actuantes': {
         'hora_salida': 'TIME',
@@ -178,9 +179,9 @@ def _asegurar_columnas_nuevas(app):
 
     try:
         inspector = inspect(db.engine)
-        tablas = set(inspector.get_table_names())
+        dialect = db.engine.dialect
         for tabla, columnas in COLUMNAS_NUEVAS.items():
-            if tabla not in tablas:
+            if tabla not in inspector.get_table_names():
                 continue
             existentes = {c['name'] for c in inspector.get_columns(tabla)}
             for nombre, tipo in columnas.items():
@@ -189,6 +190,32 @@ def _asegurar_columnas_nuevas(app):
                 db.session.execute(text(f'ALTER TABLE {tabla} ADD COLUMN {nombre} {tipo}'))
                 db.session.commit()
                 app.logger.warning('Esquema actualizado: %s.%s agregada.', tabla, nombre)
+
+        # Sincronización genérica: agrega cualquier columna del modelo que
+        # falte en tablas ya existentes (create_all no altera tablas viejas).
+        for tabla_modelo in db.metadata.sorted_tables:
+            nombre_tabla = tabla_modelo.name
+            if nombre_tabla not in inspector.get_table_names():
+                continue
+            existentes = {c['name'] for c in inspector.get_columns(nombre_tabla)}
+            for columna in tabla_modelo.columns:
+                if columna.name in existentes or columna.primary_key:
+                    continue
+                try:
+                    tipo_sql = columna.type.compile(dialect=dialect)
+                    db.session.execute(text(
+                        f'ALTER TABLE {nombre_tabla} ADD COLUMN {columna.name} {tipo_sql}'
+                    ))
+                    db.session.commit()
+                    app.logger.warning(
+                        'Esquema actualizado: %s.%s agregada (sincronización).',
+                        nombre_tabla, columna.name,
+                    )
+                except Exception as col_error:  # noqa: BLE001
+                    db.session.rollback()
+                    app.logger.error(
+                        'No se pudo agregar %s.%s: %s', nombre_tabla, columna.name, col_error,
+                    )
     except Exception as error:  # noqa: BLE001 - no debe impedir el arranque
         db.session.rollback()
         app.logger.error('No se pudo verificar el esquema: %s', error)
@@ -249,10 +276,12 @@ def create_app(config_class=Config):
     from app.routes.auth import auth_bp
     from app.routes.main import main_bp
     from app.routes.reportes import reportes_bp
+    from app.routes.soporte import soporte_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(main_bp)
     app.register_blueprint(reportes_bp, url_prefix='/reportes')
+    app.register_blueprint(soporte_bp)
 
     # Filtros de plantilla para mostrar los tipos de reporte de forma uniforme
     from app.etiquetas import ETIQUETAS_TIPO, color_tipo, etiqueta_tipo

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Soporte - Cuerpo de Bomberos{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-white flex items-center space-x-3">
+        <i data-lucide="life-buoy" class="w-7 h-7 text-cyan-400"></i>
+        <span>Panel de Soporte</span>
+    </h1>
+    <p class="text-slate-400 text-sm mt-1">Herramientas de administración del sistema</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <a href="{{ url_for('soporte.limpiar') }}" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-red-500/40 transition-colors block">
+        <i data-lucide="trash-2" class="w-8 h-8 text-red-400 mb-3"></i>
+        <div class="text-white font-bold">Limpiar Data</div>
+        <div class="text-slate-400 text-xs mt-1">{{ total_reportes }} reportes en el sistema</div>
+    </a>
+    <a href="{{ url_for('soporte.respaldos') }}" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition-colors block">
+        <i data-lucide="database-backup" class="w-8 h-8 text-emerald-400 mb-3"></i>
+        <div class="text-white font-bold">Respaldos</div>
+        <div class="text-slate-400 text-xs mt-1">{{ total_respaldos }} respaldo(s) registrado(s)</div>
+    </a>
+    <a href="{{ url_for('soporte.logs') }}" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-amber-500/40 transition-colors block">
+        <i data-lucide="scroll-text" class="w-8 h-8 text-amber-400 mb-3"></i>
+        <div class="text-white font-bold">Logs del Sistema</div>
+        <div class="text-slate-400 text-xs mt-1">{{ total_logs }} actividad(es) registrada(s)</div>
+    </a>
+    <a href="{{ url_for('soporte.conexion') }}" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-cyan-500/40 transition-colors block">
+        <i data-lucide="plug-zap" class="w-8 h-8 text-cyan-400 mb-3"></i>
+        <div class="text-white font-bold">Conexión a BD</div>
+        <div class="text-slate-400 text-xs mt-1">Estado del motor de base de datos</div>
+    </a>
+    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+        <i data-lucide="clock" class="w-8 h-8 text-slate-400 mb-3"></i>
+        <div class="text-white font-bold">Último Respaldo</div>
+        <div class="text-slate-400 text-xs mt-1">
+            {% if ultimo_respaldo %}{{ ultimo_respaldo.fecha.strftime('%d/%m/%Y %H:%M') }} — {{ ultimo_respaldo.nombre_archivo }}{% else %}Nunca se ha generado{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

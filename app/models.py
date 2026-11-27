@@ -21,7 +21,7 @@ class Usuario(db.Model, UserMixin):
     apellido = db.Column(db.String(100), nullable=False)
     cedula = db.Column(db.String(20), unique=True, nullable=False)
     rango = db.Column(db.String(50), nullable=True)  # Ej: Distinguido, Sargento, Teniente, etc.
-    rol = db.Column(db.String(20), nullable=False, default='bombero')  # 'bombero' o 'administrador'
+    rol = db.Column(db.String(20), nullable=False, default='bombero')  # 'bombero', 'administrador' o 'soporte'
     activo = db.Column(db.Boolean, default=True)
     fecha_registro = db.Column(db.DateTime, default=datetime.now)
 
@@ -36,7 +36,13 @@ class Usuario(db.Model, UserMixin):
 
     @property
     def es_admin(self):
-        return self.rol == 'administrador'
+        # 'soporte' tiene los mismos permisos que administrador más las
+        # herramientas exclusivas del módulo de soporte.
+        return self.rol in ('administrador', 'soporte')
+
+    @property
+    def es_soporte(self):
+        return self.rol == 'soporte'
 
     def __repr__(self):
         return f'<Usuario {self.rango} {self.nombre} {self.apellido}>'
@@ -1183,3 +1189,42 @@ class ReporteGuardiaSeguridad(Reporte):
     __mapper_args__ = {
         'polymorphic_identity': 'guardia_seguridad',
     }
+
+
+class LogActividad(db.Model):
+    """
+    Registro de actividades del sistema (auditoría).
+    Solo visible para usuarios con rol administrador o soporte.
+    """
+    __tablename__ = 'logs_actividad'
+
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id', ondelete='SET NULL'), nullable=True)
+    username = db.Column(db.String(50), nullable=True)
+    accion = db.Column(db.String(100), nullable=False)      # ej: 'inicio_sesion', 'crear_reporte'
+    detalle = db.Column(db.Text, nullable=True)
+    fecha = db.Column(db.DateTime, default=datetime.now, nullable=False)
+
+    usuario = db.relationship('Usuario', lazy=True)
+
+    def __repr__(self):
+        return f'<Log {self.accion} {self.username} {self.fecha}>'
+
+
+class Respaldo(db.Model):
+    """
+    Registro de respaldos generados de la base de datos.
+    """
+    __tablename__ = 'respaldos'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre_archivo = db.Column(db.String(150), nullable=False)
+    tipo = db.Column(db.String(20), nullable=False, default='sqlite')  # 'sqlite', 'postgres', 'json'
+    tamano_bytes = db.Column(db.Integer, nullable=True)
+    fecha = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id', ondelete='SET NULL'), nullable=True)
+
+    usuario = db.relationship('Usuario', lazy=True)
+
+    def __repr__(self):
+        return f'<Respaldo {self.nombre_archivo}>'
