@@ -1161,6 +1161,7 @@ class ReporteTalaArbol(Reporte):
 
     id = db.Column(db.Integer, db.ForeignKey('reportes.id', ondelete='CASCADE'), primary_key=True)
 
+    tipo_despeje = db.Column(db.String(20), nullable=True)  # Árbol / Escombro
     especie = db.Column(db.String(100), nullable=True)
     tamano = db.Column(db.String(50), nullable=True)
     edad = db.Column(db.String(50), nullable=True)

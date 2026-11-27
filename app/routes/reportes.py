@@ -154,7 +154,7 @@ REPORT_TITLE_MAP = {
     'rescate_caida': 'Rescate de Persona Caída en Altura',
     'rescate_cadaver': 'Rescate de Cadáver',
     'apertura_puerta': 'Recuperación de Llaves / Apertura de Puerta',
-    'incendio_arbol_caido': 'Control de Peligro por Árbol Caído',
+    'incendio_arbol_caido': 'Control y Eliminación de Peligro por Árbol Caído Sobre Estructura o Vehículo',
     'servicio_piscinas': 'Recorrido por Piscinas y Balnearios',
     'servicio_lluvias': 'Recorrido por Lluvias',
     'inspeccion_insectos': 'Inspección - Control y Reubicación de Insectos',
@@ -162,7 +162,7 @@ REPORT_TITLE_MAP = {
     'siniestro_vial_sin_lesionado': 'Siniestro Vial sin Lesionado',
     'busqueda_rescate': 'Operaciones de Búsqueda y Rescate',
     'servicio_tendido_electrico': 'Inspección y Control de Riesgo por Tendido Eléctrico Caído',
-    'tala_arbol': 'Reporte Tala de Árbol',
+    'tala_arbol': 'Despeje de Vía por Árbol Caído o Escombro',
     'guardia_seguridad': 'Guardia de Seguridad y Prevención',
 }
 
@@ -360,10 +360,10 @@ REPORT_FIELDS_MAP = {
         'observaciones_custodio', 'vehiculo_cargo_nombre', 'vehiculo_cargo_cedula', 'vehiculo_cargo_telefono'
     ],
     'rescate_ascensor': [
-        'subtipo_rescate', 'tipo_servicio', 'despliegue_material_usado', 'salida_ambulancia'
+        'subtipo_rescate', 'despliegue_material_usado', 'salida_ambulancia'
     ],
     'rescate_inmueble': [
-        'subtipo_rescate', 'tipo_servicio', 'despliegue_material_usado', 'salida_ambulancia'
+        'subtipo_rescate', 'despliegue_material_usado', 'salida_ambulancia'
     ],
     'rescate_tapiada': [
         'subtipo_rescate', 'tipo_servicio', 'motivo_tapiada',
@@ -412,14 +412,9 @@ REPORT_FIELDS_MAP = {
     # Árbol caído: parámetros de incendio de estructura/vehículo según el
     # objeto afectado (se filtran en el formulario con el check de cabecera).
     'incendio_arbol_caido': [
-        'subtipo_incendio', 'arbol_afecto', 'tipo_estructura', 'lugar_desarrollo',
-        'presunto_punto_origen',
-        'hora_control', 'hora_extincion_total',
-        'porcentaje_perdida_total',
-        'litros_agua_utilizados', 'hubo_propagacion', 'propagacion_donde',
-        'metodos_extincion', 'tecnicas_extincion',
-        'poseia_equipos', 'fue_usado', 'por_quien_uso', 'por_quien_ci',
-        'tipo_equipo_contra_incendio', 'evaluacion_preliminar',
+        'subtipo_incendio', 'arbol_afecto', 'lugar_desarrollo',
+        'hora_control', 'hora_extincion_total', 'tecnicas_extincion',
+        'evaluacion_preliminar',
         'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono',
         'inmueble_descripcion', 'inmueble_valor', 'inmueble_perdidas', 'inmueble_aseguradora',
         'mueble_propietario', 'mueble_propietario_ci', 'mueble_valor', 'mueble_perdidas',
@@ -442,7 +437,7 @@ REPORT_FIELDS_MAP = {
         'tendido_energizado', 'material_usado'
     ],
     'tala_arbol': [
-        'especie', 'tamano', 'edad', 'material_usado'
+        'tipo_despeje', 'especie', 'tamano', 'edad', 'material_usado'
     ],
     'guardia_seguridad': [
         'material_usado'

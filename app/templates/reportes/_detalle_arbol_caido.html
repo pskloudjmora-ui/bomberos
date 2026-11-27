@@ -6,7 +6,7 @@
 <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
     <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
         <i data-lucide="tree-pine" class="w-4 h-4 text-orange-500"></i>
-        <span>2. Control de Peligro por Árbol Caído</span>
+        <span>2. Control y Eliminación de Peligro por Árbol Caído</span>
     </div>
     <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
 
@@ -14,17 +14,9 @@
             <span class="block font-semibold text-slate-500">Objeto Afectado:</span>
             <span class="text-white text-sm font-medium">{% if es_vehiculo %}Vehículo{% elif reporte.arbol_afecto %}Inmueble / Estructura{% else %}--{% endif %}</span>
         </div>
-        {% if not es_vehiculo and reporte.tipo_estructura %}
-        <div><span class="block font-semibold text-slate-500">Tipo de Estructura:</span><span class="text-white text-sm font-medium">{{ reporte.tipo_estructura }}</span></div>
-        {% endif %}
-
         {% if reporte.lugar_desarrollo %}
         <div class="sm:col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo }}</span></div>
         {% endif %}
-        {% if not es_vehiculo and reporte.presunto_punto_origen %}
-        <div class="sm:col-span-3"><span class="block font-semibold text-slate-500">Presunto Punto de Origen:</span><span class="text-white text-sm font-medium block">{{ reporte.presunto_punto_origen }}</span></div>
-        {% endif %}
-
         {% if reporte.hora_control or reporte.hora_extincion_total %}
         <div class="sm:col-span-3 border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
             {% if reporte.hora_control %}<div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M:%S') }}</span></div>{% endif %}
@@ -32,39 +24,8 @@
         </div>
         {% endif %}
 
-        {% if not es_vehiculo and reporte.porcentaje_perdida_total is not none %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2">
-            <span class="block font-semibold text-slate-500">Pérdida Estimada Total:</span>
-            <span class="text-white text-sm font-medium"><strong class="text-fire-400">{{ reporte.porcentaje_perdida_total }}%</strong></span>
-        </div>
-        {% endif %}
-
-        {% if reporte.litros_agua_utilizados %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2">
-            <span class="block font-semibold text-slate-500">Litros de Agua Utilizados:</span>
-            <span class="text-white text-sm font-medium">{{ reporte.litros_agua_utilizados }} Lts.</span>
-        </div>
-        {% endif %}
-
-        {% if not es_vehiculo and reporte.hubo_propagacion %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2">
-            <span class="block font-semibold text-slate-500">Hubo Propagación:</span>
-            <span class="text-white text-sm font-medium">Sí{% if reporte.propagacion_donde %} — {{ reporte.propagacion_donde }}{% endif %}</span>
-        </div>
-        {% endif %}
-
-        {% if reporte.metodos_extincion %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Métodos de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.metodos_extincion }}</span></div>
-        {% endif %}
         {% if reporte.tecnicas_extincion %}
         <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion }}</span></div>
-        {% endif %}
-
-        {% if not es_vehiculo and reporte.poseia_equipos %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2 space-y-1">
-            <span class="block font-semibold text-slate-500">Equipos Contra Incendio:</span>
-            <span class="text-white text-sm font-medium">El inmueble poseía equipos: Sí{% if reporte.fue_usado %} | Fueron utilizados{% if reporte.por_quien_uso %} por {{ reporte.por_quien_uso }}{% if reporte.por_quien_ci %} ({{ reporte.por_quien_ci }}){% endif %}{% endif %}{% if reporte.tipo_equipo_contra_incendio %} | {{ reporte.tipo_equipo_contra_incendio }}{% endif %}{% endif %}</span>
-        </div>
         {% endif %}
 
         {% if reporte.evaluacion_preliminar %}

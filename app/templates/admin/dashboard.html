@@ -50,7 +50,7 @@
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Reporte</label>
-                <select name="tipo_reporte" 
+                <select name="tipo_reporte" onchange="this.form.submit()"
                     class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                     <option value="Todos" {% if filtro_tipo == 'Todos' %}selected{% endif %}>Todos los Tipos</option>
                     {% for clave, nombre in tipos_reporte.items() %}
@@ -77,6 +77,17 @@
                     <option value="Todos" {% if filtro_animal == 'Todos' %}selected{% endif %}>Todos los Animales</option>
                     {% for a in animales_disponibles %}
                     <option value="{{ a }}" {% if filtro_animal == a %}selected{% endif %}>{{ a }} ({{ conteo_animales[a] }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% elif filtro_tipo in ('servicio_insectos', 'inspeccion_insectos') %}
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Insecto</label>
+                <select name="insecto"
+                    class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                    <option value="Todos" {% if filtro_insecto == 'Todos' %}selected{% endif %}>Todos los Insectos</option>
+                    {% for i in insectos_disponibles %}
+                    <option value="{{ i }}" {% if filtro_insecto == i %}selected{% endif %}>{{ i }} ({{ conteo_insectos[i] }})</option>
                     {% endfor %}
                 </select>
             </div>

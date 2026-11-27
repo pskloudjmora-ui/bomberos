@@ -149,11 +149,15 @@ def dashboard_admin():
             r for r in reportes_filtrados if r.tipo_especifico == tipo_reporte_filtro
         ]
 
-    # Filtro por tipo de animal (solo aplica cuando el tipo de reporte es
-    # 'servicio_animal'). Se calcula sobre el conjunto ya filtrado por tipo.
+    # Filtros por subtipo (animal / insecto). Solo aplican cuando el tipo de
+    # reporte seleccionado tiene el campo correspondiente. Se calculan sobre
+    # el conjunto ya filtrado por tipo.
     animal_filtro = request.args.get('animal', 'Todos')
+    insecto_filtro = request.args.get('insecto', 'Todos')
     animales_disponibles = []
     conteo_animales = {}
+    insectos_disponibles = []
+    conteo_insectos = {}
     if tipo_reporte_filtro == 'servicio_animal':
         conteo_animales = Counter(
             (getattr(r, 'tipo_animal', None) or 'Sin especificar')
@@ -164,6 +168,17 @@ def dashboard_admin():
             reportes_filtrados = [
                 r for r in reportes_filtrados
                 if (getattr(r, 'tipo_animal', None) or 'Sin especificar') == animal_filtro
+            ]
+    elif tipo_reporte_filtro in ('servicio_insectos', 'inspeccion_insectos'):
+        conteo_insectos = Counter(
+            (getattr(r, 'tipo_insecto', None) or 'Sin especificar')
+            for r in reportes_filtrados
+        )
+        insectos_disponibles = sorted(conteo_insectos)
+        if insecto_filtro != 'Todos':
+            reportes_filtrados = [
+                r for r in reportes_filtrados
+                if (getattr(r, 'tipo_insecto', None) or 'Sin especificar') == insecto_filtro
             ]
 
     # 2. ESTADÍSTICAS AGRUPADAS POR CUADRANTE DE PAZ
@@ -263,6 +278,9 @@ def dashboard_admin():
         filtro_animal=animal_filtro or 'Todos',
         animales_disponibles=animales_disponibles,
         conteo_animales=conteo_animales,
+        filtro_insecto=insecto_filtro or 'Todos',
+        insectos_disponibles=insectos_disponibles,
+        conteo_insectos=conteo_insectos,
     )
 
 

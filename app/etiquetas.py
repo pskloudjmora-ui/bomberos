@@ -34,7 +34,7 @@ ETIQUETAS_TIPO = {
     'inspeccion_insectos': 'Inspección - Insectos',
     'apertura_puerta': 'Apertura de Puerta',
     'servicio_tendido_electrico': 'Inspección y Control de Riesgo por Tendido Eléctrico Caído',
-    'tala_arbol': 'Tala de Árbol',
+    'tala_arbol': 'Despeje de Vía',
     'guardia_seguridad': 'Guardia de Seguridad',
     # Incendios
     'incendio_estructura': 'Incendio - Estructura',
@@ -44,7 +44,7 @@ ETIQUETAS_TIPO = {
     'incendio_desechos': 'Incendio - Desechos',
     'incendio_vegetacion': 'Incendio - Vegetación',
     'incendio_arbol': 'Incendio - Árbol',
-    'incendio_arbol_caido': 'Árbol Caído',
+    'incendio_arbol_caido': 'Control Peligro Árbol Caído',
     # Rescates
     'rescate_colision_con_lesionado': 'Rescate - Colisión c/ Lesionado',
     'rescate_colision_sin_lesionado': 'Rescate - Colisión s/ Lesionado',

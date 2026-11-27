@@ -43,6 +43,14 @@
     .tvalor {
         font-size: 7.8pt;
     }
+    .tabla-dos-col .tcampos {
+        width: 17%;
+        font-size: 6.2pt;
+    }
+    .tabla-dos-col .tvalor {
+        width: 33%;
+        font-size: 7.4pt;
+    }
     .titulo-seccion {
         background-color: #1f1f1f;
         color: #ffffff;
@@ -120,11 +128,12 @@
     }
     .firma-caja td {
         border: none;
+        padding: 0;
     }
     .linea-firma {
         border-top: 0.9pt solid #000000;
-        padding-top: 4pt;
-        margin-top: 16pt;
+        padding-top: 3pt;
+        margin-top: 18pt;
         text-align: center;
         font-size: 6.8pt;
         font-weight: bold;
@@ -141,7 +150,7 @@
         margin-top: 2pt;
     }
     .pie-imagen img {
-        height: 16pt;
+        height: 30pt;
         width: auto;
     }
     .texto-largo {
@@ -203,7 +212,7 @@
     <tr>
         <td style="width: 21%; text-align: center;">
             {% if dto.logo %}
-            <img src="{{ dto.logo }}" width="48">
+            <img src="{{ dto.logo }}" style="height: 11mm; width: auto;">
             {% else %}
             <div class="logo-rec">LOGOTIPO<br>OFICIAL</div>
             {% endif %}
@@ -282,16 +291,41 @@
 </table>
 
 <!-- ============ 2. DETALLE ESPECÍFICO DEL SERVICIO ============ -->
-<table class="tarjeta">
+<table class="tarjeta{{ ' tabla-dos-col' if dto.especifico|length > 6 }}">
     <tr>
-        <td class="titulo-seccion" colspan="2">{{ dto.titulo_seccion_2 }}</td>
+        <td class="titulo-seccion" colspan="{{ 4 if dto.especifico|length > 6 else 2 }}">{{ dto.titulo_seccion_2 }}</td>
     </tr>
+    {% if dto.especifico|length > 6 %}
+    {# Dos columnas: primeros 6 campos a la izquierda, el resto a la derecha #}
+    {% set n_filas = [6, dto.especifico|length - 6]|max %}
+    {% for i in range(n_filas) %}
+    <tr>
+        {% if i < 6 %}
+        {% set c1 = dto.especifico[i] %}
+        <td class="tcampos">{{ c1.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ c1.valor }}</td>
+        {% else %}
+        <td class="tcampos"></td>
+        <td class="tvalor"></td>
+        {% endif %}
+        {% if dto.especifico[i + 6] is defined %}
+        {% set c2 = dto.especifico[i + 6] %}
+        <td class="tcampos">{{ c2.etiqueta }}</td>
+        <td class="tvalor texto-largo">{{ c2.valor }}</td>
+        {% else %}
+        <td class="tcampos"></td>
+        <td class="tvalor"></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    {% else %}
     {% for campo in dto.especifico %}
     <tr>
         <td class="tcampos">{{ campo.etiqueta }}</td>
         <td class="tvalor texto-largo">{{ campo.valor }}</td>
     </tr>
     {% endfor %}
+    {% endif %}
 </table>
 
 {% if dto.tipo_reporte == 'falsa_alarma' and dto.descripcion_alarma %}
@@ -488,13 +522,13 @@
     <tr>
         <td style="width: 50%;">
             <div class="linea-firma">Jefe de Comisi&oacute;n</div>
-            <div class="centro" style="font-size: 8pt; margin-top: 3pt;">
+            <div class="centro" style="font-size: 8pt; margin-top: 2pt;">
                 {% if dto.jefe_comision %}{{ dto.jefe_comision.nombre }}<br>C.I.: {{ dto.jefe_comision.cedula }}{% else %}Nombre y C.I.{% endif %}
             </div>
         </td>
         <td style="width: 50%;">
             <div class="linea-firma">Reporte Elaborado Por</div>
-            <div class="centro" style="font-size: 8pt; margin-top: 3pt;">
+            <div class="centro" style="font-size: 8pt; margin-top: 2pt;">
                 {% if dto.elaborado_por %}{{ dto.elaborado_por.nombre }}<br>C.I.: {{ dto.elaborado_por.cedula }}{% else %}Nombre y C.I.{% endif %}
             </div>
         </td>

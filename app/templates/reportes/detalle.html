@@ -813,9 +813,13 @@
         <div class="print-section border border-slate-800/80 rounded-xl overflow-hidden">
             <div class="bg-slate-800/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-slate-800/80 flex items-center space-x-2">
                 <i data-lucide="tree-deciduous" class="w-4 h-4 text-green-500"></i>
-                <span>2. Datos del Árbol</span>
+                <span>2. Datos del Despeje</span>
             </div>
             <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="block font-semibold text-slate-500">Tipo de Despeje:</span>
+                    <span class="text-white text-sm font-medium">{{ reporte.tipo_despeje or '--' }}</span>
+                </div>
                 <div>
                     <span class="block font-semibold text-slate-500">Especie:</span>
                     <span class="text-white text-sm font-medium">{{ reporte.especie or '--' }}</span>
@@ -1211,7 +1215,6 @@
             </div>
             <div class="p-4 grid grid-cols-1 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Tipo de Rescate:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_rescate|replace('_', ' ')|upper }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Tipo de Servicio / Especialidad:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_servicio or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Vehículos Desplegados:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_vehiculos or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div><span class="block font-semibold text-slate-500">Conductor:</span><span class="text-white text-sm font-medium">{{ reporte.despliegue_conductor_nombre or '--' }} ({{ reporte.despliegue_conductor_ci or '--' }})</span></div>
@@ -1230,7 +1233,6 @@
             </div>
             <div class="p-4 grid grid-cols-1 gap-4 text-xs">
                 <div><span class="block font-semibold text-slate-500">Tipo de Rescate:</span><span class="text-white text-sm font-medium">{{ reporte.subtipo_rescate|replace('_', ' ')|upper }}</span></div>
-                <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Tipo de Servicio / Especialidad:</span><span class="text-white text-sm font-medium block">{{ reporte.tipo_servicio or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Vehículos Desplegados:</span><span class="text-white text-sm font-medium block">{{ reporte.despliegue_vehiculos or '--' }}</span></div>
                 <div class="border-t border-slate-800/40 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div><span class="block font-semibold text-slate-500">Conductor:</span><span class="text-white text-sm font-medium">{{ reporte.despliegue_conductor_nombre or '--' }} ({{ reporte.despliegue_conductor_ci or '--' }})</span></div>

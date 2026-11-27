@@ -17,6 +17,20 @@
         }
     }
 
+    function alternarTalaArbol(select) {
+        const cont = document.getElementById('tala-datos-arbol');
+        if (!cont) return;
+        const esEscombro = select.value === 'Escombro';
+        cont.style.display = esEscombro ? 'none' : 'grid';
+        cont.querySelectorAll('input, select, textarea').forEach(function(el) {
+            el.disabled = esEscombro;
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const sel = document.querySelector('select[name="tipo_despeje"]');
+        if (sel) alternarTalaArbol(sel);
+    });
+
     function agregarVehiculo() {
         const contenedor = document.getElementById('contenedor-vehiculos');
         const plantilla = document.getElementById('plantilla-vehiculo');
@@ -909,6 +923,7 @@
                         <option value="Canino">Canino (Perro)</option>
                         <option value="Felino">Felino (Gato)</option>
                         <option value="Reptil">Reptil (Serpiente / Caimán)</option>
+                        <option value="Ofidios">Ofidios (Serpientes, Arañas, Escorpiones)</option>
                         <option value="Ave">Ave</option>
                         <option value="Otro">Otro</option>
                     </select>
@@ -1044,7 +1059,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Instalación *</label>
-                    <select name="clasificacion_servicio" required
+                    <select name="clasificacion_servicio" required onchange="manejarOtros(this, 'clasificacion_piscinas_otro')"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                         <option value="Piscina Pública">Piscina Pública</option>
                         <option value="Balneario / Club">Balneario / Club Privado</option>
@@ -1052,6 +1067,8 @@
                         <option value="Privado / Residencial">Privado / Residencial</option>
                         <option value="Otro">Otro</option>
                     </select>
+                    <input type="text" name="clasificacion_servicio_otro" id="clasificacion_piscinas_otro" placeholder="Especifique el tipo de instalación" style="display:none"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Distribuidos *</label>
@@ -1077,13 +1094,15 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Recorrido *</label>
-                    <select name="clasificacion_servicio" required
+                    <select name="clasificacion_servicio" required onchange="manejarOtros(this, 'clasificacion_lluvias_otro')"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                         <option value="Monitoreo de Vías">Monitoreo de Vías y Drenajes</option>
                         <option value="Prevención de Inundaciones">Prevención de Inundaciones</option>
                         <option value="Apoyo a Emergencias">Apoyo a Emergencias por Lluvias</option>
                         <option value="Otro">Otro</option>
                     </select>
+                    <input type="text" name="clasificacion_servicio_otro" id="clasificacion_lluvias_otro" placeholder="Especifique el tipo de recorrido" style="display:none"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1 mt-2">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Litros de Agua Utilizados *</label>
@@ -1201,6 +1220,16 @@
             {% elif tipo_reporte == 'tala_arbol' %}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Despeje *</label>
+                    <select name="tipo_despeje" required onchange="alternarTalaArbol(this)"
+                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
+                        <option value="Árbol">Árbol Caído</option>
+                        <option value="Escombro">Escombro</option>
+                    </select>
+                </div>
+            </div>
+            <div id="tala-datos-arbol" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Especie del Árbol *</label>
                     <input type="text" name="especie" required placeholder="ej: Algarrobo, Samán"
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
@@ -1260,6 +1289,9 @@
                         class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
                 </div>
 
+            </div>
+            <div class="grid grid-cols-1 gap-4 border-t border-slate-800/40 pt-4">
+                            {% include 'reportes/_aph_glasgow.html' %}
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
@@ -1703,15 +1735,7 @@
             {# 2.23 RESCATE ASCENSOR #}
 
             {% elif tipo_reporte == 'rescate_ascensor' %}
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="hidden" name="subtipo_rescate" value="ascensor">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Servicio / Especialidad</label>
-                    <input type="text" name="tipo_servicio" required placeholder="ej: Rescate en ascensor" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-
-            </div>
+<input type="hidden" name="subtipo_rescate" value="ascensor">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Material Utilizado</label>
@@ -1738,15 +1762,7 @@
 
 
             {% elif tipo_reporte == 'rescate_inmueble' %}
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="hidden" name="subtipo_rescate" value="inmueble">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tipo de Servicio / Especialidad</label>
-                    <input type="text" name="tipo_servicio" required placeholder="ej: Rescate en ascensor" 
-                        class="block w-full rounded-xl border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 focus:border-fire-500 focus:ring-fire-500 focus:outline-none border focus:ring-1">
-                </div>
-
-            </div>
+<input type="hidden" name="subtipo_rescate" value="inmueble">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/40 pt-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Material Utilizado</label>
@@ -2705,6 +2721,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         el.value = val;
+        if (el.name === 'tipo_despeje' && typeof alternarTalaArbol === 'function') {
+            el.dispatchEvent(new Event('change'));
+        }
     }
 
     // 1) Campos escalares de cabecera y parámetros técnicos

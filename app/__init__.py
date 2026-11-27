@@ -166,6 +166,9 @@ COLUMNAS_NUEVAS = {
         'causa_traslado': 'TEXT',
         'recomendaciones': 'TEXT',
     },
+    'reportes_tala_arbol': {
+        'tipo_despeje': 'VARCHAR(20)',
+    },
 }
 
 

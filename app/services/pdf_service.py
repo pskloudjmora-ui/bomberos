@@ -13,7 +13,6 @@ El logotipo se incrusta como Data URI (base64) directamente en el HTML para
 que la conversión a PDF nunca dependa de servidores/URLs externas.
 """
 import base64
-import re
 import io
 import os
 from datetime import datetime
@@ -70,12 +69,12 @@ NOMBRE_SERVICIO = {
     'servicio_lluvias': 'RECORRIDO POR LLUVIAS',
     'inspeccion_insectos': 'INSPECCIÓN - CONTROL Y REUBICACIÓN DE INSECTOS',
     'apertura_puerta': 'RECUPERACIÓN DE LLAVES / APERTURA DE PUERTA',
-    'incendio_arbol_caido': 'CONTROL DE PELIGRO POR ÁRBOL CAÍDO',
+    'incendio_arbol_caido': 'CONTROL Y ELIMINACIÓN DE PELIGRO POR ÁRBOL CAÍDO SOBRE ESTRUCTURA O VEHÍCULO',
     'siniestro_vial_con_lesionado': 'SINIESTRO VIAL CON LESIONADO',
     'siniestro_vial_sin_lesionado': 'SINIESTRO VIAL SIN LESIONADO',
     'busqueda_rescate': 'OPERACIONES DE BÚSQUEDA Y RESCATE',
     'servicio_tendido_electrico': 'INSPECCIÓN Y CONTROL DE RIESGO POR TENDIDO ELÉCTRICO CAÍDO',
-    'tala_arbol': 'REPORTE TALA DE ÁRBOL',
+    'tala_arbol': 'DESPEJE DE VÍA POR ÁRBOL CAÍDO O ESCOMBRO',
     'guardia_seguridad': 'GUARDIA DE SEGURIDAD Y PREVENCIÓN',
 }
 
@@ -117,12 +116,12 @@ TITULO_SECCION_2 = {
     'servicio_lluvias': '2. PARÁMETROS DEL RECORRIDO POR LLUVIAS',
     'inspeccion_insectos': '2. PARÁMETROS DE LA INSPECCIÓN DE INSECTOS',
     'apertura_puerta': '2. DATOS DEL INMUEBLE Y PROPIETARIO',
-    'incendio_arbol_caido': '2. DETALLE DEL ÁRBOL CAÍDO',
+    'incendio_arbol_caido': '2. CONTROL Y ELIMINACIÓN DE PELIGRO POR ÁRBOL CAÍDO',
     'siniestro_vial_con_lesionado': '2. DETALLE DEL SINIESTRO VIAL CON LESIONADO',
     'siniestro_vial_sin_lesionado': '2. DETALLE DEL SINIESTRO VIAL SIN LESIONADO',
     'busqueda_rescate': '2. DETALLE DE LA BÚSQUEDA Y RESCATE',
     'servicio_tendido_electrico': '2. PARÁMETROS — INSPECCIÓN Y CONTROL DE RIESGO POR TENDIDO ELÉCTRICO CAÍDO',
-    'tala_arbol': '2. DATOS DEL ÁRBOL',
+    'tala_arbol': '2. DATOS DEL DESPEJE',
     'guardia_seguridad': '2. ACTUACIÓN DE LA GUARDIA',
 }
 
@@ -555,22 +554,10 @@ SECCIONES_ESPECIFICAS = {
     ],
     'incendio_arbol_caido': [
         ('Objeto Afectado', 'arbol_afecto', 'afecto'),
-        ('Tipo de Estructura', 'tipo_estructura', 'plain'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
-        ('Presunto Punto de Origen', 'presunto_punto_origen', 'plain'),
         ('Hora de Control', 'hora_control', 'hora'),
         ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
-        ('% Perdida Total', 'porcentaje_perdida_total', 'plain'),
-        ('Litros de Agua', 'litros_agua_utilizados', 'plain'),
-        ('Hubo Propagacion', 'hubo_propagacion', 'bool'),
-        ('Propagacion - Donde', 'propagacion_donde', 'plain', 'propagacion'),
-        ('Metodos de Extincion', 'metodos_extincion', 'plain'),
         ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
-        ('Poseia Equipos', 'poseia_equipos', 'bool'),
-        ('Fueron Usados', 'fue_usado', 'bool', 'equipos_poseia'),
-        ('Usados Por', 'por_quien_uso', 'plain', 'equipos_usados'),
-        ('C.I. Usado Por', 'por_quien_ci', 'plain', 'equipos_usados'),
-        ('Tipo de Equipo Usado', 'tipo_equipo_contra_incendio', 'plain', 'equipos_usados'),
         ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
         ('Inmueble - Descripcion', 'inmueble_descripcion', 'plain'),
         ('Inmueble - Propietario', 'inmueble_propietario_nombre', 'plain'),
@@ -624,13 +611,11 @@ SECCIONES_ESPECIFICAS = {
     # --- RESCATE ESPECIALIZADO ---
     'rescate_ascensor': [
         ('Subtipo', 'subtipo_rescate', 'plain'),
-        ('Tipo de Servicio', 'tipo_servicio', 'plain'),
         ('Hora Salida Ambulancia', 'salida_ambulancia', 'hora'),
         ('Material Utilizado', 'despliegue_material_usado', 'plain'),
     ],
     'rescate_inmueble': [
         ('Subtipo', 'subtipo_rescate', 'plain'),
-        ('Tipo de Servicio', 'tipo_servicio', 'plain'),
         ('Hora Salida Ambulancia', 'salida_ambulancia', 'hora'),
         ('Material Utilizado', 'despliegue_material_usado', 'plain'),
     ],
@@ -714,6 +699,7 @@ SECCIONES_ESPECIFICAS = {
         ('Tipo de Tendido', 'tendido_energizado', 'plain'),
     ],
     'tala_arbol': [
+        ('Tipo de Despeje', 'tipo_despeje', 'plain'),
         ('Especie', 'especie', 'plain'),
         ('Tamaño', 'tamano', 'plain'),
         ('Edad', 'edad', 'plain'),
@@ -881,7 +867,7 @@ def _data_uri_imagen(ruta, max_ancho=None, max_alto=None):
 @lru_cache(maxsize=1)
 def obtener_pie_data_uri():
     """Pie de página institucional (imagen) como Data URI pequeño."""
-    return _data_uri_imagen(RUTA_PIE_PAGINA, max_alto=100)
+    return _data_uri_imagen(RUTA_PIE_PAGINA, max_alto=110)
 
 
 @lru_cache(maxsize=1)
@@ -902,7 +888,7 @@ def obtener_logo_data_uri():
     """
     ruta_logo = RUTA_LOGO_BOMBEROS if os.path.exists(RUTA_LOGO_BOMBEROS) else RUTA_LOGO
     try:
-        return _data_uri_imagen(ruta_logo, max_ancho=220)
+        return _data_uri_imagen(ruta_logo, max_ancho=96)
     except Exception:
         pass
     try:
@@ -1083,7 +1069,7 @@ def serializar_reporte(reporte):
         'reporte_id': reporte.id,
         'tipo_reporte': tipo,
         # En el documento físico solo se muestra el correlativo sin el año
-        'nro_control': re.sub(r'^\d{7}-\d{4}$', lambda m: m.group(0).split('-')[0], reporte.nro_control or ''),
+        'nro_control': reporte.nro_control or '',
         'nombre_servicio': nombre_servicio,
         'titulo_seccion_2': titulo_seccion_2,
         'fecha_incidente': _formatear_fecha(reporte.fecha),
