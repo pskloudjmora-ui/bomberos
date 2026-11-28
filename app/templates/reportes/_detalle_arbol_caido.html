@@ -17,15 +17,12 @@
         {% if reporte.lugar_desarrollo %}
         <div class="sm:col-span-3"><span class="block font-semibold text-slate-500">Lugar de Desarrollo:</span><span class="text-white text-sm font-medium block">{{ reporte.lugar_desarrollo }}</span></div>
         {% endif %}
-        {% if reporte.hora_control or reporte.hora_extincion_total %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2 grid grid-cols-2 gap-4">
-            {% if reporte.hora_control %}<div><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M:%S') }}</span></div>{% endif %}
-            {% if reporte.hora_extincion_total %}<div><span class="block font-semibold text-slate-500">Hora Extinción Total:</span><span class="text-white text-sm font-medium">{{ reporte.hora_extincion_total.strftime('%H:%M:%S') }}</span></div>{% endif %}
-        </div>
+        {% if reporte.hora_control %}
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Hora Control:</span><span class="text-white text-sm font-medium">{{ reporte.hora_control.strftime('%H:%M:%S') }}</span></div>
         {% endif %}
 
         {% if reporte.tecnicas_extincion %}
-        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Técnicas de Extinción:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion }}</span></div>
+        <div class="sm:col-span-3 border-t border-slate-800/40 pt-2"><span class="block font-semibold text-slate-500">Técnicas:</span><span class="text-white text-sm font-medium block">{{ reporte.tecnicas_extincion }}</span></div>
         {% endif %}
 
         {% if reporte.evaluacion_preliminar %}

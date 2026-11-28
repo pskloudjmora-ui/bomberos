@@ -413,7 +413,7 @@ REPORT_FIELDS_MAP = {
     # objeto afectado (se filtran en el formulario con el check de cabecera).
     'incendio_arbol_caido': [
         'subtipo_incendio', 'arbol_afecto', 'lugar_desarrollo',
-        'hora_control', 'hora_extincion_total', 'tecnicas_extincion',
+        'hora_control', 'tecnicas_extincion',
         'evaluacion_preliminar',
         'inmueble_propietario_nombre', 'inmueble_propietario_cedula', 'inmueble_propietario_telefono',
         'inmueble_descripcion', 'inmueble_valor', 'inmueble_perdidas', 'inmueble_aseguradora',
@@ -427,7 +427,7 @@ REPORT_FIELDS_MAP = {
         'clasificacion_servicio', 'material_usado'
     ],
     'servicio_lluvias': [
-        'clasificacion_servicio', 'material_usado', 'litros_distribuidos', 'beneficiarios_estimados'
+        'clasificacion_servicio', 'material_usado'
     ],
     'inspeccion_insectos': [
         'tipo_insecto', 'clasificacion_riesgo', 'condicion_actual',
@@ -565,7 +565,8 @@ def resolver_personal_seleccionado(clave_usuario_id, clave_nombre, clave_ci, cla
 CAMPOS_BOOLEANOS = {
     'certificado_bomberil', 'hoja_seguridad', 'extintor', 'equipo_derrame',
     'limpieza_vias_efectuada', 'vehiculo_afecto', 'medico_firma',
-    'rechazo_firma', 'hubo_propagacion', 'poseia_equipos', 'fue_usado',
+    'rechazo_firma', 'paciente_firma', 'golpeada_por_vehiculo',
+    'hubo_propagacion', 'poseia_equipos', 'fue_usado',
 }
 
 CAMPOS_ENTEROS = {
@@ -1123,7 +1124,9 @@ def crear_reporte(tipo_reporte):
         title = f'Editar - {title}'
 
     vehiculos = Vehiculo.query.filter_by(activo=True).all()
-    bomberos = Usuario.query.filter_by(activo=True).order_by(Usuario.rango.asc(), Usuario.nombre.asc()).all()
+    bomberos = Usuario.query.filter(
+        Usuario.activo == True, Usuario.rol != 'soporte'
+    ).order_by(Usuario.rango.asc(), Usuario.nombre.asc()).all()
     date_today = datetime.now().strftime('%Y-%m-%d')
     return render_template(
         'reportes/crear.html',

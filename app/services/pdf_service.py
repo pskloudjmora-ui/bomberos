@@ -252,8 +252,6 @@ SECCIONES_ESPECIFICAS = {
     ],
     'servicio_lluvias': [
         ('Clasificación del Servicio', 'clasificacion_servicio', 'plain'),
-        ('Litros Suministrados (Lts.)', 'litros_distribuidos', 'plain'),
-        ('Beneficiarios Estimados', 'beneficiarios_estimados', 'plain'),
     ],
     'inspeccion_insectos': [
         ('Tipo de Insecto', 'tipo_insecto', 'plain'),
@@ -554,8 +552,7 @@ SECCIONES_ESPECIFICAS = {
         ('Objeto Afectado', 'arbol_afecto', 'afecto'),
         ('Lugar de Desarrollo', 'lugar_desarrollo', 'plain'),
         ('Hora de Control', 'hora_control', 'hora'),
-        ('Hora Extincion Total', 'hora_extincion_total', 'hora'),
-        ('Tecnicas de Extincion', 'tecnicas_extincion', 'plain'),
+        ('Tecnicas', 'tecnicas_extincion', 'plain'),
         ('Evaluacion Preliminar', 'evaluacion_preliminar', 'plain'),
         ('Inmueble - Descripcion', 'inmueble_descripcion', 'plain'),
         ('Inmueble - Propietario', 'inmueble_propietario_nombre', 'plain'),
